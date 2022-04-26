@@ -1,0 +1,121 @@
+Templates e Resources:
+https://github.com/divanov11/Django-2021
+https://www.geeksforgeeks.org/django-crud-create-retrieve-update-delete-function-based-views/
+
+###### CRUD. Create, Read, Update, Delete ######
+
+https://github.com/divanov11/Django-2021/blob/master/projects/forms.py
+- App/forms.py:
+from django.forms import ModelForm
+from .models import Project
+
+
+
+class ProjectForm(ModelForm):
+    class Meta:
+        model = Project
+        fields = ['title', 'featured_image', 'description',
+                  'demo_link', 'source_link' [...]  
+				  
+				  
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+https://github.com/divanov11/Django-2021/blob/master/projects/views.py
+- App/views.py:
+from .models import Project, Tag
+from .forms import ProjectForm, ReviewForm
+from django.contrib.auth.decorators import login_required
+
+
+### https://github.com/divanov11/Django-2021/blob/master/projects/templates/projects/project_form.html
+@login_required(login_url="login")
+def createProject(request):
+    form = ProjectForm()
+	if request.method == 'POST':
+
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.owner = profile
+            project.save()
+			return redirect('...')
+
+    context = {'form': form}
+    return render(request, "projects/project_form.html", context)
+	
+### https://github.com/divanov11/Django-2021/blob/master/projects/templates/projects/project_form.html
+@login_required(login_url="login")
+def updateProject(request, pk):
+    project = Project.objects.get(id=pk)
+    form = ProjectForm(instance=project)
+
+    if request.method == 'POST':        
+        form = ProjectForm(request.POST, instance=project)
+        if form.is_valid():
+            form.save()            
+            return redirect('...') 
+
+    context = {'form': form}
+    return render(request, "projects/project_form.html", context)
+
+
+https://github.com/divanov11/Django-2021/blob/master/templates/delete_template.html
+@login_required(login_url="login")
+def deleteProject(request, pk):
+    profile = request.user.profile
+    project = profile.project_set.get(id=pk)
+    if request.method == 'POST':
+        project.delete()
+        return redirect('projects')
+    context = {'object': project}
+    return render(request, 'delete_template.html', context)
+	
+	
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+https://github.com/divanov11/Django-2021/blob/master/projects/urls.py
+- App/urls.py:
+urlpatterns = [
+    path('create-project/', views.createProject, name="create-project"),
+    path('update-project/<str:pk>/', views.updateProject, name="update-project"),
+	path('delete-project/<str:pk>/', views.deleteProject, name="delete-project"),
+	[...]
+]
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+https://github.com/divanov11/Django-2021/blob/master/templates/delete_template.html
+- Main/templates/delete_template.html:
+{% extends 'main.html' %}
+{% block content %}
+            <form class="form" action="" method="POST">
+                {% csrf_token %}
+                <p>Are you sure you want to delete "{{object}}"?</p>
+                <a class="btn btn--sub btn--lg  my-md" href="{{request.GET.next}}">Go Back</a>
+                <input class="btn btn--sub btn--lg  my-md" type="submit" value="Confirm" />
+            </form>
+{% endblock %}
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+- Main/templates/navbar.html:
+
+<h1>Logo</h1>
+<a href="{% url 'create-project' %}">Add Project</a>
+#create-skill no github de exemplo, skill_form.html
+<hr>
+
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+https://github.com/divanov11/Django-2021/tree/5db08e339381ad7104409085c4b96a95aaf0ab19/templates
+https://github.com/divanov11/Django-2021/tree/master/projects/templates/projects
+
+<form method="POST">
+<td>{{project.title}}</td>
+<td>{{project.description}}</td>
+<td>{{project.vote}}</td>
+
+<td><a href="{% url 'project' project.id %}">View</a></td>
+#single-project.html
+<td><a href="{% url 'update-project' project.id %}">Edit</a></td> 
+#project_form.html
+<td><a href="{% url 'delete-project' project.id %}">Delete</a></td>
+#delete_template.html
+</form>

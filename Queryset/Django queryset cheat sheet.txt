@@ -1,0 +1,170 @@
+https://learndjango.com/tutorials/django-slug-tutorial
+https://www.procoding.org/django-slug-tutorial-adding-slug-field-in-a-django-model/sc
+https://www.youtube.com/watch?v=iWie_2I1_9M&list=PLEsfXFp6DpzRMby_cSoWTFw8zaMdTEXgL&index=40
+https://medium.com/@rioweber/python-code-snippets-24e473d8d2fd
+https://github.com/chrisdl/Django-QuerySet-Cheatsheet
+https://github.com/chardur/Django-QuerySets-Cheat-Sheet
+
+##################################
+Exemplo Template:
+queryset = ModelName.objects.all()
+
+queryset: Variable tha tholds response
+.ModelName: Model Name
+.objects: Module objects attribute
+.all(); .get(); .filter; [...]: Method
+
+veja no arquivo Querysets.png desse diretório
+##################################
+
+Exemplo.objects.values_list()
+#Retorna queryset com todos os valores que o model Exemplo contem
+
+(1)Returns all customers from customer table
+customers = Customer.objects.all()
+
+(2)Returns first customer in table
+firstCustomer = Customer.objects.first()
+
+(3)Returns last customer in table
+lastCustomer = Customer.objects.last()
+
+(4)Returns single customer by name
+customerByName = Customer.objects.get(name='Peter Piper')
+
+(5)Returns single customer by name
+customerById = Customer.objects.get(id=4)
+
+(6)Returns all orders related to customer (firstCustomer variable set above)
+firstCustomer.order_set.all()
+
+(7)Returns orders customer name: (Query parent model values)
+order = Order.objects.first() 
+parentName = order.customer.name
+
+(8)***Returns products from products table with value of "Out Door" in category attribute
+products = Product.objects.filter(category="Out Door")
+
+(9)***Order/Sort Objects by id
+leastToGreatest = Product.objects.all().order_by('id') 
+greatestToLeast = Product.objects.all().order_by('-id') 
+
+
+(10) Returns all products with tag of "Sports": (Query Many to Many Fields)
+productsFiltered = Product.objects.filter(tags__name="Sports")
+
+'''
+(11)Bonus
+Q: If the customer has more than 1 ball, how would you reflect it in the database?
+A: Because there are many different products and this value changes constantly you would most 
+likly not want to store the value in the database but rather just make this a function we can run
+each time we load the customers profile
+'''
+
+// Returns the total count for number of time a "Ball" was ordered by the first customer
+ballOrders = firstCustomer.order_set.filter(product__name="Ball").count()
+
+// Returns total count for each product orderd
+allOrders = {}
+
+for order in firstCustomer.order_set.all():
+	if order.product.name in allOrders:
+		allOrders[order.product.name] += 1
+	else:
+		allOrders[order.product.name] = 1
+
+//Returns: allOrders: {'Ball': 2, 'BBQ Grill': 1}
+
+
+// RELATED SET EXAMPLE
+class ParentModel(models.Model):
+	name = models.CharField(max_length=200, null=True)
+
+class ChildModel(models.Model):
+	parent = models.ForeignKey(Customer)
+	name = models.CharField(max_length=200, null=True)
+
+parent = ParentModel.objects.first()
+//Returns all child models related to parent
+parent.childmodel_set.all()
+
+// Filtrando todas as slugs com hello-world
+qs = Article.objects.filter(slug='hello-world')
+// Case insensitive filter
+qs = Article.objects.filter(slug__iexact='hello-world')
+// Contain exact filter
+qs = Article.objects.filter(slug__icontains='hello-world')
+
+### Complex Search using Django Queryset Lookups: https://youtu.be/H_EWDGvo99s?list=PLEsfXFp6DpzRMby_cSoWTFw8zaMdTEXgL
+
+views.py -> 
+qs = Article.objects.all
+if query is not None:
+	qs = Article.objects.filter(title__icontains=query)
+context = {"object_list: qs"}
+
+<ol>
+template->search.html->
+{% for object in object_list %}
+	{% if object.title %}
+	<li>
+		<a href ="" {{ object.get_absolute_url }} 
+							{{ object.title }}</a>		
+	</li>
+	{% endif %}
+{endfoir}
+<ol>
+
+
+@@@@@@@@@@@ ETC:
+self._db //(menciona o database atual)
+title_icontains=query //()
+content_icontains=query  //()
+Q(content_icontains=query) //(utilizando a importação 'django.db.modelsl import Q', o Q ..................)
+
+
+##### Querying One-To-Many Relationships in Django #####
+#models.py->
+Class Course(models.Model):
+[...]
+Class Section(models.Model):
+	course = models.ForeingnKey(Course, on_delete=models.CASCADE)
+[...]
+Class Lecture(models.Model)Ç
+	section = models.ForeignKey(Section, on_delete=models.CASCADE)
+
+#Shell ->
+from exemplo.models import Lecture, Course
+Lecture.objects.filter(section__course__title='texto_database')
+								  ^
+#Course = Parent
+#Lecture = Child
+# __ (dunder) move para o proximo model, de baixo pra cima
+
+#Agora de cima para baixo (Parent para Child)
+Shell->
+Course.objects.filter(section__lecture__title='texto')
+						^        ^
+
+########## Agreggation in Django:
+from example.models import City
+from django.db.models import Sum, Min, Max, Avg
+
+City.objects.all()
+>>> <Queryset>
+City.objects.aggregate(Sum('population'))
+>>> {{'population__sum': 175242139}}
+City.objects.aggregate(sum_of_population = Sum('population'))
+>>> {{'sum_of_population': 175242139}}
+
+City.objects.aggregate(Avg('population'), Min('population'))
+City.objects.aggregate(Max('population'))
+etc
+
+########## Annotate:
+from example.models import City
+from django.db.models import Sum, Min, Max, Avg
+
+City.objects.all()
+>>> <Queryset>
+

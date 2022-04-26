@@ -1,0 +1,189 @@
+https://www.udemy.com/course/python-django-2021-complete-course/learn/lecture/27270394#overview
+Templates e Resources 
+https://github.com/divanov11/Django-2021
+
+### Implementação de sistema de Mensagens entre usuários do website ###
+
+### INBOX ###
+https://github.com/divanov11/Django-2021/blob/master/users/models.py
+Users/models.py:
+
+class Message(models.Model):
+    sender = models.ForeignKey(
+        Profile, on_delete=models.SET_NULL, null=True, blank=True)
+    recipient = models.ForeignKey(
+        Profile, on_delete=models.SET_NULL, null=True, blank=True, related_name="messages")
+    name = models.CharField(max_length=200, null=True, blank=True)
+    email = models.EmailField(max_length=200, null=True, blank=True)
+    subject = models.CharField(max_length=200, null=True, blank=True)
+    body = models.TextField()
+    is_read = models.BooleanField(default=False, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True,
+                          primary_key=True, editable=False)
+
+    def __str__(self):
+        return self.subject
+
+    class Meta:
+        ordering = ['is_read', '-created']
+
+
+- Users/admin.py:
+from .models import Message 
+
+admin.site.register(Message)
+
+>>>python manage.py makemigrations
+>>>python manage.py migrate
+- Testes nop painel
+
+https://github.com/divanov11/Django-2021/blob/master/users/views.py
+- Users/views.py:
+
+from .models import Message
+
+@login_required(login_url='login')
+def inbox(request):		
+    profile = request.user.profile	
+    messageRequests = profile.messages.all()
+	#profile.messages seria o 'related name' no models.py para evitar conflitos.
+	
+    unreadCount = messageRequests.filter(is_read=False).count()
+    context = {'messageRequests': messageRequests, 'unreadCount': unreadCount}
+    return render(request, 'users/inbox.html', context)
+
+- Users/urls.py:
+path('inbox/', views.inbox, name="inbox"),
+
+https://github.com/divanov11/Django-2021/blob/master/templates/navbar.html
+- Root/templates/navbar.html:
+{% if request.user.is_authenticated %}
+<li class="header__menuItem"><a href="{% url 'inbox' %}">Inbox</a></li>
+
+### Estilo para a Inbox / Caixa de mensagens ###
+https://github.com/divanov11/Django-2021/blob/master/resources/DevSearch-Theme/inbox.html
+- Template DevSearch-Theme/inbox.html, copiar ->
+- Criar Users/templates/users/inbox.html
+- Usar apenas tudo que estiver entre <main>..</main> e ir substituindo as variáveis:
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/inbox.html
+{% extends 'main.html' %}
+{% block content %}
+
+{% for message in messageRequests %}
+{% if message.is_read == False %}
+
+{% else %}
+{% endif %}
+
+{{unreadCount}}
+
+{{message.name}}
+{{message.subject}}
+{{message.created}}
+
+{% endfor %}
+
+{% endblock content %}
+
+### CARREGAR MENSAGEM NA INBOX ###
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/message.html
+- Página que vai carregar a mensagem individual
+- Template DevSearch-Theme/message.html, copiar apenas a <main> inteira ->
+- Criar Users/templates/users/message.html e colar, deixar as variáveis vazias até o a linha 127.
+
+https://github.com/divanov11/Django-2021/blob/master/users/views.py
+Users/views.py:
+
+@login_required(login_url='login')
+def viewMessage(request, pk):
+    profile = request.user.profile
+    message = profile.messages.get(id=pk)
+    if message.is_read == False:
+        message.is_read = True
+        message.save()
+    context = {'message': message}
+    return render(request, 'users/message.html', context)
+
+- Users/urls.py:
+path('message/<str:pk>/', views.viewMessage, name="message"),
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/inbox.html
+- Users/templates/users/inbox.html
+
+<a href="{% url 'message' message.id %}">
+  <span class="message__author">{{message.name}}</span>
+  <span class="message__subject">{{message.subject}}</span>
+  <span class="message__date">{{message.created}}</span>
+</a>
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/message.html
+- Users/templates/users/message.html:
+{{message.subject}}
+{{message.name}}
+{{message.created}}
+{{message.body|linebreaksbr}}
+
+- Testes.
+
+### ENVIAR MENSAGEM (PERFIL -> SEND MESSAGE) ###
+https://github.com/divanov11/Django-2021/blob/master/templates/form-template.html
+https://github.com/divanov11/Django-2021/tree/master/resources/DevSearch-Theme
+- Template DevSearch-Theme/form-template.html, copiar apenas <main> ->
+- Criar Users/templates/users/message_form.html e colar dentro com variáveis e etc
+
+- Users/forms.py:
+from .models import Message
+
+class MessageForm(ModelForm):
+    class Meta:
+        model = Message
+        fields = ['name', 'email', 'subject', 'body']
+
+    def __init__(self, *args, **kwargs):
+        super(MessageForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'input'})
+
+- Users/views.py:
+from .forms import MessageForm
+
+def createMessage(request, pk):
+    recipient = Profile.objects.get(id=pk)
+    form = MessageForm()
+
+    try:
+        sender = request.user.profile
+    except:
+        sender = None
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = sender
+            message.recipient = recipient
+
+            if sender:
+                message.name = sender.name
+                message.email = sender.email
+            message.save()
+
+            messages.success(request, 'Your message was successfully sent!')
+            return redirect('user-profile', pk=recipient.id)
+
+    context = {'recipient': recipient, 'form': form}
+    return render(request, 'users/message_form.html', context)
+	
+- Users/urls.py:
+ path('create-message/<str:pk>/', views.createMessage, name="create-message"),
+ 
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/user-profile.html
+- Users/templates/user-profile.html:
+{% if request.user.profile.id != profile.id %}
+<a href="{% url 'create-message' profile.id %}" class="btn btn--sub btn--lg">Send Message </a>
+{% endif %}
+
+

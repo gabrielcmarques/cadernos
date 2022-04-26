@@ -1,0 +1,193 @@
+Referências e templates:
+https://github.com/divanov11/Django-2021/tree/master/resources
+https://github.com/divanov11/Django-2021/tree/master/users
+
+### Funcionalidades de Adicionar, Editar e Deletar "Skills" para o usuário: ###
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/account.html
+- Users/templates/users/accounts.html:
+{% url 'create-project' %}
+{% url 'update-project' project.id %}
+{% url 'delete-project' project.id %}
+
+- ProjectApp/views.py, modificar createProject():
+
+@login_required(login_url="login")
+def createProject(request):
+
+	#Puxando o logged user
+	profile = request.user.profile
+	
+	form = ProjectForm()	
+	if request.method == 'POST':
+		form = ProjectForm(request.POST, request.FILES)
+		if form.is_valid():
+		
+			#Criando uma instância do projeto atual, commit false para podermos atualizar o atributo owner.
+			project = form.save(commit=False)			
+			project.owner = profile
+			project.save()
+			return redirect('projects')
+	
+	context = {'form': form, 'profile': profile}
+	return render(request, "projects/project_form.html", context)
+	
+# Testar criando novos posts e verificando se vai vincular com o dono (owner).
+# Agora para garantir que apenas o dono consiga Editar o projeto:
+
+def updateproject(request, pk):
+	#Relação 1 to 1
+	profile = request.user.profile 
+	
+	#Query apenas no perfil do dono
+	project = profile.project_set.get(id=pk)
+	form = ProjectForm(instance=project)
+	
+	if request.method == 'POST':
+		form = ProjectForm(request.POST, request.FILES, instance=project)
+		if form.is_valid():
+			form.save()
+			return redirect('projects')
+		
+	context = {'form': form}
+	return render(request, "projects/project_form.html", context)
+
+- Garantir que apenas o dono consiga Deletar:
+
+@login_required(login_url="login")
+def deleteProject(request, pk):
+
+	#1 to 1
+	profile = request.user.profile
+	
+	#Query apenas no perfil do dono
+	project = profile.project_set.get(id=pk)
+	
+	if request.method == 'POST':
+		project.delete()
+		return redirect('projects')
+	context = {'object': project}
+	return render(request, 'projects/delete_template.html', context)	
+	
+
+https://github.com/divanov11/Django-2021/blob/master/users/forms.py
+- No exemplo isso são Tags de habilidades de programação.
+- Users/forms.py:
+class SkillForm(ModelForm):
+    class Meta:
+        model = Skill
+        fields = '__all__'
+		#A princípio só até fields, para testes. Depois o resto abaixo.
+		
+        exclude = ['owner']
+		#Vai listar todos os fields (__all__) exceto owner. Ou pode listar 1 a 1 em lista msm.
+
+    def __init__(self, *args, **kwargs):
+        super(SkillForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'input'})
+
+https://github.com/divanov11/Django-2021/blob/master/users/views.py
+- Users/views.py:
+from .forms import SkillForm
+
+@login_required(login_url='login')
+def createSkill(request):
+	profile = request.user.profile
+    form = SkillForm()
+	
+	#Adicionar os ifs depois de testar o template skill_form.html
+	
+    context = {'form': form}
+    return render(request, 'users/skill_form.html', context)
+
+
+@login_required(login_url='login')
+def updateSkill(request, pk):
+    profile = request.user.profile
+    skill = profile.skill_set.get(id=pk)
+    form = SkillForm(instance=skill)
+	
+	#Adicionar os ifs depois de testar o template skill_form.html
+	
+    context = {'form': form}
+    return render(request, 'users/skill_form.html', context)
+
+
+https://github.com/divanov11/Django-2021/blob/master/projects/views.py
+- Checar se o template está em Main/template.
+- ProjectApp/views.py:
+
+def deleteProject():
+return render (request, 'projects/delete_template.html', context) ->
+	para
+return render (request, 'delete_template.html', context)
+
+
+@login_required(login_url='login')
+def deleteSkill(request, pk):
+    profile = request.user.profile
+    skill = profile.skill_set.get(id=pk)
+	
+	#Adicionar os ifs depois de testar o template skill_form.html
+	
+    context = {'object': skill}
+    return render(request, 'delete_template.html', context)
+
+https://github.com/divanov11/Django-2021/blob/master/templates/delete_template.html
+Main/template/delete_template.html:
+#Após testar, copiar form-template.html, copiar <main> inteira e ir preenchendo para estilo.
+	
+- Users/urls.py:
+	path('create-skill/', views.createSkill, name="create-skill"),
+    path('update-skill/<str:pk>/', views.updateSkill, name="update-skill"),
+    path('delete-skill/<str:pk>/', views.deleteSkill, name="delete-skill"),
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/account.html
+Users/accounts.html:
+#Criar 
+{% url 'create-skill' %}
+
+#Mostrar 
+{% for skill in skills %}
+{{skill.name}}
+{{skill.description}}
+
+#Editar
+{% url 'update-skill' skill.id %}
+{% endfor %}
+
+#Deletar
+{% url 'delete-skill' skill.id %}
+#Para redirecionar depois que aperta o botão de confirmar:
+{% url 'delete-skill' skill.id %}?next=/account
+
+#Essa variável nextAccount vai ser puxada pelo {{request.GET.next}} em delete_template.html
+#Adicionar {{.next}} no delete-project também.
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/skill_form.html
+- Criar Users/templates/users/skill_form.html
+
+{% extends 'main.html' %}
+{% block content %}
+	<form class="form" method="POST" action="">
+		{% csrf_token %}
+		
+		{% for field in form %}
+			{{field.label}}
+			{{field}}
+		{% endfor %}
+		<input class="btn btn--sub btn--lg  my-md" type="submit" value="Submit" />
+	</form>
+{% endblock %}
+
+- Delete Template: 
+Projects/templates/projects/delete_template.html, copiar -> 
+colar em Main/templates/main/, deletar o de cima.
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/skill_form.html
+### ESTILOS ###
+- DevSearch-Theme/form-template, copiar -> User/templates/users/skill_form.html:
+- Deixar apenas um <-Input:text->
+- Tudo dentro de <main>, colar abaixo de /form no skill_form.html e ir encaixando as variáveis.

@@ -1,0 +1,50 @@
+Templates e Resources:
+https://github.com/divanov11/Django-2021/tree/master/api
+
+###### Esse exemplo adiciona Tags, Reviews e Profiles 
+em JSON para a API Serializer  #####
+- api/serializers.py: 
+#Puxando classes de Projects/models.py:
+from projects.models import Project, Tag, Review
+from users.models import Profile
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'
+		
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = '__all__'
+		
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = '__all__'
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    owner = ProfileSerializer(many=False)	
+	#Criando relação entre Project + Profile.
+	tags = TagSerializer(many=True)
+	#Project + Tag 
+	reviews = serializers.SerializerMethodField()
+	#Project + Review. Esse methodfield vai 
+    
+	class Meta:
+        model = Project
+        fields = '__all__'
+		
+	def get_reviews(self, obj):
+        reviews = obj.review_set.all() 
+		#Fazendo referência de Project/models.py no exemplo ^,
+		#Tomar cuidado com related names no models.py qdo der query.
+        serializer = ReviewSerializer(reviews, many=True)
+        return serializer.data
+
+- Testar url/api/projects
+- Testar url/api/projects/[project_id]

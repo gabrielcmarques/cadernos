@@ -1,0 +1,198 @@
+https://pytutorial.com/django-models-filefield-example
+https://docs.djangoproject.com/en/4.0/ref/models/
+
+blank=True
+#O Django permite deixar em branco
+null=True
+#O Database permite deixar em branco
+
+- nomeApp/models.py:
+from django.db import models
+import uuid
+
+class Project(models.Model):
+    title = models.CharField(max_length=250,null=True, blank=True)
+    body = models.TextField(max_length=2500) 
+    image = models.FileField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    tags = TaggableManager()
+    id = models.UUIDField(default=uuid4, unique=True, primary_key=True, editable=False)
+   #[...]
+	
+   def __str__(self):
+	return self.title
+
+- nomeApp/admin.py:
+from .models import Project
+
+admin.site.register(Project)
+#url/admin
+
+>>>python manage.py makemigrations
+>>>python manage.py migrate
+#Histórico em nomeApp/migrations.py
+
+### Database Relationships ###
+https://drawsql.app/
+https://docs.djangoproject.com/en/4.0/search/?q=relationships
+
+- nomeApp/models.py:
+
+class Project(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField(null=True, blank=True)
+    tags = models.ManyToManyField('Tag', blank=True)
+    vote_total = models.IntegerField(default=0, null=True, blank=True)
+    vote_ratio = models.IntegerField(default=0, null=True, blank=True)
+    [...]
+
+class Review(models.Model):
+    VOTE_TYPE = (
+        ('up', 'Up Vote'),
+        ('down', 'Down Vote'),
+    )
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)
+	#A classe Reviews se tornou child de Profile.
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    body = models.TextField(null=True, blank=True)
+    value = models.CharField(max_length=200, choices=VOTE_TYPE)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True,
+                          primary_key=True, editable=False)
+
+    def __str__(self):
+        return self.value
+
+class Tag(models.Model):
+    name = models.CharField(max_length=200)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True,
+                          primary_key=True, editable=False)
+
+    def __str__(self):
+        return self.name
+
+- appNome/admin.py:
+from .models import Review, Tag
+
+admin.site.register(Review)
+admin.site.register(Tag)
+
+>>>python manage.py makemigrations
+>>>python manage.py migrate
+
+#url/admin -> logar -> testar criando informação.
+
+### Database Queries ###
+ver em "Django queryset cheat sheet.txt" no outro diretório.
+
+- appNome/views.py:
+from .models import Project 
+
+#Páginas
+def projects(request):
+	projects = Projects.objects.all()
+	context = {'projects': projects}
+	return render(request, 'appNome/projects.html', context)
+
+#Página específica com ID
+def project(request, pk):
+	projectObj = Projects.objects.get(id=pk)
+	context = {'projectObj': projectObj}
+	return render(request, 'appNome/projects.html', context)
+
+
+- appNome/projects.html:
+#Selecionar de acordo com o que tenha em models.py
+<table>
+	<tr>
+		<th>ID</th>
+		<th>Project</th>
+		<th>Positive Votes</th>
+		<th>Votes</th>
+		<th>EXAMPLE_TEXT</th>
+		<th>EXAMPLE_TEXT</th>
+	</tr>
+	{% for project in projects %}
+	<tr>
+		<td>{{project.id}}</td>
+		<td>{{project.title}}</td>
+		<td>{{project.vote_ratio}}</td>
+		<td>{{project.vote_total}}</td>
+		<td>{{project.created}}</td>
+	</tr>
+	{% for project in projects %}
+</table
+
+{{project.title}}
+{{project.description}}
+[...]
+
+- appNome/single-project.html:
+#Selecionar de acordo com o que tenha em models.py
+{{projectObj.title}}
+
+{{projectObj.description}}
+
+{% for tag in projectObj.tags.all %}
+{{tag}}
+{% endfor %}
+
+[...]
+
+https://github.com/divanov11/Django-2021/blob/master/projects/templates/projects/project_form.html
+### Model Forms ###
+
+https://github.com/divanov11/Django-2021/blob/master/projects/forms.py
+- nomeApp/forms.py:
+
+from django.forms import ModelForm
+from .models import Project
+
+class ProjectForm(ModelForm):
+    class Meta:
+        model = Project
+        fields = ['title', 'featured_image', 'description',
+                  'demo_link', 'source_link' [...]]
+
+#Create Project Form View:
+- nomeApp/views.py:
+from .forms import ProjectForm
+
+def createProject(request):
+    form = ProjectForm()    
+    context = {'form': form}
+    return render(request, "projects/single-project.html", context)
+
+- nomeApp/urls.py:
+urlpatterns = [
+path('create-project/', views.createProject, name="create-project"),
+]
+
+- Botão Submit: nomeApp/template/nomeApp/project_form.html:
+{% extends 'main.html' %}
+{% block content %}
+
+ <form class="form" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+		{% for field in form %}
+		{{field.label}}
+		{{field.label}}
+		{% endfor %}
+                <input class="btn btn--sub btn--lg  my-md" type="submit" value="Submit" />
+            </form>
+
+{% endblock %}
+
+
+https://github.com/divanov11/Django-2021/blob/master/templates/navbar.html
+- nomeApp/navbar.html:
+<h1>logo</h1>
+<a href="{% url 'create-project.html' %}">Add a Project</a>
+<hr>
+
+
+
+
+
+

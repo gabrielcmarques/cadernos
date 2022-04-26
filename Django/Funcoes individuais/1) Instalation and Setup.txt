@@ -1,0 +1,107 @@
+Referência 
+https://github.com/divanov11/Django-2021/tree/master/devsearch
+### Setup New Project/App ###
+
+>>>mkdir projetoNome
+>>>cd projetoNome
+>>>pip install virtualenv
+>>>python -m venv .
+>>>venv/scripts/activate
+>>>pip install django
+>>>django-admin startproject projetoNome
+>>>cd projetoNome
+>>>python manage.py startapp appNome
+>>>code .
+
+- Main/Settings.py:
+import os
+
+TEMPLATES = [
+{'DIRS':[os.path.join(BASE_DIR, 'templates'),}
+],
+
+
+INSTALLED_APPS:[
+'appNome.apps.ProjectsConfig',
+],
+
+
+### Views & URLS ###
+- nomeApp/views.py:
+from django.http import Render
+
+def projects(request):
+	msg = 'Hello, you are on projects'
+	context = {'mensagem': msg}
+	return render(request, 'nomeApp/projects.html', context)
+
+def project(request, pk):
+	msg = 'Hello, you are on single-project'
+	context = {'mensagem': msg}
+	return HttpResponse(request, 'nomeApp/single-project.html', context)
+
+- nomeApp/urls.py:
+from . import views
+
+urlpatterns = [
+path('projects/', views.projects, name="projects"),
+path('project/<str:pk>', views.project, name="project"),
+]
+
+- Main/urls.py:
+from django.urls import include
+
+urlpatterns = [
+path('', include('nomeApp.urls'))
+]
+
+### Templates ###
+Templates para Main.html e Navbar.html:
+
+- appNome/templates/appNome/navbar.html
+<h1>Navbar</h1>
+<hr>
+
+- appNome/templates/appNome/main.html
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HTML 5 Boilerplate</title>
+</head>
+<body>
+	<h1>This is the main template</h1>
+	{% include 'navbar.html' %}
+
+	{% block content %}
+
+	{% endblock content %}
+<hr>
+<p>FOOTER</p>
+
+</body>
+</html>
+
+- projetoNome/templates/projects.html
+{% extends 'main.html' %}
+
+{% block content %}
+<h1>Projects Page</h1>
+{{mensagem}}
+{% endblock content %}
+#url/projects
+
+- projetoNome/templates/single-project.html
+{% extends 'main.html' %}
+
+{% block content %}
+<h1>Single project Page</h1>
+{{mensagem}}
+{% endblock content %}
+#url/project/1
+
+
+
+

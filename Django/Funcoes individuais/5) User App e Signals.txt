@@ -1,0 +1,178 @@
+- Templates e Resources:
+https://github.com/divanov11/Django-2021/tree/master/resources/DevSearch-Theme
+
+- Site para criar diagramas de database (models.py)
+https://drawsql.app/
+
+https://github.com/divanov11/Django-2021/tree/master/users
+### Criando conexões entre usuários e páginas ###
+
+>>>python manage.py startapp users
+https://github.com/divanov11/Django-2021/tree/master/users/templates/users
+
+- Main/Settings.py:
+INSTALLED_APPS = [
+'users',
+]
+
+- Main/urls.py:
+from django.urls import include
+path('[...]', include('users.urls')),
+
+https://github.com/divanov11/Django-2021/blob/master/users/views.py
+- Users/views.py:
+from django.shortcuts import render,
+
+def profiles(request):   
+    context = {}
+    return render(request, 'users/profiles.html', context)
+	
+	
+def userProfile(request, pk):
+    profile = Profile.objects.get(id=pk)
+
+    #topSkills = profile.skill_set.exclude(description__exact="")
+    #otherSkills = profile.skill_set.filter(description="")
+
+    context = {'profile': profile}
+    return render(request, 'users/user-profile.html', context)
+
+- Users/urls.py:
+from django.urls import path
+from . import views
+
+urlpatterns = [
+path('', views.profiles, name="profiles"),
+path('profile/<str:pk>/', views.userProfile, name="user-profile"),
+]
+
+- Criar Users/templates/users/profiles.html:
+{% extends 'main.html' %}
+{% block content %}
+<h1>USER PROFILES PAGE TEST</h1>
+{% endblock content %}
+
+https://github.com/divanov11/Django-2021/blob/master/templates/navbar.html
+- Main/templates/navbar.html
+<li class="header__menuItem"><a href="{% url 'profiles' %}"> ... </a></li>
+
+- Checar se no App/urls.py está certo entre Projetos e Projetos de Usuários. Exemplo:
+path('[...]', views.projects, name="projects"),
+path('[...]/<str:pk>/', views.project, name="project"),
+
+
+https://github.com/divanov11/Django-2021/blob/master/users/models.py
+https://devsheet.com/code-snippets/django/
+- Criar User/models.py:
+user, name, email, bio, profile_image, etc. Exemplo:
+
+from django.db import models
+from django.contrib.auth.models import User
+import uuid
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    email = models.EmailField(max_length=500, blank=True, null=True)
+    username = models.CharField(max_length=200, blank=True, null=True)
+    location = models.CharField(max_length=200, blank=True, null=True)    
+    bio = models.TextField(blank=True, null=True)
+    profile_image = models.ImageField(null=True, blank=True, upload_to='profiles/', default="profiles/user-default.png")
+    social_website = models.CharField(max_length=200, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+
+	def __str__(self):
+        return str(self.username)
+
+
+https://github.com/divanov11/Django-2021/blob/master/users/admin.py
+- Criar Users/admin.py
+from django.contrib import admin
+from .models import Profile
+
+admin.site.register(Profile)
+
+>>>python manage.py makemigrations
+>>>python manage.py migrate
+- Testar painel admin novo
+
+### Vínculando App Users com App Projects ###
+- AppProjects/models.py:
+
+from users.models import Profile
+
+class Project(models.Model):
+	owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=Models.SET_NULL)
+	
+	#Testar comportamento com .SET_NULL, .CASCADE ou até mesmo outro. 
+	https://zerotobyte.com/django-on-delete-explained/
+
+
+>>>python manage.py makemigrations
+>>>python manage.py migrate
+- Testar o vínculo no painel admin se o Owner está puxando o Profile.
+
+
+https://github.com/divanov11/Django-2021/blob/master/projects/templates/projects/projects.html
+### Fazendo referência do vínculo acima ###
+- AppProject/templates/appproject/projects.html:
+<p><a class="project__author" href="{% url 'user-profile' project.owner.id %}">By {{project.owner.name}}</a></p>
+
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/profiles.html
+### Adicionando e Renderizando user profiles na página ###
+
+https://github.com/divanov11/Django-2021/blob/master/users/views.py
+- Users/views.py:
+from .models import Profile
+
+def profiles(request):
+    profiles = Profile.objects.all()    
+    context = {'profiles': profiles}
+    return render(request, 'users/profiles.html', context)
+
+
+https://github.com/divanov11/Django-2021/tree/master/users/templates/users
+#Users/templates/users/profiles.html
+#Usar como referência o template acima, selecionar o que precisar e usar as variáveis do models.py:
+#(Profile.html = Informação da pessoa na página, 
+Userprofiles.html = Informação pessoal do usuário) 
+
+{{profile.name}}
+{{profile.description}}
+{{profile.bio}}
+{{profile.location}}
+{{profile.profile_image.url}}
+{% url 'user-profile' profile.id %}
+{% url 'profiles' %}
+
+{% if profile.social_website %}
+{{profile.social_website}}
+{% endif %}
+#ETC
+
+########### SIGNALS ###########
+https://docs.djangoproject.com/en/4.0/topics/signals/
+https://github.com/divanov11/Django-2021/tree/master/users
+DJANGO SIGNALS. Precisamos de signals para mandar um email pro usuário, uma 
+página de Boas Vindas, Password reset ou Novidades do website. É uma função que 
+'escuta' uma ação do código e dispara para uma ação diferente.
+
+https://github.com/divanov11/Django-2021/blob/master/users/signals.py
+https://github.com/divanov11/Django-2021/blob/master/users/models.py
+- Criar users/signals.py:
+- Importar em models.py e atualizar o código de acordo com o exemplo.
+
+- Users/apps.py:
+class UsersConfig(AppConfig):
+	...
+	
+	def ready(self):
+		import users.signals
+
+#Testar no admin panel, criar e deletar.
+#Agora sinais personalizados vão ser imprimidos no terminal django quando algo específico acontece.
+#Modificar de acordo com o que desejar
+https://docs.djangoproject.com/en/4.0/topics/signals/
+https://www.djangosnippets.org/tags/signals/

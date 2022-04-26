@@ -1,0 +1,51 @@
+https://www.udemy.com/course/python-django-2021-complete-course/learn/lecture/27270394#overview
+Templates e Resources 
+https://github.com/divanov11/Django-2021
+
+### Função para enviar email para usuários registrados. 
+Boas vindas, novidades, promoções, etc. ###
+
+https://docs.djangoproject.com/en/4.0/topics/email/
+https://support.google.com/mail/answer/7126229?hl=en#zippy=%2Cstep-check-that-imap-is-turned-on%2Cstep-change-smtp-other-settings-in-your-email-client
+### Configurando um email backend ###
+
+- Usando sistema tls gmail no exemplo
+- Main/settings.py:
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'WEBSITE-GMAIL'
+EMAIL_HOST_PASSWORD = 'WEBSITE-GMAIL-PASSWORD' 
+#colocar em variavel quando estiver em produção
+
+https://docs.djangoproject.com/en/4.0/topics/email/
+https://github.com/divanov11/Django-2021/blob/master/users/signals.py
+- Users/signals.py:
+
+from django.core.mail import send_mail
+from django.conf import settings
+
+def createProfile(sender, instance, created, **kwargs):
+    if created:
+        ...
+		
+        subject = 'Welcome to DevSearch'
+        message = 'We are glad you are here!'
+
+        send_mail(
+            subject,
+            message,			
+            settings.EMAIL_HOST_USER,
+			[profile.email],
+            fail_silently=False,
+        )
+		
+- Agora que pode ser que dê uma erro "SMTP Authentication", no caso do Gmail ele pode estar bloqueando
+o acesso do Django. Para desligar isso vamos ter que ativar Autenticação em 2 fases e configurar:
+
+myaccount.google.com -> Login -> Two Factor Auth
+myaccount.google.com -> Login -> Less Secure app access: Deixar ON.
+
+- Testar registrando um usuário no website.

@@ -1,0 +1,134 @@
+https://github.com/divanov11/Django-2021
+https://docs.djangoproject.com/en/4.0/ref/contrib/messages/
+https://docs.djangoproject.com/en/4.0/topics/auth/
+Construindo Login e Logout:
+
+- Authentication: Confirma quem o usuário é
+- Authorization: Permite ou nega o acesso a certas funções do website
+- Webside -> Inspect Element -> Application, Sessions, Cookies: Onde ficam armazenados as sessões e tokens
+Também aparece em databases como postgres
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+https://github.com/divanov11/Django-2021/tree/master/users
+Criar Users/templates/users/login_register:
+
+{% extends 'main.html' %}
+{% block content %}
+<form action="" method="POST" class="form auth__form">
+	{% csrf_token %}
+	<!-- Input:Username -->
+	<div class="form__field">
+		<label for="formInput#text">Username: </label>
+		<input class="input input--text" id="formInput#text" type="text" name="username"
+			placeholder="Enter your username..." />
+	</div>
+	<!-- Input:Password -->
+	<div class="form__field">
+		<label for="formInput#password">Password: </label>
+		<input class="input input--password" id="formInput#passowrd" type="password" name="password"
+			placeholder="••••••••" />
+	</div>
+	<div class="auth__actions">
+		<input class="btn btn--sub btn--lg" type="submit" value="Log In" />
+		<a href="{% url 'reset_password' %}">Forget Password?</a>
+	</div>
+</form>
+{% endblock content %}
+
+https://docs.djangoproject.com/en/4.0/ref/contrib/messages/#displaying-messages
+- Main/templates/main.html:
+
+<html>
+<head>
+    <title>{% block title %} Website {% endblock %}</title>
+</head>
+
+<body>
+	{% include 'navbar.html' %}
+	
+	{% block content %}
+	
+	{% if messages %}
+	<ul class="messages">
+		{% for message in messages %}
+			<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+	
+	{% endblock content%}
+
+
+</body>
+</html>
+
+-=-=-=-=-=-=-=-=-=-=-= LOG IN / LOG OUT VIEW -=-=-=-=-=-=-=-=-=-=-=-=-=
+https://github.com/divanov11/Django-2021/blob/master/users/views.py
+- Users/views.py:
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.models import User
+from django.contrib import messages
+
+
+def loginUser(request):
+	...
+	if request.user.is_authenticated:
+		return redirect('profiles')
+	
+	if request.method == POST:
+		#print(request.POST) #teste terminal
+		username = request.POST['username']
+		password = request.POST['password']
+		
+		try:
+			user = User.objects.get(username=username)
+		except:
+			messages.error(request, 'Username does not exist')
+		
+		user = authenticate(request username=username password=password)
+		
+		if user is not None:
+			login(request, user)
+			return redirect('profiles')
+		else: 
+			messages.error(request, 'Username OR password is incorrect')
+			
+	return render(request, 'users/login_register.html')
+
+
+def logoutUser(request):
+	logout(request)
+	messages.info(request, 'User was logged out!')
+	return redirect('login')
+
+	
+- Users/urls.py:
+path('login/', views.loginUser, name="login"),
+path('logout/', views.logoutUser, name="logout"),
+
+https://github.com/divanov11/Django-2021/blob/master/templates/navbar.html
+- Main/templates/navbar.html:
+<li>header__menu {% url 'profiles' %} >Devs<
+<li>header__menu {% url 'projects' %} >Projects<
+	{% if authenticated %}
+<li>header__menu {% url 'create_project' %} >Add Project<
+<li>header__menu {% url 'logout' %} >Logout<
+	{% else %}
+<li>header__menu {% url 'login' %} >Login/Sign in<
+	{% endif %}
+
+# Testar o login/sign up no webiste
+- ProjectApp/views.py-
+from django.contrib.auth.decorators import login_required
+
+@login_required(login_url="login")
+def createProject(...)
+	...
+
+@login_required(login_url="login")
+def updateProject(...)
+	...
+
+@login_required(login_url="login")
+def deleteProject(...)
+	...

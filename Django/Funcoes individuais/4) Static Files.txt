@@ -1,0 +1,149 @@
+- Criar pasta 'static' na Main
+- Copiar e colar pastas 'styles', 'images' e 'js' dentro da 'Main/static'
+- Copiar main.css dentro de 'styles' adicionar codigos 
+https://github.com/divanov11/Django-2021/tree/master/static/styles
+
+- Main/settings.py:
+
+ALLOWED_HOST = ['localhost', '127.0.0.1']
+
+STATIC_URL = '/static/'
+MEDIA_URL = '/images/'
+
+STATICFILES_DIRS = [
+BASE_DIR / 'static'
+]
+#OU os.path.join(BASE_DIR, 'static' com import os) dependendo da versão do django
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
+
+
+https://github.com/divanov11/Django-2021/blob/master/devsearch/urls.py
+### Configurando Media URL ###
+- Main/urls.py:
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns[
+...
+...
+]
+
+urlpatterns += static settings media url document root settings.MEDIA_ROOT
+#MEDIA_ROOT
+
+https://github.com/divanov11/Django-2021/blob/master/templates/main.html
+- Main/templates/main.html:
+- Ver no link o que precisa em <link>. Favicon, Icon, Mumble, UI. O principal para CSS:
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'styles/[app].css' %}" />
+
+https://htmlcheatsheet.com/css/
+- Ver no CSS qual cor precisar e estilos em Main/static/styles/main.css.
+
+### Adicionando uma Logo para o header: ###
+https://github.com/divanov11/Django-2021/tree/master/resources/DevSearch-Theme/images
+https://github.com/divanov11/Django-2021/blob/master/templates/navbar.html
+- Copiar logo.svg (exemplo) acima, colar em Main/static/images
+- Main/templates/navbar.html:
+
+{% load static %}
+<a href="{% url 'profiles' %}" class="header__logo">
+	<img src="{% static 'images/logo.svg' %} " alt="DevSearch Logo" />
+</a>
+
+### Configurando uma default image ###
+- Main/models.py:
+featured_image = models.ImageField(null=True, blank=True, default="default.jpg")
+
+https://pypi.org/project/Pillow/
+INSTALAR PILLOW, se não isso acima vai dar erro:
+>>>pip install pillow
+>>>python manage.py makemigrations
+>>>python manage.py migrate
+
+- Teste no painel admin para ver se dá para enviar alguma foto nesse model novo.
+
+https://github.com/divanov11/Django-2021/blob/master/projects/templates/projects/single-project.html
+### Renderizando uma imagem do database no site ###
+
+- App/templates/app/single-project.html:
+<img src="{{ project.featured_image.url }}">
+
+### Adicionando o form field para upload de imagem ###
+- App/forms.py:
+class ProjectForm(ModelForm):
+    class Meta:
+        model = Project
+        fields = [
+		... 
+		'featured_image' 
+		...
+		]
+
+### Configurando enctype para permitir upload de imagens: ###
+- App/templates/app/project_form.html:
+<form class="form" method="POST" enctype="multipart/form-data">
+	...
+	{{form.as_p}}
+	<input class="btn btn--sub btn--lg  my-md" type="submit" value="Submit" />
+</form>
+
+https://github.com/divanov11/Django-2021/blob/master/projects/views.py
+### Processando imagem pelos métodos Create e Update ###
+- App/views.py:
+
+def updateProject(request, pk):
+	...
+		...
+		form = ProjectForm(request.POST, request.FILES, instance=project)
+		...
+
+
+def createProject(request):
+	...
+		...
+		form = ProjectForm(request.POST, request.FILES)
+		...
+
+- Testar se dá para criar e editar imagens. Checar se está salvando na pasta static.
+
+### Configurando o CollectStatic (um comando que junta os arquivos de media empacotando numa pasta separada) ###
+- Main/settings.py:
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+#Media root define onde o usuario manda arquivos. Static define static files em production vão estar.
+
+>>>python manage.py collectstatic
+#vai coletar arquivos dentro da pasta static e adicionar em uma nova 'staticfiles'
+#fazer isso sempre que alterar o static, é +/- igual makemigrations;migrate
+
+
+### Apontando a pasta staticfiles na URL ###
+- Main/urls.py:
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+#STATIC_ROOT em settings.py.
+
+
+### Django ainda não sabe como servir isso acima, por isso precisamos do whitenoise: ###
+http://whitenoise.evans.io/en/stable/django.html
+>>>pip install whitenoise
+- Main/settings.py:
+MIDDLEWARE = [
+    # ...
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    # ...
+]
+
+### Temas com UIKIT ###
+https://github.com/divanov11/Django-2021/tree/master/resources/DevSearch-Theme/uikit
+https://github.com/divanov11/Django-2021/blob/master/projects/forms.py
+- Copiar, substituir, remover o que não precisa.
+
+- pasta 'uikit' dentro de 'project/static'
+- styles/app -> static/styles
+- ver os templates.html e substituir os {%%} ou {{}}
+- update em forms.py (def init self args kwargs....)
+- #vai permitir os forms ficarem com estilo

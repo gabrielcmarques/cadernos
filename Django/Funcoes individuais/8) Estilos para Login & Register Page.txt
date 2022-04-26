@@ -1,0 +1,91 @@
+https://www.udemy.com/course/python-django-2021-complete-course/learn/lecture/27270358#overview
+Pesquisar por resources de temas e estilos para django com Bootstrap e arquivos CSS
+https://github.com/divanov11/Django-2021/tree/master/resources
+Main/static/styles/uikit/ Verificar se está tudo certo nesses arquivos, se não vai dar erro.
+Pasta DevSearch-Theme: Usar Login.html e Sign up como template referência
+
+- Users/templates/users/login_register.html
+- Pegar as divs com Cards do Login.html, colocar na login_register.html 
+- Encaixar as {{variáveis}} e testar
+
+- Users/login_register.html:
+
+{% if field.help_text %}
+<small>{{field.help_text}}</small>
+{% endif %}
+#Mensagens de ajuda para evitar erro (Password too small, too similar, etc.)
+https://www.geeksforgeeks.org/help_text-django-built-in-field-validation/
+#Melhor usar uma customizada, tem muita coisa.
+
+{% for error in field.errors %}
+<pstyle="color: red;">{{error}}</p>
+{% endfor %}
+#Mensagem de erro caso aconteça um erro
+
+- Modificando ícone de login do login_register.html (<img src="{% static 'images/icon.sxg' %}" alt="icon"/>):
+Resources ->  DevSearch-Theme -> images -> icon.svg (referência apenas)
+-> colocar o arquivo em static/images
+
+### Aplicando Image Pattern no background: ### 
+- Main/static/styles/app.css: 
+Linha
+
+.auth::after {
+...
+
+...
+background: url(../images/pattern.jpg)
+#Vai puxar de Root/static/images/pattern.jpg
+}
+
+https://github.com/divanov11/Django-2021/tree/master/resources
+### Estilo na Sign Up page: ###
+Pasta DevSearch-Theme/signup.html 
+-> copiar a div dentro de <body> inteira e escolhar o que manter em 
+- Users/templates/users/login_register.html, logo abaixo do <form> method POST.</form>
+- Encaixar as variáveis e testar
+{% for field in form %}
+{{field.label}}
+{{field}}
+
+
+### Adicionando estilo nos formulários ###
+
+Qualquer forms.py -> adicionar a função dentro da classe já existente:
+
+Classe [form](models.Model):
+	...
+	...
+	
+	def __init__(self, *args, **kwargs)Ç
+		super(CustomUserCreationForm, self).__init__(*args, **kwargs)
+		
+		for name, field in self.fields.items():
+			field.widget.attrs.update({'class': 'input'})
+			#Vai dar loop em cada field do form e adicionar estilo nas classes de input#
+
+
+https://github.com/divanov11/Django-2021/tree/master/resources/DevSearch-Theme/uikit
+-=-=-=-=-=-=-=-= UI KIT -=-=-=-=-=-=-=-=-=
+- Vários templates com útilidades, mensagens de erro, etc.
+- DevSearch-Theme/uikit/index.html (abrir no browser) -> Sessão "Alert messages"
+- Instalar static files na Root contendo images, js, styles e uikit.
+- Root/templates/main.html:
+<body>
+...
+
+#Comentar o if messages anterior, copiar e modificar:
+{% if messages %}
+	{% for message in messages%}
+	<div class="alert alert--{{message.tags}}">
+		<p class="alert__message">{{message}}</p>
+		<button class="alert__close"> x </button>
+	</div>
+	{% endfor %}
+{% endif %}
+#Isso tem que fazer aparecer um popup quando errar a senha!
+...
+</body>
+
+<script src="{% static 'uikit/app.js' %}"></script>
+</html>

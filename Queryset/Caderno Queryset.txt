@@ -1,0 +1,94 @@
+https://docs.djangoproject.com/en/4.0/ref/models/querysets/
+https://courses.prettyprinted.com/courses/django-database-essentials/lectures/4674911
+
+.exclude é e .filter são opostos
+
+#Shell ->
+from example.models import Simple
+exemplo = Simple(text='four', number=20, url='www.google.com')
+exemplo.save()
+exemplo.text, exemplo.number, exemplo.url [...]
+
+
+Simple.objects.all()
+Simple.objects.all()[0:3] #apenas 3 primeiros resultados
+Simple.objects.all()[3:] #começa a partir do terceiro
+Simple.objects.all()[:3] #mesma coisa que o primeiro.
+
+Simple.objects.exclude(id=1)
+Simple.objects.exclude(id=1).filter(url='www.google.com') [...] #Chain Filter
+q1 = Simple.objects.exclude(id=1).filter(url='www.google.com')
+q1.filter(url='www.google.com') #Filter Variable 
+
+Simple.objects.filter(text__contains='ou') #tudo que tiver 'ou'
+Simple.objects.filter(text__icontains='ou') #exatamente 'ou', mais nada
+Simple.objects.filter(text__startswith='ou') #começa com 'ou'
+Simple.objects.filter(text__isnull'True') #tudo que estiver nulo (em branco). False faz o contrário
+
+Simple.objects.filter(number__in=[1, 10]) #tudo entre 1 a 10
+Simple.objects.filter(number__gt=10) #maior q 10
+Simple.objects.filter(number__gt=10) #maior q 10
+Simple.objects.filter(number__gte=10) #IGUAL e maior q 10. Less = lt, lte
+
+Simple.objects.order_by('id') #filtra por id. "-id" filtra ao na ordem contrária. 
+Simple.objects.order_by('name', '-url')[:3] #filtra primeiro por name, depois url, 3 primeiros resultados.
+Simple.objects.count() #quantidade de resultados em número
+Simple.objects.filter(number=10).count() #retorna quantos resultados que contém o número 10, em número
+
+
+#### Objetos em DATETIME/NÚMEROS CALENDARIO ####
+#Shell ->
+from example.models import DateExample
+from datetime import datetime
+new_date = datetime.now()
+new_date #vai retornar algo tipo datetime.datetime(2022, 3, 14, 19, 51, 6, 59633)
+mt_date = DateExample(the_date=new_date)
+my.date.save()
+DateExample.objects.filter(the_date__date=new_date)
+another_date = datetime.now()
+DateExample.objects.filter(the_date__time=another_date) #__time converte para horas. __date pra dia, __month, etc.
+DateExample.objects.filter(the_data__day=3) #tudo que for dia 3. __month, __year, etc.
+DateExample.objects.filter(the_data__day=3) #entre o dia 3 e dia 10. ^       ^
+
+#### NULL:
+#Shell ->
+from example.models import NullExample
+one = NullExample(col='one')
+one.save()
+two = NullExample(col=None)
+two.save()
+NullExample.objects.filter(col__isnull = True) #retorna nulos. False faz oposto.
+
+#### Query One To Many Relationships:
+models.py->
+Class Language(models.Model):
+	name = models.Charfield()
+
+class Framework(models.Model):
+	name = models.CharField()
+	language = models.ForeignKey(Language, on_delete=models.CASCADE)
+	
+Framework.objects.filter(language__name='Python') #Framework = Child, checando na variavel name do parent Language.
+Framework.objects.filter(language__name__startswith='Py') #etc
+
+
+#### Query Many To Many Relationships:
+'Movies' tem apenas 'name'. 'Character' tem 'name' e 'movies'. 'movies' é o ManyToMany.
+
+Character.objects.filter(movies__name='Civil War') 
+Movie.objects.filter(character__name='Captain America')
+captain_america = Charater.objects.get(name= 'Captain America')
+captain_america.movies.all()
+avengers = Movies.objects.get(name='Avengers')
+avengers.character__set.all()
+
+
+#### DATABASE SETTINGS:
+https://docs.djangoproject.com/en/4.0/ref/settings/#databases
+Settings.py -> Ctrl+ F "DATABASES"
+Mudar de acordo com o que está no website acima.
+
+
+
+####
+Ver na documentação certinho sobre outras opções específicas.

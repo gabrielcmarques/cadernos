@@ -1,0 +1,45 @@
+Templates e Resources:
+https://github.com/divanov11/Django-2021/tree/master/api
+
+###### Configurando POSTMAN, um aplicativo de terceiros 
+que ajuda a dar Debug na API com uma interface prática #####
+
+https://www.postman.com/
+- Instalar normal, nada em especial. Abrir o app -> Logar:
+
+Workspace -> Name, Team, etc -> Create Workspace
+Collections -> '+' -> New Collection -> "nome" -> '...', add request -> 
+
+### Testando uma request simples ###
+- Preencher os campos com:
+
+GET
+[url]/api/projects/
+#Adicionar '/' no final sempre, pode dar erro.
+*Save*
+*Send*
+
+- em Body tem que retornar linhas em formato Json.
+- Testar uma nova request com:
+
+GET
+[url]/api/projects/[id]
+*Save*
+*Send*
+
+### Criar uma variável fixa para a URL ###
+- Procurar por "Environment quick lock", é pra ser um ícone de olho -> Add
+- Vai criar "New Environment", preencher com começo da url do projeto, no exemplo:
+
+URL
+http://127.0.0.1:8000
+
+- Se estiver escrito "No environment" na interface, clicar e escolher a que criamos agora.
+- Agora podemos usar {{URL}} ao invés de http:127[...] nos testes.
+- Voltar para a área de testes e usar:
+
+GET
+{{URL}}/api/projects/
+*Save*
+*Send*
+

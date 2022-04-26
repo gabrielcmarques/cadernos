@@ -1,0 +1,84 @@
+Templates e Resources:
+https://github.com/divanov11/Django-2021/tree/master/api
+
+
+###### O exemplo vai criar um endpoint para um usuário submeter uma POST Data #####
+- Api/views.py:
+from projects.models import Project
+
+#Permission abauxi testa apenas usuário logado. Basta comentar para testar o oposto.
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def projectVote(request, pk):
+    project = Project.objects.get(id=pk)
+    user = request.user.profile
+    data = request.data
+	
+	print('DATA:', data)
+	#Debug Console
+
+    serializer = ProjectSerializer(project, many=False)
+    return Response(serializer.data)
+	
+- Api/urls.py:
+path('projects/<str:pk>/vote/', views.projectVote),
+
+- Ir para o website/api/users/token, logar, gerar um novo "access" token, copiar.
+
+- Postman:
+New Request, 
+POST
+{{URL}}/api/projects/[project_id]/vote/
+
+- Headers:
+Authorization
+Bearer [token copiado]
+*Save*
+*Send*
+- Tem que retornar uma lista json dentro de Headers.
+
+- Body:
+raw
+JSON
+{ 
+	"value": "up",
+}
+#Referência de Projects/models.py: Class Reviews() -> VOTE_TYPE=(up, down)
+
+- Body: 
+form-data 
+value: down
+#Faz a mesma coisa que o acima, manda uma POST data com valor de review up/down.
+
+### ###
+- Api/views.py:
+
+from projects.models import Project, Review
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def projectVote(request, pk):
+    project = Project.objects.get(id=pk)
+    user = request.user.profile
+    data = request.data
+
+    review, created = Review.objects.get_or_create(
+        owner=user,
+        project=project,
+    )
+
+    review.value = data['value']
+    review.save()
+    project.getVoteCount
+	#Referência Projects/models.py: def getVoteCount()...
+
+    serializer = ProjectSerializer(project, many=False)
+    return Response(serializer.data)
+
+- Testar novamente no Postman. Body:
+raw
+JSON
+{ 
+	"value": "up",
+}
+#E value down tbm.

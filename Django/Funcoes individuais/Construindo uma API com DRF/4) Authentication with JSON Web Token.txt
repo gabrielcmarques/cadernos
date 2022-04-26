@@ -1,0 +1,130 @@
+Templates e Resources:
+https://github.com/divanov11/Django-2021/tree/master/api
+
+###### O exemplo vai configurar um sistema de autorização e 
+autenticação com JSON Web Tokens #####
+
+- Website -> Inspect Element -> Storage/Cookies é onde ficam armazenados os Web Token IDs
+- Nesse site podemos decodificar os tokens armazenados https://jwt.io/
+
+### Nesse exemplo vamos usar web tokens do Simple JWT ###
+https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html#installation
+
+>>>pip install djangorestframework-simplejwt
+
+- Main/settings.py:
+#Pode ser acima do MIDDLEWARE
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+- Api/urls.py:
+#A primeira gera token baseado no usuário. O segundo gera um novo token a cada intervalo que selecionarmos mais abaixo
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+urlpatterns = [
+	#Acima das outras URLS mesmo:
+    path('users/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('users/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+	[...]
+]
+
+- Testar url/api/users/token
+- Testar url/api/users/token/refresh
+- Copiar o token e testar decodificação https://jwt.io/
+
+### Testando no Postman ###
+- New request:
+
+POST:
+{{URL}}/api/users/token
+
+- Para testar isso, vamos precisar preencher a parte Body com um usuário:
+- Body
+raw
+JSON
+
+{
+"username": "nome"
+"password": "senha"
+}
+
+- Tem que retornar um 'Refresh' e 'Access' com os tokens.
+
+- Api/views.py:
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getProjects(request):
+	print('USER:', request.user)
+	...
+	
+#Apenas usuários autenticados vão poder ver projetos. Similar ao @login_required, para DRF.
+- Testar em url/api/projects/, tem que estar limitado.
+- url/api/users/token/, logar para gerar um token, copiar token de "access"
+- Postman:
+GET
+{{URL}}/api/projects/
+
+- Headers:
+Key: Authorization
+Value: Bearer [Ctrl+VToken]
+*Save*
+*Send*
+
+- Tem que retornar informação JSON. Desmarque o "Authorization" e aperte Send, 
+tem que retornar um erro de credencial.
+
+- Depois de testar isso, remover @permission_classes([IsAuthenticated]) e usar apenas se realmente precisar.
+
+### Como customizar um Token: ###
+https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+
+- Main/settings.py:
+#Pode ser acima de MIDDLEWARE e REST_FRAMEWORK:
+
+# Django project settings.py
+from datetime import timedelta
+...
+...
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+	#minutes=, hours=, days=, etc 
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+    'JWK_URL': None,
+    'LEEWAY': 0,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}

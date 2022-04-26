@@ -1,0 +1,90 @@
+Templates e Resources:
+https://www.udemy.com/course/python-django-2021-complete-course/learn/lecture/27270384#overview
+https://github.com/divanov11/Django-2021/tree/master/resources
+https://django-filter.readthedocs.io/en/stable/guide/usage.html#the-filter
+
+### Funcionalidade de Search Form. Nesse exemplo procurar por
+ título, descrição, tags e usuários registrados: ###
+ 
+https://github.com/divanov11/Django-2021/blob/master/projects/utils.py
+- Criar ProjectApp/utils.py:
+
+from .models import Project, Tag
+from django.db.models import Q
+
+def searchProfiles(request):
+    search_query = ''
+
+    if request.GET.get('search_query'):
+        search_query = request.GET.get('search_query')
+
+    skills = Skill.objects.filter(name__icontains=search_query)
+
+    profiles = Profile.objects.distinct().filter(
+        Q(name__icontains=search_query) |
+        Q(short_intro__icontains=search_query) |
+        Q(skill__in=skills)
+    )
+
+    return profiles, search_query
+
+- Users/Views.py:
+https://github.com/divanov11/Django-2021/blob/master/users/views.py
+https://docs.djangoproject.com/en/4.0/ref/models/querysets/#distinct
+https://docs.djangoproject.com/en/4.0/topics/db/queries/
+
+from django.db.models import Q
+from .utils import searchProfiles
+
+
+def profiles(request):
+
+	#Search de perfil:
+    profiles, search_query = searchProfiles(request)
+
+    context = {'profiles': profiles, 'search_query': search_query}
+    return render(request, 'users/profiles.html', context)
+
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/profiles.html
+- Users/templates/users/profiles.html:
+
+<div class="hero-section__search">
+	<form id="searchForm" class="form" action="{% url 'profiles' %}" method="get">
+		<div class="form__field">
+			<label for="formInput#search">Search Developers </label>
+			<input class="input input--text" id="formInput#search" type="text" name="search_query"
+				value="{{search_query}}" placeholder="Search by developer name" />
+				
+		</div>
+		<input class="btn btn--sub btn--lg" type="submit" value="Search" />
+	</form>
+</div>
+#Isso já vai mandar uma request para o backend, modificando a url para o que foi buscado.
+EX: "Gabriel", *Search*, URL passa a ser: 127:0.0.1:8000/?search_query=Gabriel
+
+
+https://github.com/divanov11/Django-2021/blob/master/projects/templates/projects/projects.html
+Projects/templates/projects.html:
+
+<div class="hero-section__search">
+	<form id='searchForm' class="form" action="{% url 'projects' %}" method="get">
+		<div class="form__field">
+			<label for="formInput#search">Search By Projects </label>
+			<input class="input input--text" id="formInput#search" type="text" name="search_query"
+				placeholder="Search by Project Title" value="{{search_query}}" />
+		</div>
+
+		<input class="btn btn--sub btn--lg" type="submit" value="Search" />
+	</form>
+</div>
+
+- Projects/views.py:
+from .utils import searchProjects
+
+def projects(request):
+    projects, search_query = searchProjects(request)
+
+    context = {'projects': projects,
+               'search_query': search_query}
+    return render(request, 'projects/projects.html', context)

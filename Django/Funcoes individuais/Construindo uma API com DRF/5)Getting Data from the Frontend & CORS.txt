@@ -1,0 +1,139 @@
+https://www.udemy.com/course/python-django-2021-complete-course/learn/lecture/27458564#overview
+Templates e Resources:
+https://github.com/divanov11/Django-2021/tree/master/api
+https://pypi.org/project/django-cors-headers/
+
+###### CORS: Cross-Origin Resource Sharing (CORS), é um mecanismo para impedir o acesso a 
+recursos de uma página da Web específicada do domínio externo. ######
+###### O exemplo cria API calls no frontend para o backend #####
+https://github.com/divanov11/Django-2021/tree/master/frontend
+- Criar diretório 'frontend' na pasta do manage.py com os arquivos dentro:
+
+- projects-list.html:
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+
+</head>
+
+<body>
+
+    <section>
+        <a href="" id="logout-btn">Logout</a>
+        <a href="login.html" id="login-btn">Login</a>
+    </section>
+
+
+    <section id="projects--wrapper">
+
+    </section>
+
+</body>
+<script src='main.js'></script>
+
+</html>
+
+########## main.js:
+let projectsUrl = 'http://127.0.0.1:8000/api/projects/'
+
+let getProjects = () => {
+
+    fetch(projectsUrl)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+        })
+
+}
+getProjects()
+
+#Instalar django cors para permitir que o teste de CORS funcione.
+>>>pip install django-cors-headers
+
+- Main/settings.py:
+SETTINGS = [
+'corsheaders',
+]
+
+MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+]
+
+#Ver bem certinho a situação e instalar de acordo. No exemplo, vamos usar a terceira com True.
+https://pypi.org/project/django-cors-headers/
+CORS_ALLOWED_ORIGINS = #True/False
+CORS_ALLOWED_ORIGIN_REGEXES = #True/False
+CORS_ALLOW_ALL_ORIGINS = #True/False
+
+- Abrir url/api/projects para comparar
+- Abrir o project-list.html no browser, clique direito -> inspect element -> console, 
+Tem que estar mostrando os projects, ids, owners
+
+
+###### Frontend/main.js:
+
+let projectsUrl = 'http://127.0.0.1:8000/api/projects/'
+
+let getProjects = () => {
+
+    fetch(projectsUrl)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            buildProjects(data)
+        })
+
+}
+
+let buildProjects = (projects) => {
+    let projectsWrapper = document.getElementById('projects--wrapper')
+
+    for (let i = 0; projects.length > i; i++) {
+        let project = projects[i]
+		console.log(project)
+    }
+}
+
+getProjects()
+#Agora no insperct element->console vai mostrar mais detalhada a informação dos objetos
+############# Modificar:
+
+let buildProjects = (projects) => {
+    let projectsWrapper = document.getElementById('projects--wrapper')
+    projectsWrapper.innerHTML = ''
+    for (let i = 0; projects.length > i; i++) {
+        let project = projects[i]
+
+        let projectCard = `
+                <div class="project--card">
+                    <img src="http://127.0.0.1:8000${project.featured_image}" />
+                    
+                    <div>
+                        <div class="card--header">
+                            <h3>${project.title}</h3>
+                            <strong class="vote--option" data-vote="up" data-project="${project.id}" >&#43;</strong>
+                            <strong class="vote--option" data-vote="down" data-project="${project.id}"  >&#8722;</strong>
+                        </div>
+                        <i>${project.vote_ratio}% Positive feedback </i>
+                        <p>${project.description.substring(0, 150)}</p>
+                    </div>
+                
+                </div>
+        `
+        projectsWrapper.innerHTML += projectCard
+    }
+}
+
+#Agora a informação adquirida pela API vai estar renderizada no website.
+
+https://github.com/divanov11/Django-2021/blob/master/frontend/main.css
+- Frontend/main.css:
+Apenas copiar, colar e modificar dependendo do que precisar.
+

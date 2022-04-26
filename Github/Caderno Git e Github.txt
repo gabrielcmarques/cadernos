@@ -1,0 +1,264 @@
+- Treinar nos sites abaixo
+https://onlywei.github.io/explain-git-with-d3/
+https://docs.github.com/en/get-started/quickstart/github-flow
+https://learngitbranching.js.org/?locale=pt_BR
+
+- Git cheat sheet
+https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet
+- Git ignore cheat sheet
+https://linuxize.com/post/gitignore-ignoring-files-in-git/#gitignore-patterns
+- Gitignore templates 
+https://github.com/github/gitignore
+
+## Template Básico ##
+git status
+git add .
+git commit -m "descrição"
+git log / git diff
+git push -u remote_nome branch_nome
+
+git checkout branch_master
+git merge nome_da_branch
+
+## fork ##
+>>>git clone [url.git]
+>>>cd
+>>>git remote -v 
+>>>git remote add upstream [url de onde demos fork]
+>>>git pull upstream master
+#upstream vai pegar os arquivos num repositório que demos fork
+>>>git checkout -b nome_branch_1
+>>>git add .
+>>>git commit -m [descrição]
+>>>git push -u remote_nome nome_branch_1
+#Sempre que clonar de um fork que não temos permissão, especificar igual acima.
+## 
+
+##### Configuração inicial GIT: #####
+O git precisa saber que é você. Terminal->
+>>>git config --global user.name "Seu Nome"
+#grava o nome
+
+>>>git config --global user.email "Seu email"
+#grava email
+
+##### Criando um repositório: #####
+>>>cd [diretório que você queira]
+>>>mkdir [projeto_pasta]
+>>>cd [projeto_pasta]
+>>>git init
+
+##### Branches #####
+!! Quando criar uma nova branch, ela vai fazer uma cópia do último commit da branch atual. !!
+>>>git branch
+#consulta local
+>>>git branch -a 
+#consulta local e remoto
+
+>>>git branch novaBranch 
+#vai criar
+>>>git checkout novaBranch 
+#vai mudar para nova branch 'novaBranch'
+>>>git checkout -b novaBranch2 
+#vai fazer as 2 linhas acima em apenas uma.
+
+>>>git log
+>>>git checkout -b [nome_da_branch] [hash_id_da_branch]
+#cria uma branch específica
+
+>>>git branch -m [branch_renomeada]
+#renomeia a branch atual
+
+>>>git branch -d [nome_da_branch]
+#-d é um modo mais seguro. -D é se tiver certeza que quer deletar.
+
+>>>git checkout master
+>>>git mergen nome_da_branch
+#isso vai unir as cópias das branches atuais para as branches master. Caso tenha conflito, código abaixo:
+
+##### Fazendo Commit: #####
+Commit em dois arquivos 'app.txt' e 'tests.txt', no terminal execute os comandos:
+
+>>>git status
+>>>git branch
+>>>git add app.txt tests.txt 
+# adiciona os arquivos que queremos monitorar. Tomar cuidado com 'git add .', que vai pegar tudo.
+>>>git commit -m "Razão do commit, mudanças, etc"
+# aplica as mudanças feitas nos arquivos monitorados. Cada commit ganha um hash id
+
+>>>git diff
+# serve para vizualizar as mudanças feitas nos arquivos monitorados pelo git. Similar ao git status
+>>>git diff app.txt 
+# apenas pro arquivo específico
+
+##### Git Push #####
+Logar no site do github
+Ao lado do ícone de avatar, clique no +, "New Repository" e configure
+>>>git remote add origin https://www.github.com/usuario/novo_rep.git
+>>>git push -u origin master
+
+#Remote é uma cópia remota do seu repositório. O primeiro comando cria um remote chamado 'origin' no endereço que apontamos
+#Push vai enviar os commmits locais da branch master para o remote 'origin'. origin é convensão, pode ser o que quiser
+#Na segunda vez apenas >>>git push já vai funcionar, ele salva.
+
+>>>git push remote_nome branch_nome: branch_remota_nome
+#Especifica o remote e a branch, 
+
+##### Git Pull #####
+Baixa as alterações do repositório remoto para o repositório local. 
+>>>git fetch [remote_nome]
+Baixa as mudanças encontradas no repositório remoto pro local
+>>>git merge [remote_nome/branch_nome]
+Une as alterações do remote_nome na branch branch_nome com nossa branch local.
+Quando tudo estiver certo na branch de desenvolvimento depois de dar pull, 
+unir os códigos com merge e deletar a branch, que agora faz parte do código.
+
+Git pull é uma junção de 2 comandos acima
+>>>git pull 
+>>>git pull remote_nome branch_nome: branch_remota_nome
+#especifico
+
+## ERRO git push: ##
+Não é possível fazer um git push se os repositórios não estão sincronizados.
+É necessário fazer um git pull primeiro, resolvendo eventuais conflitos!
+>>>git pull
+>>>git push
+
+### PULL REQUEST ###
+No github, serve como uma solicitação para unir o código presente da nossa branch para outra. 
+
+###### Comandos shell: ######
+https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet
+
+git init <argumento>
+# vai criar um Git repo vazio. Rodando sem argumentos vai iniciar o diretorio atual como repositorio. .git
+
+pwd
+#displays the absolute path name of the working directory to standard output. Linux
+
+git branch
+#printa todas as branchs
+
+git branch -d [nome da branch]
+#deleta a branch 
+
+git checkout
+#comando para trocar de branch [nome da branch]
+
+git merge [nome da branch]
+#une o código novo ao código original na branch. "--no-ff" antes do nome vai criar outro commit indicando que teve o merge.
+
+git add [nome.py]
+git commit -m "Motivo do commit"
+#The git add command is used to add file contents to the Index (Staging Area).
+
+git log/git log --stat
+#Mostra um histórico com todas as mudanças depois de dar merge e commit 
+
+git --version
+#Checa a versão, retorna erro se não estiver instalado
+
+git show [commit hash id]
+#mostra alterações específicas desse commit id
+
+git clone: Cria uma cópia independente do repositório hosteado no github para nosso computador.
+>>>git clone https://github.com/user/project.git 
+
+git remote: Printa quantos repositorios remotos temos. Se retornar nada, não tem nenhum remote configurado.
+>>>git remote -v 
+#fetch: é onde baixamos as alterações presentes no repositório remoto
+#push: é pra esse lugar que mandamos as alterações locais para sincronizar com repositório remoto 
+
+>>>git config --global credential.helper store
+#Armazena as credenciais no código para que não peça mais. TOMAR CUIDADO COM ESSE.
+#Preferência usar a opção de armazenar temporariamente na memória:
+>>>git config --global credential.helper 'cache --timeout=[segundos]'
+
+### dentro do .gitignore: ###
+
+*.py
+- #adicionar a linha acima vai ignorar todos os arquivos com extensão .py
+!arquivo_3.py
+- #colocar essa linha abaixo do *.py vai criar uma excessão para 'arquivo_3.py'
+pasta_teste/
+- #ignora pasta
+
+########## ETC ##########
+
+- Untrackad files (bash cmd) são arquivos que o git não está monitorando.
+- Usar Gitbash no windows como shell ou WSL2
+- Sistema de controle de versão:
+É um sistema que registra alterações feitas em arquivos ao longo do tempo, criando pontos de restaurações.
+- Git:
+É um sistema distribuido de controle de versão.
+- Github:
+É uma plataforma que fornece serviços relacionados ao git. É um site gerenciador de projetos
+- .gitignore é onde colocamos todas as pastas e arquivos que queremos que o git ignore
+baixar extensão 'Gitignore Templates' no vscode
+- Git Add vs Git Commit vs Git Push: 
+Suponhamos que estamos fazendo compras e adicionando produtos, isso seria o git add
+Na hora de pagar a compra, seria git commit 
+E finalmente quando levamos para casa as compras, é o git push 
+- Branches servem para pode trabalhar sem medo de quebrar o código, testar ideias e aproveitá-las ou descartá-las.
+Branches são cópias de algum estado do nosso projeto, um backup. As alterações de uma branch são independentes, 
+ou seja, as alterações em uma branch não afetam o código das outras branches.
+- Quando tem conflito no merge: Depois de dar git merge e aparecer a mensagem, o código
+já vai estar em highlight no app. Dá para optar por aceitar ambas alterações, deixando 
+uma em baixo da outra no código.
+
++-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=
+###### GitHub Flow: ######
+- Cria uma branch baseadana master para a feature que será desenvolvida
+- Trabalhe normalmente nessa branch, faça comits
+- Abra uma pull request
+- Discussão e revisão das alterações
+- Deploy em ambiente de produção
+- Finalizar o merge
+
+Procurar colocar o código no master apenas se estiver pronto para produção. Se não, manter nas branches.
+Especificar descrições e nomes de cada commit e branch
+
+### Open Source Flow / Forking Flow ###
+https://devconnected.com/how-to-set-upstream-branch-on-git/
+- Faz um fork do repositório de interesse, ele copia para nosso github.
+- Clona o fork para o ambiente de desenvolvimento
+- Configurar o remote origin para que ele aponte para o nosso fork
+- Configurar o remote upstream para que ele aponte para o repositório oficial
+- Cria uma branch para desenvolvimento / seguir GitHug Flow.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Caso dê um git add acidental:
+>>>git --rm cached [arquivo]
+# Remove um arquivo da área staged
+
+>>>git reset --soft HEAD~1
+# ~1 seriam quantos commits queremos voltar + ações dependendo do tipo:
+
+Soft: Reverte o commit e faz voltar para a etapa anterior ao commit.
+Mixed: Padrão, reverte o commit e remove as alterações da área de stage.
+Hard: Reverte commit, reverte o add e as alterações feitas no arquivos.
+
+>>>git revert [hash_id]
+#vai reverter o que foi feito no commit anterior. A diferença entre
+revert e reset é que revert mantém o histórico.
+
+>>>git push -f
+#Força o push. Usado muito poucas vezes, geralmente depois de dar resets
+
+>>>git log --online
+>>>git rebase -i
+#similar ao merge, mas ele elimina a bifurcação das branches no 
+histórico. Convertendo vários commits em um, bom para remover 
+muitos commits sem muita informação.
+
+>>>git stash
+#O git salva o trabalho numa área especial do 'stash', e já atualiza os 
+arquivos do projeto no estado do último commit. Bom para não 'sujar'
+o historico de commits.
+>>>git stash list
+>>>git stash apply
+#reverte o git stash
+>>>git status 
+
+>>>git cherry-pick [id_branch]
+#permite ao usuário selecionar commits específicos para trazer ao branch desejado.

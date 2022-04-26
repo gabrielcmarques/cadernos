@@ -1,0 +1,108 @@
+Templates e Resources:
+https://github.com/divanov11/Django-2021/tree/master/api
+
+###### Configurando Django Rest Framework para víncular e mostrar a 
+informação dentro do database/models.py no website. #####
+
+
+### 1) Setting up a simple API ###
+Criar Root/api/__init__.py:
+- Não precisa ter nada dentro.
+
+https://github.com/divanov11/Django-2021/blob/master/api/views.py
+Criar Root/api/views.py:
+
+#JsonResponse OU from rest_framework.response import Response, dependendo do que precisar.
+from django.htpp import JsonResponse
+
+def getRoutes(request):
+
+    routes = [
+        {'GET': '/api/projects'},
+        {'GET': '/api/projects/id'},
+        {'POST': '/api/projects/id/vote'},
+
+        {'POST': '/api/users/token'},
+        {'POST': '/api/users/token/refresh'},
+    ]
+    return JsonResponse(routes, safe=False)
+
+
+https://github.com/divanov11/Django-2021/blob/master/api/urls.py
+Criar Root/api/urls.py:
+
+from django.urls import path
+from . import views
+
+urlpatterns = [
+path('', views.getRoutes),
+]
+
+- Main/urls.py -> Apontar a API com a função include:
+path(api/, include('api.urls')),
+
+-Testes url/api/
+
+### 2) Django Rest Framework & Serializer ###
+https://www.django-rest-framework.org/
+https://www.django-rest-framework.org/tutorial/quickstart/
+>>>pip install djangorestframework
+
+- Root/settings.py:
+INSTALLED_APPS: [
+'rest_framework',
+]
+
+- Api/views.py:
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+@api_view(['GET'])
+def getRoutes(request):
+    routes = [
+        ...
+    ]
+    return Response(routes)
+
+- Teste url/api
+
+https://github.com/divanov11/Django-2021/blob/master/api/serializers.py
+#Converter os objetos no database models.py em Json objects:
+Criar Root/api/serializers.py:
+
+from rest_framework import serializers
+from projects.models import Project
+
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = '__all__'
+		#Models.py ^
+
+- Api/views.py:
+from .serializers import ProjectSerializer
+from projects.models import Project
+
+@api_view(['GET'])
+def getProjects(request):
+    projects = Project.objects.all()
+    serializer = ProjectSerializer(projects, many=True)
+	#Retorna vários objetos ^
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getProject(request, pk):
+	#Não confundir com o de cima
+    project = Project.objects.get(id=pk)
+    serializer = ProjectSerializer(project, many=False)
+	#Retorna apenas 1 objeto ^
+    return Response(serializer.data)
+	
+- Api/urls.py:
+path('projects/', views.getProjects),
+path('projects/<str:pk>/', views.getProject),
+#Vai ser url/api/projects no final, não apenas url/projects.
+
+- Testar url/api/projects 
+- Testar url/api/projects/[project_id]

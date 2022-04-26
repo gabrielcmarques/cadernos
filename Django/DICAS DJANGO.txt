@@ -1,0 +1,61 @@
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+Sentry.io serve para ajudar a identificar erros Em Produção (debug = off)
+https://www.youtube.com/watch?v=DNecovdu55Y
+https://sentry.io
+
+Bom database gratuito para testes: ELEPHANT SQL
+https://www.elephantsql.com/
+
+As versões "LTS" [Long Term Support] são as mais estáveis.)
+https://www.djangoproject.com/downloads 
+
+Inline Form Set Factory é melhor para Nested Forms
+https://stackoverflow.com/questions/1913913/django-inlineformsetfactory-what-is-it-good-for
+
+Django Humanize para trabalhar melhor com números.
+EX: 1 -> one; 1 -> first; 4500 -> 4,500; etc!
+https://docs.djangoproject.com/en/4.0/ref/contrib/humanize/
+
+Celery é um serviço Assincrono
+https://pypi.org/project/celery/
+
+Site para cheio de packages pip
+https://pypi.org/
+
+============== Snippets ==============
+https://djangosnippets.org/popular/rated/
+
+Django models:
+https://pytutorial.com/category/django-snippet
+
+Django HTML Templates:
+https://www.codecademy.com/learn/templates-in-django/modules/django-templates/cheatsheet
+https://djangosnippets.org/snippets/
+
+Django Forms:
+https://docs.djangoproject.com/en/4.0/topics/forms/
+
+Templates HTML
+https://docs.djangoproject.com/en/3.2/ref/templates/language/
+
+Django HTMX
+https://justdjango.com/blog/dynamic-forms-in-django-htmx
+https://django-htmx.readthedocs.io/en/latest/
+
+### Form and field validation
+https://docs.djangoproject.com/en/3.2/ref/forms/validation
+
+### SLUGS EM URLS DINÂMICAS:
+https://stackoverflow.com/questions/53067186/how-to-use-slugs-in-django-url
+
+### Absolute URL:
+https://learndjango.com/tutorials/django-slug-tutorial
+
+CRUD: https://youtu.be/ncjUOq7ohrs?list=PLEsfXFp6DpzRMby_cSoWTFw8zaMdTEXgL
+CREATE, RETRIEVE, UPDATE, & DELETE
+
+CRUD Templates: https://youtu.be/aStLddXMJrk?list=PLEsfXFp6DpzRMby_cSoWTFw8zaMdTEXgL
+Pasta Templates (subApp) -> list.html
+
+Verificação de item duplicado no database por qs queryset
+https://youtu.be/rKXVuG4axTg?list=PLEsfXFp6DpzRMby_cSoWTFw8zaMdTEXgL

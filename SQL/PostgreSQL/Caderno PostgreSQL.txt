@@ -1,0 +1,123 @@
+####### Conectando Python com database Postgresql #######
+#### Configurando Postgresql ####
+
+Abra o Postgresql:
+Right click -> Create -> Server
+
+#Aba connection:
+Host name/address: localhost
+port: 5432
+username/password
+
+Abra o cluster, right click Databases(5), Create, Database, save.
+
+NomeCluster -> Databases(6) -> NomeDatabase -> Schemas
+#Onde tudo vai estar.
+
+#### Conectando com Django ####
+
+settings.py -> 
+
+DATABASES:[
+	'default':{
+		'ENGINE': 'django.db.backends.postgresql'
+		'NAME': 'NomeDatabase'
+		'USER': 'username',
+		'PASSWORD': 'password',
+		'HOST': 'localhost',
+		'PORT': '5432',
+	}
+]
+
+#Copiar o original e colar em baixo, por backup.
+
+instalar psycopg2:
+>>>env: pip install psycopg2
+#Se der erro, psycopg2 binary.
+
+###Após isso, fazer makemigrations e migrate.
+Caso estiver em sessão antes da migration:
+Inspect Element -> Application -> Sessions;Storage -> Cookies -> deletar e Ctrl+R.
+
+### Criar um novo superuser
+>>>python manage.py createsuperuser
+[...]
+Checar em Tables -> auth_user -> right click -> view/edit data -> all rows.
+
+- user_profile
+registro de usuários.
+
+- django-sessions
+registro de login com session key, session data, expire date.
+
+### Trabalhando com um database LIVE pela AWS ### :
+www.aws.amazon.com -> login to console-> Services Query Search: 'rds' -> Amazon RDS.
+
+#Configurando Amazon RDS. Principais:
+Dashboard -> Create Database:
+
+- Standard Create 
+- PostgreSQL + Version
+- Templates (é o que mais pesa na conta final $)
+- DB instance name (settings.py)
+- Master Username (settings.py)
+- Master Password (settings.py)
+- DB Instance Classes
+- Storage (O segundo que mais pesa $)
+- Availability & durability (Basicamente backup)
+- Public Access: Yes (para que possamos acessar o database. Yes não significa pro publico geral, mas para devs mesmo)
+- Password (depende do que a empresa quer. IAMUser ou normal)
+
+- Ler as documentações e calculadoras.
+- Create Database
+
+### Para testes:
+- Free Tier
+- PostgreSQL + Version
+- SSD: Burstable ; o menor
+- Templates (é o que mais pesa na conta final $)
+- DB instance name (settings.py)
+- Master Username (settings.py)
+- Master Password (settings.py)
+- DB Instance Classes
+- Storage (O segundo que mais pesa $)
+- Availability & durability (Basicamente backup)
+- Public Access: Yes (para que possamos acessar o database. Yes não significa pro publico geral, mas para devs mesmo)
+- Password (depende do que a empresa quer. IAMUser ou normal)
+
+- Ler as documentações e calculadoras.
+- Create Database
+- Aguardar...
+
+
+### Conectando com Django ###
+
+- Dashboard -> Databases -> conectivity & security -> "Endpoint & port". Copiar a url.
+Abra o PostgreSQL, right click na Cluster do database, new server group -> "Live DBS"
+Right click LIVE DBS -> Create -> New Server -> Connection Tab:
+Host name/address: [url Endpoint & port]
+username (settings.py)
+password (settings.py)
+
+- Um pouco abaixo no website -> Security group rules, se estiver tudo 0.0.0.0/0 significa que está tudo certo.
+##Se não:
+Clique na hyperlink da regra, hyperlink da aba 'security group id', Edit inbound rules, deletar a regra default.
+##Add new rule ->
+Type: All trafic
+Source: Anywhere ipv4
+0.0.0.0/0
+save
+
+settings.py->
+DATABASES:[
+	'default':{
+		[...]
+		'HOST': 'URL Endpoint & port'
+		[...]
+]
+
+>>>python manage.py createsuperuser
+>>>python manage.py makemigration
+>>>python manage.py migrate
+
+Cluster -> database -> schemes -> tables -> checar se Superuser criou.

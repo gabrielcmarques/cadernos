@@ -1,0 +1,63 @@
+Referências e templates:
+https://github.com/divanov11/Django-2021/tree/master/resources
+
+
+### Página de perfil de usuário. Informações, 
+foto de perfil, bio, tags, contato. ####
+
+- Users/views.py:
+
+@login_required
+def userAccount(request):
+	profile = request.user.profile
+	
+	skills = profile.skill_set.all()
+	projects = profile.projects_set.all()
+	
+	context = {'profile': profile, 'skills': skills, 'projects': projects}
+	return render(request, 'user/account.html', context)
+	
+	
+- Users/urls.py:
+path(account/ views.userAccount "account")
+
+- Main/templates/navbar.html:
++/- linha 23, alterar 
+<li class="header__menuItem"><a href="{% url 'create-project' %}">add project</a></li>
+
+		para
+
+<li class="header__menuItem"><a href="{% url 'account' %}">Account</a></li>
+
+#Testar no website
+
+https://github.com/divanov11/Django-2021/blob/master/resources/DevSearch-Theme/account.html
+- DevSearch-Theme/account.html, copiar -> Users/templates/users/account.html:
+- Remover !Doctype, <html>, <body> e <header> tags. Usar apenas a <main><-- Main Section --></main>
+- Substituir os códigos de acordo.
+
+{% extends 'main.html %}
+{% block content %}
+<-- Main Section -->
+...
+{{profile.name}}
+{{profile.profile_image.url}}
+{{profile.short_intro}}
+{{profile.location}}
+{{profile.ETC ...}}
+<table class settings table>
+
+{% for skill in skills %}
+{{skill.label}}(?)
+{{skill.name}}
+{% endfor  %}
+
+{% for project in projects %}
+{% url 'project' project.id %}
+{{project.featured_image.url}}
+{{project.title}}
+{{project.description|slice:"150"}}
+{% endfor  %}
+#ETC!
+...
+{% endblock content %}

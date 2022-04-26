@@ -1,0 +1,136 @@
+****** CÓDIGO PARA VISUALIZAR MELHOR OS ATRIBUTOS ******
+
+import httpresponse
+
+def see_request(request):
+	text = f"""
+	Some attributes of the HttpRequest Object:
+	
+	scheme:  {request.scheme}
+	path: 	 {request.path}
+	method:  {request.method}
+	GET: 	 {request.GET}
+	uset: 	 {request.user}
+	"""
+	
+	return HttpResponse(text, content_type="text/plain")
+	
+###urls.py -> from project import views as project_views 
+			  path("see_request/", project_views.see_request)
+			  
+### Adicionando Info: https://127.0.0.1:8000/see_request/?breakfast=spam&lunch=spam
+### Resultado: <QueryDict: {'breakfast': ['spam'], 'lunch': ['spam']}>
+************************************************************************
+import httpresponse
+
+def user_info(request):
+	text = f"""
+	Some attributes of the HttpRequest Object:
+	
+	username:  {request.username}
+	is_anonymous: 	 {request.is_anonymous}
+	is_staff:  {request.is_staff}
+	is_superuser: 	 {request.is_superuser}
+	is_active: 	 {request.is_active}
+	"""
+	
+	return HttpResponse(text, content_type="text/plain")
+	
+###urls.py -> from project import views as project_views 
+			  path("user_info/", project_views.user_info)
+			  
+### Logando como admin, resultado: 
+	is_anonymous: False	
+	is_staff:  	  True
+	is_superuser: True 
+	is_active: 	  True
+
+************************************************************************
+=== CRIANDO VIRTUALENV SNIPPET: //(Comandos detalhados abaixo)
+
+python -m venv ./venv
+pip install "django[version]" djangoproject.com/downloads 
+pip freeze
+pip install --upgrade pip //(Opcional)
+django-admin startproject startproject [nomeProject] . 
+cd [nomeProject]
+python manage.py startapp [subProject]
+
+python manage.py makemigrations
+python manage.py migrate
+code . #pra abrir o vscode
+
+// Selecionando interpretador: O path vai estar em bin\python //(Sem números, apenas python.shortcut)
+.\Scripts\activate //(vai poder dar pra usar em outras Tabs de terminal tb)
+pip install -r requirements.txt
+python -m django startproject [nome] .
+
+ii .  		   //(abre a pasta atual. 'open .' no mac)
+ls -al 		   //mostra mais específico
+rm -rf [pasta] //deleta a pasta
+
+=== EDITOR:
+VScode -> File -> Save Workspace As. //(Salva facilmente o projeto atual sem compilar, igual no photoshop.) 
+print(dir(codigo)) //(Muito bom para fazer debug. Dando F5 na URL mostra no terminal)
+
+=== TERMINAL: 
+which python // (mostra o caminho onde python está instalado)
+which python3
+which python3.6
+etc
+
+=== VIRTUAL ENVS: 
+python -m venv .
+.\Scripts\activate //('source bin/activate' no mac)
+pip install "Django>=3.2,<3.3" //(versão mais atualizada de Django 3.2 antes de 3.3.)
+pip install Django==3.2.5      //(versão exata)
+pip freeze 	 //(printa o requirements.txt)
+python -m django //(mostra os subcomandos)
+python -m django startproject [nome] . 
+django-admin startproject [nome]
+python manage.py startapp [nome]
+pip install --upgrade pip
+pip freeze > requirements.txt //(salva a os requirements atuais todos no txt)
+
+==== Importações interessantes e breve descrição:
+from django.http import HttpResponse //(permite printar html)
+from django.http import Http404 //(error handling)
+from django.shortcuts import get_object_or_404 //(calls the given model and get object from that if that object or model doesn’t exist it raise 404 error.  | subApp views.py)
+from django.template.loader import render_to_string //(Permite printar strings a partir de templates .htmls. Talvez precise de {} adicionais ou ate % %)
+
+from django.contrib.auth import authenticate, login, redirect 
+// authenticate: Serve para validar login e logout. 															  
+// login: Facilita o log in
+// redirect: redireciona para alguma url específica após alguma ação)
+
+from django.contrib.auth.decorators import login_required //redireciona o usuário para tela de login caso não estiver logado. Decorador.
+from django.shortcuts import render //(Usado em subApps (?) para printar a página)
+from dianjo.contrib.auth.forms import UserCreationForm //(serve para a criação de forms de cadastro. {{  form.as_p }} dentro dos templates) 
+from dianjo.contrib.auth.forms import AuthenticationForm //(serve para a autenticação de forms de Login / login_view, {{  form.as_p }} dentro dos templates) 
+from django.conf import settings //(permite fazer referência de variáveis dentro de settings.py )
+																				
+import dotenv //(Usado mais em manage.py, tem pacotes que servem para ler arquivos ocultos que servem para esconder certas informações. .env por exemplo. Ver doc)
+from dianjo.utils.text import slugify //(torna qualquer string em uma string slug, entre '-' e minusculo. | Models.py.)
+from django.db.models.signals import pre_save, post_save //(conecta duas funções;classes (receptor e remetente) para salvar a informação. Basicamente um melhor método de save(). | Models.py)
+from django.db.modelsl import Q //(usado em complex search com queryset | views.py, models.py)
+from django.contrib.auth import get_user_model //(this is how we get the user model, exceto no models.py. | admin.py)
+import pint //(bom para conversão de números inteiros, floats, etc. || Models.py)
+
+==== Templates:
+'DIRS'=[] o caminho de todos os templates. EX: DIRS'=[BASE_DIR / "templates"], //(Na dúvida: print(BASE_DIR))
+
+==== admin.py: //(importando subApps, dá para registrar os subapps com):
+from .models import [subApp]
+admin.site.register(subApp)
+
+==== Customizando a página admin:
+list_display=[]
+readonly_fields=[]
+raw_id_fields=[]
+
+### usar 'admin.TabularInLine' ou 'admin.StackedInline' inves de 'admin.site.register(abc123)' é interessante, dar uma olhada no doc.
+### Ver na documentação sobre admin Classes para modificar a parte admin e deixar mais dinâmico
+https://docs.djangoproject.com/en/3.2/ref/contrib/admin/
+
+
+

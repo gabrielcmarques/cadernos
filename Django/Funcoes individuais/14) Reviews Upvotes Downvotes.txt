@@ -1,0 +1,176 @@
+Templates e Resources 
+https://www.udemy.com/course/python-django-2021-complete-course/learn/lecture/27270390#overview
+https://github.com/divanov11/Django-2021
+
+### Configurando um de sistema de Review, Upvote e Downvote ###
+https://github.com/divanov11/Django-2021/blob/master/projects/models.py
+Projects/models.py:
+
+from users.models import Profile
+
+class Project(models.Model):
+    owner = models.ForeignKey(
+        Profile, null=True, blank=True, on_delete=models.CASCADE)
+        ...
+    ...	
+	
+	#Ordenação de reviews
+	class Meta:
+		ordering = ['-vote_ratio', '-vote_total', 'title']
+		
+	#Cria uma lista dos reviewers. flat converte numa lista
+    @property
+    def reviewers(self):
+        queryset = self.review_set.all().values_list('owner__id', flat=True)
+        return queryset
+	
+	#Calcula e mostrar a contagem de reviews
+	@property
+    def getVoteCount(self):
+        reviews = self.review_set.all()
+        upVotes = reviews.filter(value='up').count()
+        totalVotes = reviews.count()
+
+        ratio = (upVotes / totalVotes) * 100
+        self.vote_total = totalVotes
+        self.vote_ratio = ratio
+
+        self.save()
+
+class Review(models.Model):
+    VOTE_TYPE = (
+        ('up', 'Up Vote'),
+        ('down', 'Down Vote'),
+    )
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True)	
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    body = models.TextField(null=True, blank=True)
+    value = models.CharField(max_length=200, choices=VOTE_TYPE)
+    created = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(default=uuid.uuid4, unique=True,
+                          primary_key=True, editable=False)
+
+    class Meta:
+        unique_together = [['owner', 'project']]
+		#Evita duplicação de reviews
+		
+    def __str__(self):
+        return self.value
+		
+>>>python manage.py makemigrations
+>>>python manage.py migrate
+- Testar no painel admin
+
+https://github.com/divanov11/Django-2021/blob/master/projects/templates/projects/single-project.html
+Projects/templates/projects/single-project.html:
+
+{% for review in project.review_set.all %}
+{% if review.body %}
+<div class="comment">
+	<a href="{% url 'user-profile' review.owner.id  %}">
+		<img class="avatar avatar--md" src="{{review.owner.profile_image.url}}" alt="user" />
+	</a>
+
+
+	<div class="comment__details">
+		<a href="{% url 'user-profile' review.owner.id  %}"
+			class="comment__author">{{review.owner.name}}</a>
+		<p class="comment__info">{{review.body|linebreaksbr}}</p>
+	</div>
+
+</div>
+{% endif %}
+{% endfor %}
+
+https://github.com/divanov11/Django-2021/blob/master/projects/forms.py
+- Projects/forms.py:
+
+from .models import Project, Review
+
+class ReviewForm(ModelForm):
+    class Meta:
+        model = Review
+        fields = ['value', 'body']
+
+        labels = {
+            'value': 'Place your vote',
+            'body': 'Add a comment with your vote'
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(ReviewForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'input'})
+			
+			
+https://github.com/divanov11/Django-2021/blob/master/projects/views.py
+- Projects/views.py:
+
+from .forms import ReviewForm
+from django.contrib import messages
+
+def project(request, pk):
+    ...
+    form = ReviewForm()
+
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        review = form.save(commit=False)
+        review.project = projectObj
+        review.owner = request.user.profile
+        review.save()
+
+        projectObj.getVoteCount
+
+        messages.success(request, 'Your review was successfully submitted!')
+        return redirect('project', pk=projectObj.id)
+
+    return render(request, 'projects/single-project.html', {'form': form})
+	
+https://github.com/divanov11/Django-2021/blob/master/projects/templates/projects/single-project.html
+Projects/templates/projects/single-project.html:
+
+#If abaixo evita review duplicado.
+{% if request.user.profile.id in project.reviewers %}
+<p>You have already submitted your review for this project</p>
+
+{% elif request.user.profile == project.owner %}
+<p>You cannot review your own work</p>
+
+{% elif request.user.is_authenticated %}
+
+<form class="form" action="{% url 'project' project.id %}" method="POST">
+	{% csrf_token %}
+	{% for field in form %}
+	<div class="form__field">
+		<label for="formInput#textarea">{{field.label}}</label>
+		{{field}}
+	</div>
+	{% endfor %}
+	<input class="btn btn--sub btn--lg" type="submit" value="Add Review" />
+</form>
+{% else %}
+<a href="{% url 'login' %}?next={{request.path}}">Please login to leave a review</a>
+{% endif %}
+
+!!!
+
+- Quando estiver deslogado e ir no botão "Please login to leave a review",
+vai redirecionar para a página de Login com uma queryset "?next=/ ...". 
+- Para configurar essa queryset enquanto o login acontece:
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/login_register.html
+- Users/templates/users/login_register.html:
+- <form action="">, deixar em Branco se estiver com alguma {% url '...' %}
+
+https://github.com/divanov11/Django-2021/blob/master/users/views.py
+Users/views.py:
+
+def loginUser(request):
+	...
+	
+	if user is not None:
+		login(request, user)
+		return redirect(request.GET['next'] if 'next' in request.GET else 'account')
+		#Manda o usuário para a próxima rota (next queryset) caso tenha next esteja dentro de request.GET

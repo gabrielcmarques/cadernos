@@ -1,0 +1,113 @@
+Referências e templates:
+https://github.com/divanov11/Django-2021/tree/master/users
+
+### Adicionando a habilidade de Editar o perfil de usuário. Pode 
+servir para editar outras coisas do website também. ###
+
+- Users/forms.py:
+from .models import Profile
+
+class ProfileForm(ModelForm):
+	class Meta:
+		model = Profile
+		fields = ['name', 'email', 'username', 
+		'location', 'bio', 'short_intro', 
+		'profile_image', 'ETC', ]
+	
+	def __init__(self, *args, **kwargs):
+        super(ProfileForm, self).__init__(*args, **kwargs)
+
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'input'})
+
+
+https://docs.djangoproject.com/en/4.0/topics/signals/
+- Users/signals.py:
+from .models import Profile
+
+def updateUser(sender, instance, created, **kwargs):
+	profile = instance
+	user = profile.user
+	### puxando de "profile = request.user.profile" em UserAccount() no views.py por instancia. One to One relation. ###
+	
+	if created == False:
+		user.first_name = profile.name
+		user.username = profile.username
+		user.email = profile.email
+		user.save()
+	#Importante checar se Não Existe para não passar informação por cima da outra registrada.
+	#Também pode acontecer um erro de recursão infinita com o createProfile() acima desse código.
+	
+post_save.connect(updateUser, sender=Profile)
+
+#Testar no painel admin, modificar informações e checar se muda também no website!
+
+https://github.com/divanov11/Django-2021/blob/master/users/views.py
+- Users/views.py:
+from .forms import ProfileForm
+
+
+def registerUser(request):
+	...
+	if ..
+		if ..
+		login(request, user)
+	 -> return redirect('edit-account') <-
+
+...
+...
+
+@login_required(login_url='login')
+def editAccount(request):
+	profile = request.user.profile	
+	form = ProfileForm(instance=profile) 	
+	
+	if request.method == 'POST':
+		form = form = ProfileForm(request.POST, request.FILES, instance=profile)
+		if form.is_valid():
+			form.save()
+			
+			return redirect('account')
+	
+	context={'form': form, 'profile': profile}
+	return render(request, 'users/profile_form.html', context)
+
+
+- Users/urls.py:
+path('edit-account/', views.editAccount, name="edit-account"),
+
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/profile_form.html
+- Criar Users/templates/users/profile_form.html:
+{% extends 'main.html' %}
+{% block content %}
+<h1>Edit Account</h1>
+
+<form method="POST" action="{% url 'edit-account' %}", enctype="multipart/form-data">
+	{% csrf_token %}
+	{{form}} 
+	#{{form.as_p}}
+	<input type="submit" value="Submit"/>
+</form>
+
+{% endblock %}
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/account.html
+- Users/templates/users/account.html:
+<a class="tag tag--pill tag--main settings__btn" href="{% url 'edit-account' %}"><i class="im im-edit"></i>Edit</a>
+
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/profile_form.html
+- Adicionando Estilo:
+- Resources/DevSearch/form-template.html, copiar -> Root/templates/profile_form.html:
+Copiar apenas de <main> até </main>, Colar depois do </form> e atualizar os fields certinho.
+
+{% url 'account' %}
+
+method POST
+{% csrf_token %}
+
+{% for field in form %}
+	{{form.label}}
+	{{field}}
+{% endfor %}

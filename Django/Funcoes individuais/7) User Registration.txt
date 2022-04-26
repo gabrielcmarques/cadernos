@@ -1,0 +1,83 @@
+Referências e Templates:
+https://github.com/divanov11/Django-2021/tree/master/users
+
+###### Configurando Registro de usuários: ######
+
+- Criar Users/forms.py:
+
+from django.forms import ModelForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
+class CustomUserCreationForm(UserCreationForm):
+	class Meta:
+		model = User 
+		fields = [
+			'first_name',
+			'last_name',
+			'email',
+			'username',
+			'password1',
+			'password2',
+			]
+		labels={
+		'first_name': Nome}
+		#Labels vai customizarm os fields padrões do database para o que quisermos.
+	
+https://github.com/divanov11/Django-2021/blob/master/users/views.py
+- Users/views.py:
+from .forms impor UserCreationForm
+
+def registerUser(request):
+	page = 'register'
+	form = UserCreationForm()
+	
+	if request.method == 'POST':
+		form = UserCreationForm(request.POST)
+		if form.is_valid():
+			user = form.save(commit=False)
+			user.username = user.username.lower()
+			user.save()
+			
+			messages.success(request, "User account was created!")
+			
+			login(request, user)
+			return redirect('profiles')
+		
+		else:
+			messages.success(request, 'An error has occured during registration.')
+	
+	context = {'page':page, 'form': form}
+	return render(request, 'users/login_register.html', context)
+	
+		
+- Users/urls.py:
+ path('register/', views.registerUser, name="register"),
+
+https://github.com/divanov11/Django-2021/blob/master/users/templates/users/login_register.html
+- Users/templates/users/login_register.html:
+
+{% block content %}
+
+{% if page == 'register' %}
+
+<h1> Register User
+
+<form method post action {% url register %}>
+{% csrf_token %}
+{{form.as_p}}
+
+<input type submit value "Register User"/>
+</form>
+
+<p>Already have an account? <a href="{% url 'login' %}">Sign Up</a></p>
+
+<form>
+<inputs>
+
+<p>Dont have an account? <a href="{% url 'register' %}">Sign Up</a></p>
+</form>
+{% endif %}
+
+{% endblock content %}
+#Testar no website.

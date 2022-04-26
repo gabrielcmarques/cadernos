@@ -1,0 +1,86 @@
+######## Static Files in S3 Bucket: ########
+
+models.py
+class Project:
+[models.imagefield]
+
+settings.py
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
+#project/static/images
+
+Vamos mudar para o static files para AWS S3 Bucket.
+www.aws.amazon.com -> login -> AWS Management Console -> "S3" -> create bucket 
+remover "Block all public access" 
+-> create.
+
+Upload -> Add files -> adicionar uma imagem aleatoria para teste (Object Url). 
+
+- Caso o Object URL não estiver funcionando, provavelmente está privado:
+Dashboard -> Buckets -> Permissions -> Bucket policy -> Learn More / EDIT:
+
+{
+    "Version": "2008-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowPublicRead",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "*"
+            },
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::your-bucket-name/*"
+        }
+    ]
+}
+
+#Alterar "your-bucket-name/" com oq estiver na dashboard login
+#O código acima vai permitir qualquer Get Request
+Save Changes.
+
+Testar novamente adicionando mais uma imagem, tem que estar pública.
+
+
+######## Conectando AWS com Django: ########
+https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
+https://www.udemy.com/course/python-django-2021-complete-course/learn/lecture/27580808#overview
+
+>>>pip install django-storages
+>>>pip install boto3
+
+settings.py -> 
+
+INSTALLED_APPS = [
+	'storages',
+]
+
+settings.py ->
+#Em qualquer lugar, pode ser na última linha:
+
+https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+#vai configurar para o S3 Buckets. Preferência apenas esse, caso tiver whitenoise instalado.
+
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+#Toda vez que rodarmos o '>>>django-admin collectstatic' todos os static files vão ser upados para o S3 Bucket.
+## Se tiver o whitenoise instalado, não precisa.
+
+aws.amazon.com -> search -> "IAM" -> dashboard -> Users -> Add users 
+-> programmatic access (checked) -> aba "Attatch permission" 
+-> "S3" no search, selecionar: AmazonS3FullAccess
+-> Create User.
+# Vai gerar uma Access key ID e Key ID. 
+
+settings.py -> 
+
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = 'devsearch-bucket-gabriel'
+#aws -> Services -> IAM -> Dashboard Buckets -> lá vai estar o nome do código acima
+#Preferência escondido no environment, usar direto apenas para testes.
+
+#Testar no website se já vai estar usando S3 Bucket.
+	
+AWS_QUERYSTRING_AUTH = False
+#Tira a query extra da url, deixando mais curta
+AWS_FILE_OVERWRITE = False
+#Evita que o arquivo upado passe por cima de outro com mesmo nome. Vai gerar um nome diferente e manter os 2.
