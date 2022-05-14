@@ -1,8 +1,9 @@
 Templates e Resources:
 https://github.com/divanov11/Django-2021/tree/master/api
+https://www.django-rest-framework.org/tutorial/1-serialization/#using-modelserializers
 
-###### Esse exemplo adiciona Tags, Reviews e Profiles 
-em JSON para a API Serializer  #####
+###### Esse exemplo adiciona Tags, Reviews e 
+Profiles em JSON para a API Serializer  #####
 - api/serializers.py: 
 #Puxando classes de Projects/models.py:
 from projects.models import Project, Tag, Review
@@ -30,21 +31,48 @@ class TagSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     owner = ProfileSerializer(many=False)	
 	#Criando relação entre Project + Profile.
+	
 	tags = TagSerializer(many=True)
 	#Project + Tag 
+	
 	reviews = serializers.SerializerMethodField()
 	#Project + Review. Esse methodfield vai 
     
 	class Meta:
         model = Project
         fields = '__all__'
-		
+	
+	#Todos fields de funções child de serializers tem que começar com 'get_'
 	def get_reviews(self, obj):
         reviews = obj.review_set.all() 
 		#Fazendo referência de Project/models.py no exemplo ^,
-		#Tomar cuidado com related names no models.py qdo der query.
+		#Tomar cuidado com related names no models.py qdo der query. reviews é child de Project.
         serializer = ReviewSerializer(reviews, many=True)
         return serializer.data
 
 - Testar url/api/projects
 - Testar url/api/projects/[project_id]
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+- Api/views.py:
+
+@api_view(['GET'])
+def getProjects(request):
+    projects = Project.objects.all()
+    serializer = ProjectSerializer(projects, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getProject(request, pk):
+    project = Project.objects.get(id=pk)
+    serializer = ProjectSerializer(project, many=False)
+    return Response(serializer.data)
+	
+- Api/urls.py:
+path('projects/', views.getProjects),
+path('projects/<str:pk>/', views.getProject),
+#Vai ser url/api/projects no final, não apenas url/projects.
+
+url/api/projects
+url/api/projects/[project_id]

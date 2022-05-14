@@ -1,4 +1,4 @@
-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+/////////////////////////////////////////////////////////////////////////
 Sentry.io serve para ajudar a identificar erros Em Produção (debug = off)
 https://www.youtube.com/watch?v=DNecovdu55Y
 https://sentry.io
@@ -6,7 +6,7 @@ https://sentry.io
 Bom database gratuito para testes: ELEPHANT SQL
 https://www.elephantsql.com/
 
-As versões "LTS" [Long Term Support] são as mais estáveis.)
+As versões "LTS" [Long Term Support] de Django são as mais estáveis.)
 https://www.djangoproject.com/downloads 
 
 Inline Form Set Factory é melhor para Nested Forms
@@ -16,11 +16,8 @@ Django Humanize para trabalhar melhor com números.
 EX: 1 -> one; 1 -> first; 4500 -> 4,500; etc!
 https://docs.djangoproject.com/en/4.0/ref/contrib/humanize/
 
-Celery é um serviço Assincrono
+Celery 
 https://pypi.org/project/celery/
-
-Site para cheio de packages pip
-https://pypi.org/
 
 ============== Snippets ==============
 https://djangosnippets.org/popular/rated/
@@ -42,13 +39,13 @@ Django HTMX
 https://justdjango.com/blog/dynamic-forms-in-django-htmx
 https://django-htmx.readthedocs.io/en/latest/
 
-### Form and field validation
+Form and field validation
 https://docs.djangoproject.com/en/3.2/ref/forms/validation
 
-### SLUGS EM URLS DINÂMICAS:
+SLUGS EM URLS DINÂMICAS:
 https://stackoverflow.com/questions/53067186/how-to-use-slugs-in-django-url
 
-### Absolute URL:
+Absolute URL:
 https://learndjango.com/tutorials/django-slug-tutorial
 
 CRUD: https://youtu.be/ncjUOq7ohrs?list=PLEsfXFp6DpzRMby_cSoWTFw8zaMdTEXgL

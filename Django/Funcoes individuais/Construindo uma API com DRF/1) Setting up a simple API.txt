@@ -1,5 +1,7 @@
 Templates e Resources:
 https://github.com/divanov11/Django-2021/tree/master/api
+https://www.django-rest-framework.org/
+https://www.youtube.com/watch?v=cJveiktaOSQ
 
 ###### Configurando Django Rest Framework para víncular e mostrar a 
 informação dentro do database/models.py no website. #####
@@ -82,7 +84,10 @@ class ProjectSerializer(serializers.ModelSerializer):
 - Api/views.py:
 from .serializers import ProjectSerializer
 from projects.models import Project
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
+#Esse decorator é apenas para Function Based Views.
 @api_view(['GET'])
 def getProjects(request):
     projects = Project.objects.all()

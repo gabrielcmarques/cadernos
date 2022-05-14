@@ -167,4 +167,3 @@ from django.db.models import Sum, Min, Max, Avg
 
 City.objects.all()
 >>> <Queryset>
-

@@ -1,5 +1,7 @@
 Templates e Resources:
 https://github.com/divanov11/Django-2021/tree/master/api
+- Postman é bom para testar POST/PUT/GET requests diretamenta do desktop com uma interface prática.
+ Retornando informação em forma JSON etc.
 
 ###### Configurando POSTMAN, um aplicativo de terceiros 
 que ajuda a dar Debug na API com uma interface prática #####

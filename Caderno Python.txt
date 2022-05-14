@@ -1,4 +1,6 @@
-==aninhamento em print
+###### Anotações resumidas Python: ######
+
+### Aninhamento em print ###
 nome = 'gabriel'
 print('Olá {:>20}'.format(nome))
 >>>Olá              gabriel
@@ -10,8 +12,9 @@ pow(): Power, potência. Similar a **
 sqrt(): Calcular raíz quadrada (SQuareRooT)
 factorial(): calculo fatorial
 len(frase) indica a quantidade de caracteres da frase
+map()
 
-====Transformação: 
+### Transformação: ###
 '-'.join(frase) junta todos os elementos (do codigo acima) de frase e usa '-' entre os espaços.
 frase.split() Pega aonde tem espaços e cria uma divisão. Cria novas indexações para cada palavra e coloca dentro de uma Lista.
 frase.replace('Python', 'Android') = Procura e substitui 'Python' por 'Android'
@@ -23,8 +26,8 @@ frase.strip() remove todos os espaços inúteis no inicio e final da frase (Meno
 frase.rstrip() R significa Right (Direita), remove apenas somente os ultimos espaços inuteis
 frase.lstrip() L significa Left (Esquerda), remove apenas os primeiros espaços inuteis
 
-====Manipulando texto:
-==Fatiamento:
+### Manipulando texto: ###
+# Fatiamento:
 frase = cursoemvideopython
 frase[:5] >>>curso
 frase[15:] >>>python
@@ -36,11 +39,11 @@ frase.find('deo') indica em qual espaço da memoria começa "deo" = cursoemvi'de
 Se não encontrar, ele retorna -1. Que indica que não foi encontrado.
 'Curso' in frase, procuraria "Curso" na string frase e retorna True/False
 
-====Repetições FOR
+### Repetições FOR ###
 for c in range(10, 1, -1): "de 10 ate 1, tire 1"
 for c in range(0, 7, 2): "de 0 ate 6, pulando de 2 em 2"
 
-====Tuplas:
+### Tuplas: ###
 print("n1[0]))
 print("n1[0:2])) (entre o 0 a 1)
 print("n1[1:])) (Comece no 1 até o final)
@@ -48,7 +51,7 @@ print("n1[-1])) (apenas o último)
 for c in n1:
    print(c) //1 2 3 4 5
 
-==Dicionários: {}
+### Dicionários: {} ###
 informacao = {
 "nome": "Gabriel C",
 "idade": 27,
@@ -59,14 +62,17 @@ informacao = {
 print(informacao[nome])         // Gabriel C
 print(informacao.get(nome))     // Se nao existir, retorna "none" invez de erro. Mesmo com multiplas procuras.
 informacao["nome"] = "Daniel T" // Vai alterar
-==Construtores/Constructors:
+
+### Construtores/Constructors: ###
 class Point:
    def __init__(self, x, y): //Método construtor
       self.x = x
       self.y = y
+	  
 
    def move(self)
       print("move")
+	  
    def draw(self):
       print("draw")
    
@@ -74,7 +80,7 @@ point = Point(10, 20)
 point.x = 10
 print(point.x)
 
-==Herança: Mecanismo para reutilização de classes
+### Herança: Mecanismo para reutilização de classes ###
 class Mamifero:
 def walk(self):
       print("walk") 
@@ -86,15 +92,15 @@ class Dog(Mamifero):  //Herda todos os atributos da classe Mamifero
 dog1 = Dog()
 dog1.walk()
 
-==Funções matemáticas:
+### Funções matemáticas: ###
 import math
 x = 2.9
 print(abs(-2.9))       // Retorna 2.9
 print(math.ceil(2.9))  // Retorna 3
 print(math.floor(2.9)) // Retorna 2
 
-==Nested loops:
-=for x in range(4):
+### Nested loops: ###
+# for x in range(4):
    for y in range(3):
       print(f'({x}, {y})')
 Resultado:
@@ -115,8 +121,7 @@ for x_count in numbers:
 	xx
 	xx
 
--=-=-=-=-=-=-=-=-=-=-=-=-=-
-==Listas 2d (Matriz):
+### Listas 2d (Matriz): ###
 matriz = [
 1, 2, 3
 4, 5, 6
@@ -130,8 +135,8 @@ for m in matriz:
    for item in m:
       print(item) // Vai imprimir de 1 a 9, da matriz.
 
-==Comandos lista: []
-=numbers = [5, 4, 3, 2, 1]
+### Comandos para listas: [] ###
+# numbers = [5, 4, 3, 2, 1]
 numbers.append(7)    // numbers = [5, 4, 3, 2, 1, 7] sempre no fim
 numbers.inser(0, 10) // numbers = [10, 5, 4, 3, 2, 1, 4]na posicao 0. Todos os outros sao empurrados para frenrte
 numbers.remove(5)    // numbers = [4, 3, 2, 1, 4] remove o primeiro numero 5 que encontrar
@@ -142,13 +147,13 @@ numbers.sort()     // Organiza do menor pro maior
 numbers.reverse()  // Organiza do maior pro menor
 numbers.copy()     // Copia
 
-==Ordem de Precadência:
+### Ordem de Precadência: ###
 #1: ()
 #2: **
 #3: * / // %
 #4: + -
 
-====Cores:
+### Cores no Terminal: ###
 \033[m Entre o [ e m colocar o codigo da cor. Código asci
 style, text, back
 \033[0;33;44m
@@ -158,7 +163,7 @@ style, text, back
 
 __repr__(self) = DEBUGGING
 
-==Classes e Subclasses
+### Classes e Subclasses ###
 EX: Classe Trabalhador
 Subclasses de Trabalhador: Engenheiros, Programadores, Professores[...]
 
@@ -171,7 +176,7 @@ class Engenheiro(Trabalhador)
     [codigo]
     [...]
 
-=-=-=-=-=-=-=-=-=-=-=-=-=
+///////////////
 class Employee:
     num_of_emps = 0
     raise_ammount = 1.04
@@ -193,9 +198,9 @@ class Employee:
 emp_1 = Employee('Corey', 'Schafer', 50000)
 emp_2 = Employee('Test', 'User', 60000)
 print(Employee.num_of_emps)
-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=
-=====Multithread
-===Exemplo abaixo: Baixando imagens com threads assincronizadas:
+
+### Multithread ###
+# Exemplo abaixo: Baixando imagens com threads assincronizadas:
 
 import request
 import time
@@ -222,5 +227,3 @@ with concurrent.futures.ThreadPoolExecutor() as executor:
 
 t2 = time.perf_counter()
 print(f'Finished in {t2-t1} seconds')
-
-

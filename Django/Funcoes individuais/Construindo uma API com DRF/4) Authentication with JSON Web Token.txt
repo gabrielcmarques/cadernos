@@ -1,5 +1,9 @@
 Templates e Resources:
 https://github.com/divanov11/Django-2021/tree/master/api
+https://www.django-rest-framework.org/api-guide/authentication/
+
+Autenticação verifica quem o usuário é
+Autorização permite ou nega o que o usuário pode fazer
 
 ###### O exemplo vai configurar um sistema de autorização e 
 autenticação com JSON Web Tokens #####
@@ -28,6 +32,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+#Ver certinho na documentação sobre expiration date dos web tokens
 urlpatterns = [
 	#Acima das outras URLS mesmo:
     path('users/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

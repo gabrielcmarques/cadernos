@@ -78,7 +78,6 @@ Tem que estar mostrando os projects, ids, owners
 
 
 ###### Frontend/main.js:
-
 let projectsUrl = 'http://127.0.0.1:8000/api/projects/'
 
 let getProjects = () => {
@@ -131,9 +130,8 @@ let buildProjects = (projects) => {
     }
 }
 
-#Agora a informação adquirida pela API vai estar renderizada no website.
+#Agora a informação adquirida pela API vai estar renderizada no website. Estilo:
 
 https://github.com/divanov11/Django-2021/blob/master/frontend/main.css
 - Frontend/main.css:
 Apenas copiar, colar e modificar dependendo do que precisar.
-

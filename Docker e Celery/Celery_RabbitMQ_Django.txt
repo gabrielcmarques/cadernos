@@ -1,0 +1,540 @@
+Referência:
+https://github.com/veryacademy/YT-Django-Celery-Series-Intro-Install-Run-Task
+https://www.youtube.com/watch?v=fBfzE0yk97k&list=PLOLrQ9Pn6caz-6WpcBYxV84g9gwptoN20&index=1
+
+Documentação Celery:
+https://docs.celeryq.dev/en/stable/?msclkid=02a8dafdcf1011ec8a9778c4d1e2c88f
+
+Documentação RabbitMQ:
+https://www.rabbitmq.com/documentation.html?msclkid=aedf4482cf1011eca2c711f6e3d842ff
+
+Ver esse aqui detalhado depois
+https://www.rabbitmq.com/install-windows.html
+
+- Celery é um Task/Proccess manager. Ele serve para repartir as tarefas realizadas no 
+website em diferentes servidores para que o website seja executado com rapidez e eficiência.
+É praticamente multithread em web.
+
+- RabbitMQ é uma aplicação que serve como intermediário na gestão de envio e recebimento de 
+mensagens entre aplicações. Um Message-Broker, gestor de mensagens para sistema de inscritos
+do website. Label: Rotulo da mensagem. Payload: Conteúdo da mensagem. 
+
+###### INSTALAÇÃO ######
+- Instalar RabbitMQ: Se for windows primeiro precisa instalar essa linguagem chamada Erlang
+https://erlang.org/download/otp_versions_tree.html
+
+- Instalar RabbitMQ2: em "Direct Downloads" -> rabbitmq-server[versão].exe
+https://www.rabbitmq.com/install-windows.html?msclkid=1870ff3acf1311ecb933c80dfc9961a4
+
+- C:\Program Files\RabbitMQ Server\rabbitmq_server-3.10.0\sbin -> "rabbitmq-server.bat" -> Abrir como admin
+!!! EM CASO DE ERRO DE PORT !!!
+# "BOOT FAILURE" "[error] ERROR: distribution port 25672..."
+# Abrir Windows Powershell como Admin 
+>>>cd '.\Program Files\RabbitMQ Server\rabbitmq_server-3.8.9\sbin\'
+>>>.\rabbitmq-service.bat stop
+>>>.\rabbitmq-server.bat 
+# Deve resolver. Se não: https://www.google.com
+
+### VSCODE:
+- Abrir projeto principal no Vscode
+>>>python 3 -m venv venv
+>>>Ativar (env)
+>>>pip install django
+>>>pip install celery
+>>>django-admin startproject proj .
+
+- Criar 'celery.py' na pasta do projeto principal (que tem init e settings.py):
+from __future__ import absolute_import, unicode_literals
+from celery import Celery
+import os
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'proj.settings')
+app = Celery('proj')
+app_config_from_object('django.conf:settings', namespace='CELERY')
+app.autodiscover_tasks() # Crucial para detectar o Task1/tasks.py #
+
+# Para garantir que o pacote sempre seja importado qdo abre o vscode. shared_tasks vai usar esse app #
+- mainProj/__init__.py:
+from __future__ import absolute_import, unicode_literals
+
+from .celery import app as celery_app # celery.py
+__all__ = ('celery_app',)
+
+- No App:
+>>>python manage.py startapp task1
+- Proj/Settings.py: apontar novo app em INSTALLED_APPS
+
+- Criat Task1/tasks.py:
+from __future__ import absolute_import, unicode_literals
+from celery import shared_tasks
+
+@shared_task
+def add(x, y): 
+	return x + y
+
+>>>celery -A projName worker -l INFO --pool=solo
+# Vai começar as conexões e já usar o RabbitMQ como padrão.Se desativarmos o RabbitMQ
+ no outro shell, tudo vai parar de funcionar. --pool=solo é apenas para windows #
+
+### Testando em um novo shell do vscode:
+>>>python manage.py shell 
+>>>(shell)from task1.tasks import add 
+>>>(shell)add.delay(4,4) 
+# Vai retornar um 'async result'. no outro terminal tem que retornar mais info #
+
+### ENVIANDO EMAILS COM DJANGO E CELERY ###:
+- Workflow: CLIENT -> DJANGO -> RabbitMQ(Broker) -> CELERY
+
+1) O Client(Usuário) vai preencher o Form e enviar para o django por POST Request
+2) Django vai enfileirar a tarefa para o RabbitMQ Broker
+3) O Celery vai puxar a tarefa armazenada no RabbitMQ Broker.
+
+- Criar novo app task2:
+>>>python manage.py startapp task2 # Apontar para o settings.py a existência do app. #
+- Criar task2/forms.py: # Os estilos são apenas para ter uma visão do produto final #
+from django import forms 
+
+
+class ReviewForm(forms.Form):
+	name = forms.CharField(
+		label='FirstName', min_length=4, max_length=50, widget=forms.TextInput(
+			attrs={'class': 'form-control mb-3', 'placeholder': 'Firstname', 'id':
+			'forms-firstname'}))
+	email = forms.EmailField(max_length=200, widget=forms.TextInput(
+			attrs={'class': 'form-control mb-3', 'placeholder': 'E-mail', 'id':
+			'form-email'}))
+	review = forms.CharField(label='Review', widget=forms.Textarea(
+		attrs={'class': 'form-control', 'rows': '5'}))
+
+def send_email(self):
+	send_review_email_task.delay(
+		self.cleaned_data['name'], self.cleaned_data['email'], self.cleaned_data['review'])
+	https://dihfahsih.blogspot.com/2019/10/python-django-selfdata-vs.html
+# Vamos usar o atributo Review como exemplo para enviar o email #
+
+- Task2/views.py:
+from django.views.generic.edit import FormView 
+from django.http import HttpResponse # para criar um feedback após clicar o botão 'submit' #
+from task2.forms import ReviewForm 
+
+
+class ReviewEmailView(FormView): # Class based views #
+	template_name = 'review.html'
+	form_class = ReviewForm 
+	
+	def form_valid(self, form):
+		form.send_email()
+		msg = "Thanks for the review!"
+		return HttpResponse(msg)
+
+- Criar Task2/tasks.py:
+from celery.decorators import task 
+
+@task(name="send_review_email_task")
+
+- Criar Task2/email.py:
+from django.template import Context
+from django.template.loader import render_to_string 
+from django.core.mail import EmailMessage
+from django.conf import settings 
+
+def send_review_email(name, email, review):
+	context = {
+		'name:' name,
+		'email:' email, 		
+		'review:' review,
+		}
+	email_subject = 'Thank you for your review!'
+	email_body = render_to_string('email_message.txt', context)
+	
+	# Depois de criar email_message.txt: #
+	email = EmailMessage(
+		email_subject, email_body,
+		settings.DEFAULT_FROM_EMAIL, [email, ],
+	)   # Vai puxar o que estiver no settings.py #
+	return email.send(fail_silently=False)
+	# Error config #
+
+- Criar Task2/templates/email_message.txt:
+
+Hello {{name|safe}}
+Here is a copy of your review:
+{{review|safe}}
+
+Thank you!
+
+
+- MainProj/Settings.py:
+https://docs.djangoproject.com/en/4.0/topics/email/?msclkid=f9b921b4cf9611ecb0c8058d08cab6e3
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'seu@host.com'
+EMAIL_HOST_USER = 'seu@hostuser.com'
+EMAIL_HOST_PASSWORD = 'suasenha_Use_Variavel_os'
+EMAIL_PORT = 'seuport'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'seu@email.com' # Pode ser o mesmo do host user #
+
+
+### Mandando mensagens de volta para a interface utilizando o get task logger ###
+https://docs.celeryq.dev/en/stable/userguide/tasks.html?msclkid=e5d75f9fcf9711ec914484ed53c95f8c#bound-tasks
+- Task2/tasks.py:
+from celery.decorators import task 
+from celery.utils.log import get_task_logger
+
+from .email import send_review_email
+
+logger = get_task_logger(__name__)
+
+@task(name="send_review_email_task")
+def send_review_email_task(name, email, review):
+	logger.info("Sent review email")
+	return send_review_email(name, email, review)
+	# importar isso em task2/forms.py #
+	
+### Configurando gmail como um SMTP server ###
+- Precisamos de um gmail com 2 steps verification e como App para prosseguir. 
+- Create Gmail -> Settings -> Security -> 2 Steps Ver.
+- Settings -> Security -> App Password -> Select App: "My-Celery-Gmail" ->
+->  Copiar senha e colar em MainProj/settings.py:
+
+EMAIL_HOST_USER = 'gmail-cadastrado-agr'
+EMAIL_HOST_PASSWORD = 'senha-Usar-Variavel-No-Deploy'
+DEFAULT_FROM_EMAIL = 'gmail-cadastrado-agr, ou outro.'
+
+### Templates ###
+- Usar como base:
+https://github.com/veryacademy/YT-Django-Celery-Series-email-example/blob/master/task2/templates/base.html
+- Criar Task2/templates/base.html
+	[base code que precisar...]
+
+https://github.com/veryacademy/YT-Django-Celery-Series-email-example/blob/master/task2/templates/review.html
+- Criar Task2/templates/review.html
+
+      {% extends "base.html" %}
+      {% block title %}Review{% endblock %}
+      {% block content %}
+
+      <style>
+         ...
+      </style>
+
+      <div class="container-fluid">
+          <div class="row no-gutter">
+              <div class="col-md-6 bg-light">
+                  <div class="login d-flex align-items-center py-5">
+                      <div class="container">
+                          <div class="row">
+                              <div class="col-8 col-md-8  mx-auto">
+                                  <p class="h4 mb-4 font-weight-bold">Write a review</p>
+								  
+								  <!-- O importante é o FORM e Button SUBMIT. O resto é apenas base para vizualização final do produto -->
+                                  <form action="{% url 'reviews' %}" method="post">{% csrf_token %}
+                                      {{ form.as_p }}
+									  
+                                      <button class="btn btn-dark btn-block py-2 mb-4 mt-5 font-weight-bold"
+                                          type="submit" value="Log-in">Submit</button>
+                                  </form>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+            <div class="col-md-6 d-none d-md-flex bg-image"></div>
+          </div>
+      </div>
+      {% endblock %}
+
+- MainProj/urls.py:
+
+from task2.views import ReviewEmailView
+
+urlpatterns = [
+	path('reviews/', ReviewEmailView.as_view(), name="reviews"),
+]
+
+- Verificar se o RabbitMq ainda está online.
+https://www.rabbitmq.com/install-windows.html
+
+https://github.com/veryacademy/YT-Django-Celery-Series-email-example/blob/master/Commands.txt
+- Root/Commands.txt:
+# Checar como se está certinho o nome dos Apps;Projs nesse arquivo criado automaticamente #
+
+>>>celery -A mainProj worker -l INFO --pool=solo
+			# core?* 
+# Tem que retornar uma pequena lista '[tasks]' no final #
+
+### Testar no website: ###
+127.0.0.1:8000/reviews/ -> preecher forms -> Tem que redirecionar para uma página com "Thanks for the review".
+
+- No terminal tem que retornar uma task.
+- No Gmail tem que ter o email.
+
+https://www.heroku.com/
+### Dando Deploy Redis em um serviço Heroku para local dev ###
+- Workflow: CLIENT -> DJANGO -> Heroku -> CELERY
+Criar novo app -> Dashboard: Resources -> Add-ons: Heroku Redis, aguardar criar... -> 
+-> Settings Tab: Copiar o que estiver na "URI"
+
+# Configurando a broker URL para o serviço heroku #
+>>>pip install redis
+
+- MainProj/Settings.py:
+CELERY_BROKER_URL = 'Colar-URI-do-heroku'
+
+>>>python manage.py runserver
+
+# Executando celery em outro terminal #
+- Root/Commands.txt, copiar o que estiver similar e terminal:
+>>> celery -A mainProj worker -l INFO --pool=solo
+			  # core?*
+
+# Tem que retornar informação sobre o Redis com a URI #
+
+- Testar no 127.0.0.1:8000/reviews/ o form submit
+# No terminal tem que retornar o processo da task e tbm no gmail #
+
+### SCHEDULING TASKS COM DJANGO, CELERY, BEAT E FLOWER: ###
+
+https://pypi.org/project/django-flower
+# Instalando Flower: #
+>>>pip install django-flower
+
+# Em Root/Commands.txt vai ter o comando configurado para o shell, algo similar a: #
+Windows Work Around
+#####
+C:\django\venv\lib\site-packages\tornado\platform\asyncio.py 
+
+import sys
+
+if sys.platform == 'win32':
+	asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+- Checar nesse caminho acima se o asyncio.py está configurado dessa forma para funcionar no Windows.
+
+# Ativar o servidor flower #
+>>>flower -A mainProj --port=5555
+			 # core?*
+# Acessar localhost:5555. Uma dashboard similar ao django admin #
+
+### Criando Schedules com BEAT ##
+https://pypi.org/project/django-celery-beat/?msclkid=522f87eacfa111ecb1a5ca819f3fcd61
+
+>>>pip install django-celery-beat 
+# Apontar em Root/Settings.py/INSTALLED_APPS e dar Migration/Migrate #
+
+- Criar um Superuser django, no painel admin tem que ter uma nova tabela "Periodic Tasks". Clicar
+em Periodic Tasks -> Add periodic tasks, preencher o form com os testes e salvar. 
+- EXEMPLO:
+Name: NewTask
+Taks(registered): task1.tasks.add
+Description: Descrição
+Interval Schedulle: every 5 seconds
+Positional Arguments: [10,10]
+
+### Criando Schedules manualmente pelo Settings.py ###
+- MainProj/Settings.py:
+CELERY_BEAT_SCHEDULLE = {
+	"scheduled_task": {
+		"task": "task1.task.add", # task1/tasks.py def add()..#
+		"schedule": 5.0, 	      # Seconds #
+		"args": (10, 10),		  
+	},
+}
+
+- Ativar RabbitMQ Terminal1, ativar django-flower Terminal2 e ativar Beat Terminal3
+>>>flower -A mainProj --port=555
+>>>celery -A mainProj -l INFO 
+			 # core?*
+
+# Checar nos terminais os resultados. Checar localhost:5555/tasks #
+# Apenas o django admin vai ficar sem schedule. Para isso é necessário outra configuração: #
+
+### DJANGO DATABASE SCHEDULER COM BEAT ###
+>>>celery -A mainProj beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+			# core?*
+# Tem que retornar no terminal as schedules com intervalo configurado. Nas outras interfaces também. #
+
+### EXEMPLO DE TASK SCHEDULE BACKUP ###
+>>>python manage.py startapp task3
+
+- task3/models.py:
+from django.db import models 
+
+class Post(models.Model):
+	name = models.CharField(max_length=100)
+	# makemigrations/migrate #
+
+- Criar task3/tasks.py:
+from django.core.management import call_command # Permite criar comandos administrativos dentro do método abaixo#
+import sys 
+
+@shared_task 
+def bkup():
+	sys.stdout = open('db.json', 'w')
+	call_command('dumpdata', 'task3')
+
+- Painel Admin/Periodic Tasks/Add:
+task3.tasks.bkup
+
+# Isso vai criar um database backup em formato json na pasta root a cada 5 segundos #
+# Reiniciar servidores caso dê algum erro #
+
+### DJANGO RESULT BACKENDS ###
+https://pypi.org/project/django-celery-results/
+- Permite armazenar os resultados das tasks em cache e cache database
+
+>>>pip install django-celery-results
+# Apontar em mainProj/Settings.py/INSTALLED_APPS=[] #			
+>>>makemigrations/migrate
+
+!!! CASO ERRO "WindowsPath is not iterable": !!!
+Apenas tente reiniciar o vscode, reiniciar os terminais e reinstalar o pacote
+
+- Testar:
+>>>python manage.py shell
+>>>(shell) from task1.tasks import add
+>>>(shell) add.delay(2, 2)
+# Checar outros terminais e paineis admin se teve feedback #
+
+
+### DJANGO CACHE STORAGE: ###
+- Cache é um espaço para armazenar informação temporariamente com eficiência
+
+https://docs.djangoproject.com/en/4.0/topics/cache/
+* Memcached: É um cache server inteiramente baseado em memória
+* Database caching: Django pode armazenar dados em cache em databases
+* Filesystem caching: Serializes; armazena cada cache value. Separate; multiplos arquivos.
+* Local-memory caching + Dummy caching(apenas para Dev test): Cache de testes
+
+- Configurando Database Caching:
+- MainProj/Settings.py:
+CELERY_CACHE_BACKEND = 'default'
+
+CACHES = {
+	'default': {
+		'BACKEND': 'django.core.cache.cache.backends.db.DatabaseCache',
+		'LOCATION': 'cachedb',
+	}
+}
+
+>>>python manage.py createcachetable --dry-run # dry run para testar #
+# Tem que criar uma table com cache key, value e expires. #
+
+>>>python manage.py createcachetable
+# No Sqlite3 OU database de escolha tem que criar uma table "cachedb" #
+
+https://www.youtube.com/watch?v=oBQxFn1CDno
+### CONFIGURANDO DJANGO, CELERY & REDIS NO DOCKER COMPOSE ###:
+- Abrir Docker Desktop e criar containers para REDIS, Postgresql DB, Django e Django Celery
+
+- Nesse exemplo vamos criar um novo projeto chamado 'core' e app 'app'.
+>>>django-admin startproject core .
+>>>python manage.py startapp app # Apontar no Core/Settings.py/INSTALLED_APPS #
+- Criar 'Dockerfile' na pasta root (que contém manage.py) contendo:
+
+FROM python:3
+ENV PYTHONUNBUFFERED=1   # Permite criar logs de mensagens imediatamente ao inves de buffer #
+WORKDIR /usr/src/app     # Working directory do Docker Container, Ubunto. #
+COPY requirements.txt ./ 
+RUN pip install -r requirements.txt
+
+>>>pip freeze > requirements.txt
+- Editar arquivo com o que realmente precisa , especialmente:
+
+psycopg2-binary==versão
+celery==versão
+redis==versão
+
+https://hub.docker.com/
+### CONFIGURAÇÃO DOCKER COMPOSE YML FILE ###
+- Criar 'docker-compose.yml' no mesmo diretório contendo:
+version: "3.8"
+
+services:
+	django:
+		build: .
+		container_name: django
+		command: python manage.py runserver 0.0.0.0:8000
+		volumes:
+			- .:/usr/src/app/
+		ports:
+			- "8000:8000"
+		environment:
+			- DEBUG=1
+			- DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1
+			- CELERY_BROKER=redis://redis:6379/0
+			- CELERY_BACKEND=redis://redis:6379/0
+		depends_on:
+			- django
+			- redis
+		pgdb:
+			image: postgres
+			container_name: pgdb
+			environment:
+				- POSTGRES_DB=postgres
+				- POSTGRES_USER=postgres
+				- POSTGRES_PASSWORD=postgres
+				# https://hub.docker.com/_/postgres/ -> Environment Variables #
+			volumes:
+				- pgdata:/var/lib/postgresql/data/
+		redis:
+			image:"redis:alpine"
+	volumes:
+		pgdata:
+
+# Build '.' seria a root do projeto, pasta contendo manage.py #
+# container_name para não precisar referenciar por ID. Pode ser outro nome #
+# volumes vai ser um espelho da pasta root. O que mudarmos localmente vai mudar no docker #
+# 6379 é o port padrão para redis #
+
+# Conectando Redis Docker com o projeto: #
+- Core/Settings.py, adicionar na última linha:
+
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+CELERY_RESULTS_BACKEND = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+
+- Criar Core/celery.py contendo:
+from __future__ import absolute_import, unicode_literals
+import os 
+from celery import Celery 
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+
+app = Celery("core")
+
+app.config_from_object("django.conf:settings", namespace="CELERY")
+
+app.autodiscover_tasks()
+
+- Criar App/tasks.py contendo:
+from __future__ import absolute_import, unicode_literals
+
+from celery import shared_task
+
+@shared_task
+def add(x, y):
+	return x + y
+	
+- Core/__init__.py:
+from .celery import app as celery_app 
+
+__all__ = ("celery_app",)
+
+- E finalmente, vamos migrar tudo para o docker:
+>>>docker-compose run django 
+# Variável de ./Root/docker-compose.yml::container_name: django #
+- Aguardar, checar por erros, consertar. Quando terminar, desativar esse com Ctrl+C 
+
+>>>docker-compose up 
+# Olhar bem o terminal, caso erro, consertar e usar o comando novamente #
+
+- Mandando uma task do VScode para o Shell Docker:
+# Novo Terminal: 
+>>>docker exec -it django sh
+>>>python manage.py shell
+>>>from app.task import add 
+>>>add.delay(2, 2)
+
+# Checar terminais, paineis admin.
+###### E por fim, vai ligar os servidores com todas essas configurações acima. O resto é no Docker #######

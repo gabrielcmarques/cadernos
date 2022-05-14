@@ -1,0 +1,499 @@
+Exemplo:
+https://www.youtube.com/watch?v=N-R5mT-nIDk
+https://github.com/PrettyPrinted/youtube_video_code/tree/master/2021/11/21/How%20to%20Use%20Django%20Sessions
+### Django Sessions: ###
+
+- Sessions são informações guardadas no Browser ou Database.
+- Browser -> Click Direito, Inspect -> Application, Session ID;Cookies
+
+https://github.com/PrettyPrinted/youtube_video_code/blob/master/2021/11/21/How%20to%20Use%20Django%20Sessions/djangosessionsexample/sessions/store/views.py
+- Store/Views.py:
+
+from django.shortcuts import render
+import requests
+from .models import Product
+
+def index(request):
+    products = Product.objects.all()
+    context = {'products': products}
+    return render(request, 'index.html', context)
+
+def product(request, product_id):
+    product = Product.objects.get(pk=product_id)
+    recently_viewed_products = None
+
+    if 'recently_viewed' in request.session: # Caso já tenha visita no site #					
+        if product_id in request.session['recently_viewed']: 
+            request.session['recently_viewed'].remove(product_id) # Evitar duplicado #				
+
+        products = Product.objects.filter(pk__in=request.session['recently_viewed'])
+        recently_viewed_products = sorted(products, 
+            key=lambda x: request.session['recently_viewed'].index(x.id)
+            ) # Ordenação. Do mais recente para o último. O products    #
+			  # passa a ser 'x', retornando o id específico do products #
+			
+        request.session['recently_viewed'].insert(0, product_id)
+        if len(request.session['recently_viewed']) > 5: 
+            request.session['recently_viewed'].pop() # Cinco produtos por vez #
+    else:
+        request.session['recently_viewed'] = [product_id] # Primeira visita no site #
+    request.session.modified = True # Faz com que o django atualize a session toda vez que o codigo rodar #
+
+    context = {'product': product, 'recently_viewed_products': recently_viewed_products}
+    return render(request, 'product.html', context)
+	
+# Esse codigo acima vai salvar os últimos produtos visitados em um dicionário chamado 
+'recently_viewed', armazenar em Session e mostrar para o usuário as visitas anteriores #
+
+def load_products(request):
+    r = requests.get('https://fakestoreapi.com/products')
+		# print(r.json())
+    for item in r.json():
+        product = Product( 
+            title=item['title'],
+            description=item['description'],
+            price=item['price'],
+            image_url=item['image']
+        )
+        product.save()
+    return render(request, 'index.html')
+# Esse website contém informações falsas, apenas para exemplo. Testar com API propria #
+
+https://github.com/PrettyPrinted/youtube_video_code/blob/master/2021/11/21/How%20to%20Use%20Django%20Sessions/djangosessionsexample/sessions/store/templates/product.html
+- Store/templates/product.html:
+<title>{{product.title}}</title>
+<div class="container">
+	<h1>{{product.title}}</h1>
+	<img src="{{ product.image_url }}" class="main_image" />
+	<p>{{product.description}}</p>
+	<h3>Recently Viewed</h3>
+	<div class="related">
+		{% for recent_product in recently_viewed_products %}
+		<img src="{{ recent_product.image_url }}" alt="" class="related_image">
+		{% endfor %}
+	</div>
+</div>
+
+https://github.com/PrettyPrinted/youtube_video_code/blob/master/2021/11/21/How%20to%20Use%20Django%20Sessions/djangosessionsexample/sessions/store/templates/index.html
+- Store/templates/index.html:
+<div class="container">
+	<h1>Products</h1>
+	{% for product in products %}
+	<img class="image" src="{{ product.image_url }}" />
+	<a href="{% url 'product' product.id %}"><h3>{{product.title}}</h3></a>
+	{% endfor %}
+</div>  
+
+- Modificar as referências acima como precisar e testar no website.
+- Store/Views.py:
+
+###### DJANGO CHANNELS & WEB SOCKETS ######
+- Referência: https://github.com/divanov11/django-channels-basic-chat
+- Channels lida com Web Sockets, Chat Protocols e IoT Protocols via ASGI.
+>>>(venv)
+>>>django-admin startproject mywebsite .
+>>>python manage.py startapp chat # Settings.py/INSTALLED_APPS=['chat',] #
+
+- Mywebsite/Urls.py:
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('chat.urls'))
+]
+
+https://github.com/divanov11/django-channels-basic-chat/blob/master/chat/templates/chat/lobby.html
+- Criar Chat/Templates/Chat/lobby.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Lobby</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+</head>
+<body>
+    <h1>Lets chat!</h1>
+
+    <form id="form">
+        <input type="text" name="message"/>
+    </form>
+    <div id="messages"></div>
+    </body>
+</html>
+
+- Chat/Views.py:
+from django.shortcuts import render
+
+def lobby(request):
+    return render(request, 'chat/lobby.html')
+	
+- Chat/Urls.py:
+from django.urls import path 
+from . import views 
+
+urlpatterns = [
+    path('', views.lobby)
+]
+
+>>>python manage.py runserver
+...
+>>>pip install channels  # Settings.py/INSTALLED_APPS=['channels',] no topo para evitar conflitos #
+
+### Configurando ASGI:
+- Vamos criar a configuração de Routing. Ele vai apontar para o channels 
+qual codigo rodar quando uma HTTP request é recebida via channels server. -
+
+https://github.com/divanov11/django-channels-basic-chat/blob/master/mywebsite/asgi.py
+- Mywebsite/asgi.py:
+...
+from channels.routing import ProtocolTypeRouter 
+...
+application = ProtocolTypeRouter({
+    'http':get_asgi_application()   
+
+})
+
+- Settings.py, logo abaixo de INSTALLED_APPS:
+ASGI_APPLICATION = 'mywebsite.asgi.application'
+
+>>>python manage.py runserver 
+# O terminal tem que retornar "Starting ASGI/Channels ..." #
+
+https://github.com/divanov11/django-channels-basic-chat/blob/master/chat/templates/chat/lobby.html
+- Chat/templates/chat/lobby.html:
+
+<html>
+<body>
+    <h1>Lets chat!</h1>
+    <form id="form">
+        <input type="text" name="message"/>
+    </form>
+    <div id="messages"></div>
+    <script type="text/javascript">
+        let url = `ws://${window.location.host}/ws/socket-server/`
+		
+		const chatSocket = new WebSocket(url)
+		
+        chatSocket.onmessage = function(e){
+            let data = JSON.parse(e.data)
+            console.log('Data:', data)
+
+            }     
+
+    </script>
+</body>
+</html>
+
+https://github.com/divanov11/django-channels-basic-chat/blob/master/chat/consumers.py
+- Criar Chat/Consumers.py:
+
+import json
+from channels.generic.websocket import WebsocketConsumer
+
+class ChatConsumer(WebsocketConsumer):
+    def connect(self):
+        self.room_group_name = 'test'
+
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+        self.accept() 
+
+        self.send(text_data=json.dumps({
+            'type':'connection_established',
+            'message': 'You are now connected!'
+        }))
+
+https://github.com/divanov11/django-channels-basic-chat/blob/master/chat/routing.py
+- Criar Chat/routing.py:
+
+from django.urls import re_path 
+from . import consumers
+
+websocket_urlpatterns = [
+    re_path(r'ws/socket-server/', consumers.ChatConsumer.as_asgi())
+]
+
+https://github.com/divanov11/django-channels-basic-chat/blob/master/mywebsite/asgi.py
+- Modificar asgi.py:
+
+from channels.auth import AuthMiddlewareStack
+import chat.routing
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'mywebsite.settings')
+
+application = ProtocolTypeRouter({
+    'http':get_asgi_application(),
+    'websocket':AuthMiddlewareStack(
+        URLRouter(
+            chat.routing.websocket_urlpatterns # Routing.py #
+		)
+    )
+})
+
+>>>migrations/migrate
+>>>runserver 
+- Checar console dentro do website se a informação foi printada:
+"Data: type connection_established message: You are now connected"
+- Essa request foi inicializada pelo servidor, não pela view.
+
+https://github.com/divanov11/django-channels-basic-chat/blob/master/chat/templates/chat/lobby.html
+- Modificar templates/chat/lobby.html:
+
+...
+
+<body>
+    <h1>Lets chat!</h1>
+    <form id="form"> #
+        <input type="text" name="message"/> #
+    </form> #
+    <div id="messages"></div>
+    <script type="text/javascript">        
+		...
+        chatSocket.onmessage = function(e){
+            ...
+            }
+        }		
+		# Pegando id e apontando para o form acima #
+        let form = document.getElementById('form')
+        form.addEventListener('submit', (e)=> {
+            e.preventDefault()
+            let message = e.target.message.value 
+            chatSocket.send(JSON.stringify({
+                'message':message
+            }))
+            form.reset()
+        })
+    </script>
+</body>
+</html>
+
+https://github.com/divanov11/django-channels-basic-chat/blob/master/chat/consumers.py
+- modificar chat/consumers.py:
+
+class ChatConsumer(WebsocketConsumer):
+    def connect(self):
+	...
+
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+		
+		print('Message')
+
+- Testar form novo do website, tem que sair no terminal a mensagem. 
+...
+- Modificar chat/consumers.py:
+
+class ChatConsumer(WebsocketConsumer):
+    def connect(self):
+	...
+
+    def receive(self, text_data):
+        ...		
+		print('Message')
+		
+		self.send(text_data=json.dumps({
+			'type':'chat_message',
+            'message':message
+		}))
+
+- Modificar Chat/templates/chat/lobby:
+...
+<div id="messages"></div>
+...
+chatSocket.onmessage = function(e){
+	...
+	
+	if(data.type === 'chat'){
+		let messages = document.getElementById('messages')
+
+		messages.insertAdjacentHTML('beforeend', `<div>
+								<p>${data.message}</p>
+							</div>`)
+	}
+}
+              
+- Checar no website se ainda está funcionando sem erros e prosseguir:
+
+https://youtu.be/cw8-KFVXpTE?t=711 [11:50]
+### Configurando Channel Layers ###: 
+- Permite criar interações entre diferentes instâncias de aplicações 
+para comunicação em tempo real. Opcional. #
+
+- Vamos configurar com integração Redis. Settings.py:
+...
+ASGI_APPLICATION = ...
+
+CHANNEL_LAYERS = {
+    'default':{
+        'BACKEND':'channels.layers.InMemoryChannelLayer'
+    }
+}
+
+https://github.com/divanov11/django-channels-basic-chat/blob/master/chat/consumers.py
+- Modificar Chat/consumers.py:
+from asgiref.sync import async_to_sync
+
+class ChatConsumer(WebsocketConsumer):
+    def connect(self):
+        self.room_group_name = 'test'
+
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name,
+            self.channel_name
+		# cada channel name vai ser criado automaticamente para cada user #
+        )
+
+        self.accept()
+		
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type':'chat_message',
+                'message':message
+            }
+        )
+		
+    def chat_message(self, event):
+        message = event['message']
+
+        self.send(text_data=json.dumps({
+            'type':'chat',
+            'message':message
+        }))
+
+- Abrir 2 tabs de browser, testar form, a msg tem que aparecer em ambos browsers.
+
+###### CRIANDO UM CHAT APP COM CHANNELS E WEBSOCKETS ######
+- https://youtu.be/Wv5jlmJs2sU
+- https://github.com/justdjango/justchat
+- https://channels.readthedocs.io/en/stable/tutorial/part_1.html
+
+https://github.com/veryacademy/yt-django-4-baseline-multiple-image-form
+###### UPLOAD DE MULTIPLAS IMAGENS COM DJANGO ######
+
+- Existem múltiplas formas de fazer isso. Nessa usaremos a library pillow com 1 to many relations.
+Mas também tem sim como fazer Many to Many:
+
+https://pypi.org/project/Pillow/
+>>>pip install pillow
+
+- Settings.py:
+INSTALLED_APPS=[pillow,]
+MEDIA_ROOT = os.path.join(BASE_DIR, "media") # Pasta_principal/media #
+MEDIA_URL = "/media/" # Browser. url.com/media/ #
+
+- Urls.py:
+from django.conf import settings 
+
+urlpatterns = [
+...
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+	
+https://docs.djangoproject.com/en/4.0/ref/models/fields/#imagefield
+- Armazenando a url link da imagem no database:
+- Models.py:
+
+class Project(models.Model):
+	...
+	user = models.ForeignKey(User, on_delete=models.PROTECT)
+	...
+
+class Image(models.Model):
+	project = models.ForeignKey(Project, on_delete=models.CASCADE)
+	image = models.ImageField(null=True, blank=True)
+	# class ImageField(upload_to=None, height_field=None, width_field=None, max_length=100, **options) #
+	
+>>>Makemigrations/Migrate # para testes dev deletar as migrations dentro da pasta migrate. #
+
+https://www.w3schools.com/TAGS/att_input_multiple.asp
+https://github.com/veryacademy/yt-django-4-baseline-multiple-image-form/blob/main/final%20code/project/forms.py
+- Forms.py:
+from .models import Image, Project 
+
+class ImageForm(forms.ModelForm):
+	image = forms.ImageField(
+		label="Image",
+		widget=forms.ClearableFileInput(attrs={"multiple": True}), # O principal é esse Multiple:True #
+	)
+	
+	class Meta:
+		model = Image
+		fields = ("image",)
+
+https://docs.djangoproject.com/en/4.0/ref/forms/api/#using-forms-to-validate-data
+https://github.com/veryacademy/yt-django-4-baseline-multiple-image-form/blob/main/final%20code/project/views.py
+- Views.py:
+from .forms import ImageForm, ProjectForm
+from .models import Image, Project
+
+def create_project(request):
+
+    if request.method == "POST": ## Se existir informação e for válida, salvar. ##
+        form = ProjectForm(request.POST)
+			# print(request.POST)
+        files = request.FILES.getlist("image") ###
+        if form.is_valid():
+            f = form.save(commit=False)
+            f.user = request.user
+            f.save()
+            for i in files: ### 
+                Image.objects.create(project=f, image=i) ###				
+				#    Referência models.py:: class Images(...): #
+				# -> project = models.ForeignKey(...)	       #
+				# -> image = models.ImageField(...)   		   #
+			
+            messages.success(request, "New Project Added")
+            return HttpResponseRedirect("/projects") 
+			# Ou apenas o redirect convencional mesmo. Ver sobre reverse tbm #
+        else:
+            print(form.errors)
+    else: ## Se não, renderizar forms vazios mesmo ##
+        form = ProjectForm() 
+        imageform = ImageForm()
+
+    return render(request, "create_project.html", {"form": form, "imageform": imageform})
+
+https://docs.djangoproject.com/en/4.0/topics/forms/
+https://github.com/veryacademy/yt-django-4-baseline-multiple-image-form/blob/main/final%20code/project/templates/create_project.html
+- Template/create_project.html: 
+{% extends "base.html" %}
+{% block title %}
+<h1>New Project</h1>
+{% endblock %}
+
+{% block content %}
+<form id="post_form" method="post" action="" enctype="multipart/form-data"> 
+  {% csrf_token %}
+  {% for hidden in form.hidden_fields %}
+	  {{ hidden }}
+  {% endfor %}
+  {% for field in form %}
+	  {{ field }} <br />
+  {% endfor %}
+  {{ imageform.management_form }}
+  {% for form in imageform %}
+	  {{ form }}
+  {% endfor %}
+  <input type="submit" name="submit" value="Submit" />
+</form>
+{% endblock %}
+
+- Ver sobre o {% if message %} em main.html
+https://github.com/veryacademy/yt-django-4-baseline-multiple-image-form/blob/main/final%20code/project/templates/base.html
+- Enctype multipart form-data é mt importante. Ver sobre hidden fields na doc acima
+
+- Testar no website criando uma nova conta com imagem. Checar no db tbm
+- A biblioteca Pillow oferece ainda mais formas de validar imagem, redimensionar, 
+permitir apenas PNG ou JPG, etc.
+
