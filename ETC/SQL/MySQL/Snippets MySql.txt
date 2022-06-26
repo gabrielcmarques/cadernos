@@ -1,4 +1,4 @@
-//////////// Inserindo informções na tabela
+### Inserindo informções na tabela ###
 insert into cursos values
 ('1', 'HTML4', 'Curso de HTML5', '40', '37', '2014'),
 ('2', 'Algoritmos', 'Lógica de Programação', '20', '15', '2014'),
@@ -11,7 +11,7 @@ insert into cursos values
 ('9', 'Cozinha Árabe', 'Aprenda a fazer Kibe', '40', '30', '2018'),
 ('10', 'Youtuber', 'Gerar polêmica e ganhar inscritos', '5', '2', '2018');
 
-//////////// Criando tabelas com Chave Estrangeira
+### Criando tabelas com Chave Estrangeira ###
 create table gafanhoto_assiste_curso(
 id int not null auto_increment,
 `data` date,
@@ -22,14 +22,14 @@ foreign key(idgafanyhoto) references gafanhotos (id),
 foreign key(idcurso) references cursos(idcurso)
 )default charset = utf8;
 
-//////////// Uso avançado do Join:
+### Uso avançado do Join: ###
 select g.nome, c.nome from gafanhotos g
 join gafanhoto_assiste_curso a
 on g.id = a.idgafanhoto
 join cursos c
 on c.idcurso = a.idcurso;
 
-//////////// Outros
+### Outros ###
 show
 describe
 select * from cursos;

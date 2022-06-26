@@ -15,13 +15,13 @@ Dockerfile: É uma blueprint para construir um Docker
 Image: É um template para rodar Docker Containers
 Container: É um processo produzido a partir da Image
 
-=====================================================
+#################################################################################
 1: Criar venv, instalar django, criar requirements.txt na pasta raíz com o exemplo
 
 Django==3.1.2
 psycop2-binary==2.8.6
 
-########
+########################################################################
 2: Criar Dockerfile (sem extensão, exatamente assim) com exemplo abaixo:
 
 FROM python:3.8
@@ -38,15 +38,14 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-######
+-
 FROM:    Define a imagem base usada na construção da imagem
 ENV:     Variáveis de ambiente
 WORDDIR: Working Directory, a source.
 COPY: 	 Copia arquivos para executar no RUN na pasta /code (o ponto no final). "COPY . ." Primeiro Ponto copia tudo que está na pasta local e envia para a pasta /code. Nesse caso copiou TUDO.
 RUN: executa instruções que o COPY jogou para a source.
 
-#####
-criar docker-compose.yml na pasta raíz, copiar e colar o código do git acima com msm nome, como exemplo.
+- criar docker-compose.yml na pasta raíz, copiar e colar o código do git acima com msm nome, como exemplo.
 
 docker-compose.yml:
 
@@ -66,10 +65,8 @@ services: #No caso web e db,
 volumes:
   postgres_data:
 
-######
-.dockerignore: Criar um arquivo com esse nome permite fazer excessões, similar ao .gitignore
-######
-settings.py-> procurar por DATABASES, tudo abaixo com referência ao docker-compose.yml acima:
+- .dockerignore: Criar um arquivo com esse nome permite fazer excessões, similar ao .gitignore
+- settings.py-> procurar por DATABASES, tudo abaixo com referência ao docker-compose.yml acima:
 
 DATABASES = {
     "default": {
@@ -82,9 +79,7 @@ DATABASES = {
     }
 }
 
-#####
-Shell venv -> 
-
+- Shell venv -> 
 
 docker-compose up 
 #vai iniciar um servidor docker, executando todas as intruções que fornecemos no arquivo .yml, instalando e criando as variáveis que apontamos.
@@ -112,14 +107,14 @@ docker-compose exec web python manage.py migrate
 
 #docker-compose exec web python manage.py createsuperuser
 
-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-#####Comandos: 
+###########################################################################
+- Comandos: 
 
 docker run [container id]
 #Roda o container pelo shell
 
 
-##### Port Forwarding:
+- Port Forwarding:
 docker run -p 5000:8080 [container id]
 #roda o container pelo shell com port específico
 
@@ -130,7 +125,7 @@ docker volume create [nome]
 docker run \
 --mount source=[nome], target=/[outra pasta]
 
-#####Debugging:
+- Debugging:
 Desktop app -> Logs
 
 pelo shell: (EXEMPLO)
@@ -139,8 +134,8 @@ cd src
 ls
 cat index.html
 
-######### DEPLOYMENT com London App Developer no youtube:
-https://www.youtube.com/watch?v=nh1ynJGJuT8 ##########################################################################################################################################
+### DEPLOYMENT com London App Developer no youtube:###
+https://www.youtube.com/watch?v=nh1ynJGJuT8 
 1) Setup Docker
 2) Add NGINX proxy
 3) Modifying settings file
@@ -173,8 +168,7 @@ USER user
 
 CMD ["entrypoint.sh"]
 
-###
-uWSGI: A tool that is used to run Python applications in production
+- uWSGI: A tool that is used to run Python applications in production
 
 adicionar no requirements.txt:
 Django>=3.0.6,<3.1
@@ -206,7 +200,7 @@ services:
     environment:
     - DEBUG=1
 
-#shell:
+- shell:
 #O docker desktop tem que estar aberto para funcionar.
 docker-compose up
 
@@ -428,4 +422,3 @@ change directory. Esse acima vai direto para home
 #cria um hello.txt com uma string 'hello' dentro
 >>>ls -l /etc > files.txt
 #vai listar os arquivos dentro de etc e armazenar a informação em files.txt
-

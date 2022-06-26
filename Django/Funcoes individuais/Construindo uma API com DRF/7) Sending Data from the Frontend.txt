@@ -1,8 +1,7 @@
 Templates e Resources:
 https://github.com/divanov11/Django-2021/tree/master/api
 
-
-###### Esse exemplo vai permitir enviar POST requests pelo frontend para o backend #####
+##### Esse exemplo vai permitir enviar POST requests pelo frontend para o backend #####
 https://github.com/divanov11/Django-2021/blob/master/frontend/main.js
 -Criar Frontend/projects-list.html com boilerplatye Doctype HTML
 
@@ -25,7 +24,8 @@ getProjects()
 
 ### Isso acima vai criar um input event handler de botão. Testar no browser -> 
 -> Inspect Element -> Console. Tem que ter o Array "Vote Buttons". ###
-### Modificar:
+
+- Modificar:
 
 let addVoteEvents = () => {
     let voteBtns = document.getElementsByClassName('vote--option')
@@ -40,7 +40,7 @@ let addVoteEvents = () => {
 ###Inspect Element -> Console. Clicar nos botões Up/Down do website e ver se o console responde com:
 "Vote was clicked".
 
-### Se tudo deu certo, usar modificação abaixo vai alterar o website de acordo com interações Upvote/Downvote.
+- Se tudo deu certo, usar modificação abaixo vai alterar o website de acordo com interações Upvote/Downvote.
 https://github.com/divanov11/Django-2021/blob/master/frontend/main.js
 
 

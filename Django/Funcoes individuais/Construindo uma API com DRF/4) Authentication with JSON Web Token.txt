@@ -5,7 +5,7 @@ https://www.django-rest-framework.org/api-guide/authentication/
 Autenticação verifica quem o usuário é
 Autorização permite ou nega o que o usuário pode fazer
 
-###### O exemplo vai configurar um sistema de autorização e 
+##### O exemplo vai configurar um sistema de autorização e 
 autenticação com JSON Web Tokens #####
 
 - Website -> Inspect Element -> Storage/Cookies é onde ficam armazenados os Web Token IDs

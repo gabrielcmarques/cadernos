@@ -57,7 +57,7 @@ form.addEventListener('submit', (e) => {
             }
         })
 })
-#Testar novamente o login.html. No Console do browser vai ter que retornar o 'access' e 'refresh' token,
+- Testar novamente o login.html. No Console do browser vai ter que retornar o 'access' e 'refresh' token,
 igual como está na API quando logamos em url/api/users/token/
 
 ##### Alterar o final de login.js:

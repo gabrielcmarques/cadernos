@@ -2,10 +2,10 @@ Templates e Resources:
 https://github.com/divanov11/Django-2021/tree/master/api
 https://www.django-rest-framework.org/tutorial/1-serialization/#using-modelserializers
 
-###### Esse exemplo adiciona Tags, Reviews e 
+##### Esse exemplo adiciona Tags, Reviews e 
 Profiles em JSON para a API Serializer  #####
 - api/serializers.py: 
-#Puxando classes de Projects/models.py:
+# Puxando classes de Projects/models.py:
 from projects.models import Project, Tag, Review
 from users.models import Profile
 
@@ -53,7 +53,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 - Testar url/api/projects
 - Testar url/api/projects/[project_id]
 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+#########################################################
 - Api/views.py:
 
 @api_view(['GET'])

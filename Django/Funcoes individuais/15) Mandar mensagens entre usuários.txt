@@ -185,5 +185,3 @@ https://github.com/divanov11/Django-2021/blob/master/users/templates/users/user-
 {% if request.user.profile.id != profile.id %}
 <a href="{% url 'create-message' profile.id %}" class="btn btn--sub btn--lg">Send Message </a>
 {% endif %}
-
-

@@ -2,9 +2,9 @@ https://pytutorial.com/django-models-filefield-example
 https://docs.djangoproject.com/en/4.0/ref/models/
 
 blank=True
-#O Django permite deixar em branco
+# O Django permite deixar em branco
 null=True
-#O Database permite deixar em branco
+# O Database permite deixar em branco
 
 - nomeApp/models.py:
 from django.db import models
@@ -190,9 +190,3 @@ https://github.com/divanov11/Django-2021/blob/master/templates/navbar.html
 <h1>logo</h1>
 <a href="{% url 'create-project.html' %}">Add a Project</a>
 <hr>
-
-
-
-
-
-

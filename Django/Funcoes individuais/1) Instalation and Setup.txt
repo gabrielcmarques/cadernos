@@ -101,7 +101,3 @@ Templates para Main.html e Navbar.html:
 {{mensagem}}
 {% endblock content %}
 #url/project/1
-
-
-
-

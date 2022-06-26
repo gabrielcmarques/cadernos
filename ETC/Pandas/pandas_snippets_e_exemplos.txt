@@ -1,0 +1,543 @@
+- Praticar: https://www.stratascratch.com/?via=keith
+- Documentação: https://pandas.pydata.org/docs/
+- Rest Pandas: https://pypi.org/project/rest-pandas/0.1.1/
+- Arquivos referência para treinar: https://github.com/KeithGalli/pandas
+- Tomar cudiado com tipos str ou int
+- Para checar o que um argumento dem variável faz: Shift + Tab
+- Verificar letras maiúsculas e minúsculas do df
+###################################################
+
+import pandas as pd
+
+### Abrindo arquivos CSV ###
+
+df = pd.read_csv('pokemon_data.csv')
+print(df)
+>>>arquivo csv
+
+print(df.head(3))
+>>>csv em apenas 3 primeiras informações
+
+### Abrindo arquivos EXCEL ###
+
+df_xlsx = pd.read_excel('pokemon_data.csv')
+print(df_xlsx.tail(3))
+>>>excel em 3 ultimos valores
+
+### Abrindo arquivos TXT ###
+
+df = pd.read_csv('pokemon_data.txt', delimiter='\t')
+print(df)
+>>>abre txt. Graças ao delimiter, ele funciona sem erros.
+
+### Variações do df.  ###
+print(df.columns) 
+>>>Apenas colunas
+
+print(df['Name'])
+>>>Apenas a coluna 'Name' ...
+
+print(df['Name'][0:5])
+>>> ... Apenas 5 valores
+
+print(df[['Name', 'Type 1', 'HP']])
+>>> Apenas essas 3 colunas especificas
+
+### Utilizando df.loc ###
+- utilizado para realizar procura por valor específico 
+
+df.loc[df['Type 1'] == "Fire"]
+>>>Vai retornar apenas pokemons do tipo fogo
+
+### df.iloc ###
+- 'iloc' ou 'Integer Location'. Realiza a pesquisa apenas pelo número da série que apontamos
+
+print(df.head(4))
+>>>Vamos pegar o valor com o numero [1]
+print(df.iloc[1])
+>>>Retorna a linha em forma de coluna
+
+print(df.iloc[1:4])
+>>>3 Linhas
+
+print(df.iloc[1:4])
+>>>3 Linhas
+
+print(df.iloc[2, 1])
+>>>Integer 2, valor da posição 1. Row #2, Column #1.
+
+### Utilizando Loops ###
+- Padrão:
+for index, row in df.iterrows():
+    print(index, row)
+
+- Mais específico:
+for index, row in df.iterrows():
+    print(index, row['Name'])
+
+### Outros ###
+
+df.describe()
+>>>retorna valores númericos em formato float com um mean, count, std, min, max, %, etc; bom para operações e análise matemática
+
+df
+>>>padrão
+
+df.sort_values(['Name'], ascending=False)
+>>>Organiza por Name. 'ascending false' vai retornar ao contrario de Z ate A. 
+
+df.sort_values(['Name', 'HP'], ascending=[1, 0])
+>>>Mesma coisa acima, o Name vai retornar 'ascending' mas o HP 'descending'.
+
+### Alterando a informação ###
+- Criando um total com 3 valores
+
+df.head(5)
+>>>vizualizando 5 primeiros valores para referência
+
+df['Total'] = df.['HP'] + df.['Attack'] + df.['Defense']
+>>>Vai criar uma coluna nova no final com a soma acima
+
+### Outra forma mais recomendada ###
+- Utilizando range com cols é mais recomendado. Mas como exemplo:
+
+df['Total'] = df.iloc[:, 4:10].sum(axis=1)
+>>> Todas as linhas, das colunas 4 até 9. Axis 1 realiza a operação no sentido LINHA. 0 = Coluna.
+
+### Dataframe customizado ###
+- Realocamndo a coluna 'Total' da ultima coluna para o meio:
+
+cols = list(df.columns.values)
+df = df[cols[0:4] + [cols[-1]] + cols[4:12]]
+>>>cols vai pegar todas as colunas, depois disso podemos retornar em forma de range. cols -1 serve para reverse index. 
+
+### Filtrando infomação ###
+df.loc[df['Type 1'] == 'Grass']
+>>>apenas grass
+
+df.loc[(df['Type 1'] == 'Grass') & (df['Type 2'] == 'Poison')]
+>>>retorna apenas pokemons grass e (&) poison ao mesmo tempo
+
+df.loc[(df['Type 1'] == 'Grass') | (df['Type 2'] == 'Poison')]
+>>>retorna pokemons grass ou (|) poison ...
+
+df.loc[(df['Type 1'] == 'Grass') | (df['Type 2'] == 'Poison') & (df['HP'] > 70)]
+>>> ... com valor 'HP' acima de 70.
+
+new_df = df.loc[(df['Type 1'] == 'Grass') | (df['Type 2'] == 'Poison') & (df['HP'] > 70)]
+new_df
+>>>aplica a busca filtrada acima para uma variavel
+
+new_df = new_df.reset_index(drop=True, inplace=True)
+new_df
+>>>depois de filtrar, o index vai ser o mesmo para cada coluna. reset_index reseta tudo e reaplica cada index. Drop True vai remover os índices anteriores. Inplace True 
+caso nao queira resetar para um novo dataframe, conservando memoria.
+
+### df.loc avançado ###
+df.loc[df['Name'].str.contains('Mega')]
+>>>retorna apenas pokemons que tenham string com 'Mega'
+
+df.loc[~df['Name'].str[................]
+>>>apenas adicionando o tilt(~) ele retorna o contrário. Tudo que não tiver 'Mega' como string
+
+df.loc[df['Total'] > 500 ['Generation', 'Legendary']] = 'TEST VALUE'
+>>>Essa condicional vai substituir os valores dentro da coluna "Generation" e "Legendary" com TEST VALUE caso o Total seja maior que 500.
+
+### Utilizando Regex ###
+import re
+
+df.loc[df['Type 1'].str.contains('Fire|Grass', regex=True)]
+>>>Vai fazer a mesma coisa do df.loc avançado, com múltiplos valores.
+
+df.loc[df['Name'].str.contains('pi[a-z]*', flags=re.I, regex=True)]
+>>>retorna todos os pokemons que tem 'pi' no nome.
+
+df.loc[df['Name'].str.contains(^'pi[a-z]*', flags=re.I, regex=True)]
+>>>apenas adicionando o acento circumflexo(^), agora vai retornar apenas pokemons que Começam com 'pi'.
+
+### Agregate Statistics (Groupby) ###
+
+df.groupby(['Type 1']).mean().sort_values('Defense', ascending=False)
+>>>retorna a média fazendo comparação com Type 1, organizando por 'Defesa' do maior pro menor.
+
+df.groupby(['Type 1']).sum()
+>>>retorna a soma de todos os valores por Type 1.
+
+df.groupby(['Type 1']).count()
+>>>retorna a quantidade por Type 1 [...]
+
+df.groupby(['Type 1']).count()['Attack']
+>>> [...] apenas retornando a coluna o 'Attack'
+
+### Juntando dois dataframes ###
+new_df = pd.DataFrame(columns=df.columns)
+
+for df in pd.read_csv('arquivo.csv', chunksize=5):
+    results = df.groupby(['Type 1']).count()
+
+    new_df = pd.concat([new_df, results])
+
+>>>Criamos um novo df vazio com as mesma colunas, agrupamos por Type 1 e armazenamos no results, emfim juntamos os 2 com .concat. 
+
+### Comandos ETC ###
+df.drop(columns['Total'])
+>>>Remove a coluna Total >>>Apenas no Jupyter Notebook<<<
+
+### Salvando o CSV ###
+
+df.to_csv('modified.csv', index=False)
+>>>salva criando 'modified.csv'. Index False remove os índices adicionais que o pandas cria.
+
+df.to_excel('modified.xlsx', index=False)
+>>>formato excel
+
+df.to_txt('modified.txt', index=False, sep='\t')
+>>>formato txt
+
+### Economizando memoria para dataframes gigantes ###
+
+for df in pd.read_csv('arquivo.csv', chunksize=5000):
+print(df)
+>>>Limita apenas 5000 rows por vez
+
+############  Pandas para análise de vendas ############
+- Arquivos referência:
+
+- Sales Data: https://github.com/KeithGalli/Pandas-Data-Science-Tasks/tree/master/SalesAnalysis/Sales_Data
+- Praticar: https://www.stratascratch.com/?via=keith
+- Abrir Jupyter:
+
+### import pandas as pd ### 
+
+### Juntando 12 meses de vendas em um dataframe ###
+import os
+
+df = pd.read_csv("./Sales_April_2019.csv")
+
+files = [file for file in os.listdir('./Sales_Data')]
+
+for file in files:
+	print(file)
+
+df.head()
+>>>"./"volta um diretorio, vai variar bastante onde está nosso arquivo. Lemos todos os arquivos com OS. Modificar como abaixo:
+
+import os
+
+df = pd.read_csv("./Sales_April_2019.csv")
+
+files = [file for file in os.listdir('./Sales_Data')]
+
+all_months_data = pd.DataFrame()
+
+for file in files:
+	df = pd.read_csv("./"+file)
+	all_months_data = pd.concat([all_months_data, df])
+
+all_months_data.head()
+>>>Criamos um dataframe vazio 'all_months_data', cada iteração ele vai ler os .csvs no diretorio e dar concat no 'all_months_data'
+
+- Vamos salvar: all_months_data.to_csv("all_data.csv", index=False)
+>>>index false para ignorar a coluna index criada automaticamente no processo. Checar o arquivo csv se deu certo.
+
+all_data = pd.read_csv("all_data.csv")
+all_data.head()
+>>>5 rows.
+
+### Retornando qual foi o melhor mês de vendas e quanto foi o lucro ###
+- Adicionando uma coluna apenas para os 12 meses: (essa referência usa o calêndário estilo [MÊS/DIA/ANO]):
+
+all_data['Month'] = 1
+all_data.head()
+>>>a principio vai criar uma nova coluna com todos valores 1.
+
+all_data['Month'] = all_data['Order Data'].str[0:2]
+all_data['Month'] = all_data['Month'].astype('int32')
+all_data.head()
+>>>pegamos a coluna order data, filtramos os 2 primeiros valores em str e substituimos pelos valores "1" do Month. 
+>>>também convertemos essa str para inteiro, isso pode causar um erro cannot convert float NaN to integer, que vamos resolver abaixo:
+
+### Limpando a data (NaN) ###
+- Identificar as colunas com NaN. Pode ser que seja um ou dois valores NaN entre 10000. Podemos considerar dropar esses valores:
+
+all_data.head(50)
+>>>tentar 100, 200. .tail..
+
+nan_df = all_data[all_data.isna().any(axis=1)]
+nan_df.head()
+>>>Vai retornar todas as linhas NaN. Decidir o que fazer com feedback da equipe.
+
+all_data = all_data.dropna(how='any')
+>>>No exemplo que pegamos, vai ter 5 linhas todas com NaN, esse comando vai dropar tudo.
+
+- Agora vamos tentar converter novamente: 
+
+all_data['Month'] = all_data['Order Data'].str[0:2]
+all_data['Month'] = all_data['Month'].astype('int32')
+all_data.head()
+
+>>>pode gerar um erro invalid literal for int() with base 10: 'Or'. Vamos resolver abaixo:
+
+### Encontrando 'Or' que o erro apontou ###
+
+- Filtrando os 2 primeiros characters para serem "Or"
+temp_df = all_data[all_data['Order Date'].str[0:2] == 'Or']
+temp_df.head()
+>>>As rows que retornarem podemos decidir deletar completamente ou fazer outra coisa. Nesse exemplo Filtrar fora mudando o comando acima:
+
+all_data = all_data[all_data['Order Date'].str[0:2] != 'Or']
+
+- Agora vamos tentar converter novamente: 
+
+all_data['Month'] = all_data['Order Data'].str[0:2]
+all_data['Month'] = all_data['Month'].astype('int32')
+all_data.head()
+>>>Sucesso.
+
+### Retornando qual foi o melhor mês de vendas e quanto foi o lucro ###
+- Agora que os problemas foram filtrados, vamos voltar ao principal:
+
+all_data['Sales'] = all_data['Quantity Ordered'] * all_data['Price Each']
+all_data.head()
+>>>Pode retornar um erro cant multiply sequence by non-int or type str. Solução:
+
+all_data['Quantity Ordered'] = pd.to_numeric(all_data['Quantity Ordered']) #Int
+all_data['Price Each'] = pd.to_numeric(all_data['Price Each']) #Float
+all_data.head()
+>>>Sucesso
+
+- Voltando ao assunto acima:
+all_data['Sales'] = all_data['Quantity Ordered'] * all_data['Price Each']
+all_data.head()
+>>>Vai criar uma coluna com 'Sales' que multiplica as vendas por quantidades.
+
+all_data.groupby('Month').sum()
+>>>Agrupa por mês e realiza a soma.
+
+- Para filtrar mais específico:
+all_data.groupby('Month').sum()['Sales']
+>>>Apenas a coluna "Sales"
+
+### Criando um gráfico dessas vendas utilizando MatPlotLib ###
+import matplotlib.pyplot as plt
+
+results = all_data.groupby('Month').sum()
+
+months = range(1, 13)
+plt.bar(months, results['Sales'])
+plt.show()
+>>>Grafico
+
+- Gráfico mais detalhado:
+plt.xticks(months)
+plt.ylabel('Sales in USD ($)')
+plt.xlabel('Month number')
+plt.show()
+>>>Gráfico mais detalhado
+
+### Retornando qual cidade teve o maior número de vendas ###
+- Primeiro vamos adicionar uma coluna "City": Na coluna "Purchase Address" temos o nome da cidade (ex: 917, 1st St, Dallas Tx 75001).
+- Vamos extrair essa informação e adicionar na nova coluna City utilizando o .apply:
+
+all_data['City'] = all_data['Purchase Address'].apply(lambda x: x.split(',')[1])
+all_data.head()
+>>>.apply permite rodar qualquer função dentro do dataframe. Nota que a cidade está entre duas vírgulas, 
+>>>essa função lambda vai iterar a string por virgula e pegar o index 1, a cidade, e retornar para a coluna.
+
+- Podemos também criar uma função dentro da DF para cuidar disso:
+
+def get_city(address):
+    return address.split(',')[1]
+
+all_data['City'] = all_data['Purchase Address'].apply(lambda x: get_city(x))
+all_data.head()
+>>>Essa é uma forma mais dinâmica e reaproveitável.
+
+- Deletando a coluna caso queira fazer testes:
+all_data['City'] = all_data['Purchase Address'].apply(lambda x: get_city(x))
+all_data = all_data.drop(columns='City')
+all_data.head()
+
+### Consertando Cidades Duplicadas ###]
+- Nos EUA, existem muitas cidades com nomes duplicados, isso pode gerar muito erro estatístico. 
+
+def get_city(address):
+    return address.split(',')[1]
+
+def get_state(address):
+    return address.split(',')[2].split(' ')[1]
+
+all_data['City'] = all_data['Purchase Address'].apply(lambda x: get_city(x) + ' ' + get_state(x))
+all_data.head()
+>>>Agora vai retornar Cidade + Estado. O .split(' ')[1] é para excluir o ZIP Code.
+
+- Retornando o estado entre parenteses. Ex: Dallas(TX)
+all_data['City'] = all_data['Purchase Address'].apply(lambda x: get_city(x) + ' ' + get_state(x))
+all_data.head()
+
+- Utilizando F strings:
+all_data['City'] = all_data['Purchase Address'].apply(lambda x: f"{get_city(x)} ({get_state(x)})")
+all_data.head()
+
+- Agora que temos a Cidade e Estado, podemos retornar a informação:
+
+results = all_data.groupby('City').sum 
+results
+
+### Retornando em um gráfico ###
+import matplotlib.pyplot as plt 
+
+cities = all_data['City'].unique()
+
+plt.bar(cities, results['Sales'])
+plt.xticks(cities, rotation='vertical', size=8)
+plt.ylabel('Sales in USD ($)')
+plt.xlabel('City name')
+plt.show()
+
+- O exemplo acima vai retornar um gráfico com resultados diferentes dos anteriores. Pq quando retornar 
+a informação Y, a ordem importa. X e Y não estão na mesma ordem. Para consertar:
+
+cities = [city for city, df in all_data.groupby('City')]
+
+[... mesmo codigo ...]
+plt.show()
+>>>Sucesso.
+
+### Exercicio: Quando podemos mostrar propagandas para maximizar a probabilidade do cliente comprar um produto? ###
+- Para responder isso, precisamos adicionar colunas apenas com hora e minuto
+
+all_data['Order Date'] = pd.to_datetime(all_data['Order Date'])
+all_data.head()
+>>>Convertemos o Order Date para um formato datetime 
+
+all_data['Hour'] = all_data['Order Date'].dt.hour
+all_data['Minute'] = all_data['Order Date']dt.minute
+all_data.head()
+>>>Nova coluna Hour com informação. dt.hour vai pegar o primeiro valor da hora. dt.minute minutos, etc. 
+
+- Agora vamos agrupar:
+hours = [hours for hours, df in all_data.groupby('Hour')]
+plt.plot(hours, all_data.groupby(['Hour']).count())
+plt.show()
+>>>Dataframe
+- Se tudo der certo, adicionar x e y:
+
+hours = [hours for hours, df in all_data.groupby('Hour')]
+plt.plot(hours, all_data.groupby(['Hour']).count())
+plt.xticks(hours)
+plt.grid()
+plt.show()
+>>> Agora temos um gráfico retornando a média das vendas e comparado a horas. O .grid apenas adiciona uma grid no graph. 
+- Vamos modificar um pouco mais:
+
+hours = [hours for hours, df in all_data.groupby('Hour')]
+plt.plot(hours, all_data.groupby(['Hour']).count())
+plt.xticks(hours)
+plt.xlabel('Hour')
+plt.ylabel('Number of Orders')
+plt.grid()
+plt.show()
+
+### Exercicio: Quais produtos foram mais vendidos juntos? ###
+
+all_data.head()
+>>>analisar
+
+- Para resolver isso, primeiro precisamos contar todos os 'Order IDs' que estão duplicados 
+
+df = all_data[all_data['Order ID'].duplicated(keep=False)]
+df.head(20)
+>>>Vai retornar um DF apenas com vendas que tiverem valores duplicados por Order ID. Keep False serve para manter todos os duplicates como True.
+
+df['Grouped'] = df.groupby('Order ID')['Product'].transform(lambda x: ','.join(x))
+df.head()
+>>> Para todos os order ids agrupados, vamos realizar um join para adicionar vírgula. 
+>>> O novo df 'Grouped' vai ter os produtos agrupados agr.
+
+- Agora vamos filtrar por Order ID e Grouped e excluir as duplicadas
+df = all_data[all_data['Order ID'].duplicated(keep=False)]
+df['Grouped'] = df.groupby('Order ID')['Product'].transform(lambda x: ','.join(x))
+df = df[['Order ID', 'Grouped']].drop_duplicates()
+df.head()
+>>>DF 
+
+- Agora precisamos iterar as rows para contar cada Par em 'Grouped':
+
+from itertools import combinations
+from collections import Counter
+
+counter = Counter()
+
+for row in df['Grouped']:
+	row_list = row.split(',')
+	count.update(Counter(combinations((row_list, 2)))
+print(count)	
+>>> Isso já deve retornar uma lista contendo os pares e logo ao lado a quantidade vendida. EX: (iPhone, Charge Cable): 1005, [...]
+
+- Retornando um resumo:
+
+for row in df['Grouped']:
+	row_list = row.split(',')
+	count.update(Counter(combinations((row_list, 2)))
+count.most_common(10)
+>>>DF Simplificado
+
+- Ainda mais simplificado: 
+
+for row in df['Grouped']:
+	row_list = row.split(',')
+	count.update(Counter(combinations((row_list, 2)))
+
+for key, value in count.most_common(10):
+	print(key, value)
+>>>Experimente alterar (row_list, 2) para 3, 4 ...
+
+### Exercicio: Qual produto vendeu mais? Pq vc acha que vendeu mais? ###
+
+all_data.head()
+>>>analise
+
+- Para responder isso precisamos agrupar os produtos e realizar uma soma
+
+product_group = all_data.groupby('Product')
+product_group.sum()
+>>>DF com a soma
+
+- Se retornar certinho acima, vamos avançar com:
+
+product_group = all_data.groupby('Product')
+quantity_ordered = product_group.sum()['Quantity Ordered']
+products = [product for product, df in product_group]
+plt.bar(products, quantity_ordered)
+plt.ylabel('Quantity Ordered')
+plt.xticks(products, rotation='vertical', size=8)
+plt.show()
+
+>>>Gráfico contendo Produtos e Quantidade
+
+- Agora vamos agrupar por Produtos e retornar uma média por Price, adicionando um segundo y axis no gráfico acima.
+
+prices = all_data.groupby('Product').mean()['Price Each']
+print(prices)
+>>>Df Products + Média
+
+- Adicionando o second y axis:
+
+prices = all_data.groupby('Product').mean()['Price Each']
+ax2 = ax1.twinx()
+ax1.bar(products, quantity_ordered, color = 'g')
+ax1.plot(products, prices, 'b-')
+
+ax1.set_xlabel('Product Name')
+ax1.set_ylabel('Quantity Ordered', color = 'g')
+ax2.set_ylabel('Price (R$)', color = 'b')
+ax1.set_xtickslabels(products, rotation='vertical', size=8)
+
+plt.show()
+>>>Esse codigo mais complexo acima vai adicionar uma linha adicional em cima do gráfico para mostrar o preço.
+
+https://pandas.pydata.org/docs/
+https://pandas.pydata.org/docs/
+https://pandas.pydata.org/docs/
+https://pandas.pydata.org/docs/

@@ -18,7 +18,7 @@ class ProjectForm(ModelForm):
                   'demo_link', 'source_link' [...]  
 				  
 				  
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+########################################################################
 https://github.com/divanov11/Django-2021/blob/master/projects/views.py
 - App/views.py:
 from .models import Project, Tag
@@ -69,7 +69,7 @@ def deleteProject(request, pk):
     return render(request, 'delete_template.html', context)
 	
 	
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+########################################################################
 https://github.com/divanov11/Django-2021/blob/master/projects/urls.py
 - App/urls.py:
 urlpatterns = [
@@ -80,7 +80,7 @@ urlpatterns = [
 ]
 
 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+####################################################################################
 https://github.com/divanov11/Django-2021/blob/master/templates/delete_template.html
 - Main/templates/delete_template.html:
 {% extends 'main.html' %}
@@ -94,7 +94,7 @@ https://github.com/divanov11/Django-2021/blob/master/templates/delete_template.h
 {% endblock %}
 
 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+##########################################################################################
 - Main/templates/navbar.html:
 
 <h1>Logo</h1>
@@ -103,7 +103,7 @@ https://github.com/divanov11/Django-2021/blob/master/templates/delete_template.h
 <hr>
 
 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+###################################################################################################
 https://github.com/divanov11/Django-2021/tree/5db08e339381ad7104409085c4b96a95aaf0ab19/templates
 https://github.com/divanov11/Django-2021/tree/master/projects/templates/projects
 

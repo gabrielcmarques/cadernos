@@ -207,4 +207,3 @@ for i, comida in enumerate(comidas):
 
 - Outras variáveis: 
 for i, comida in enumerate(comidas, start=1):
-

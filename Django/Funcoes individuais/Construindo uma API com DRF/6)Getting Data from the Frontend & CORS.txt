@@ -3,9 +3,10 @@ Templates e Resources:
 https://github.com/divanov11/Django-2021/tree/master/api
 https://pypi.org/project/django-cors-headers/
 
-###### CORS: Cross-Origin Resource Sharing (CORS), é um mecanismo para impedir o acesso a 
-recursos de uma página da Web específicada do domínio externo. ######
-###### O exemplo cria API calls no frontend para o backend #####
+##### O exemplo a seguir cria API calls no frontend para o backend #####
+
+- CORS: Cross-Origin Resource Sharing (CORS), é um mecanismo para impedir o acesso a 
+recursos de uma página da Web específicada do domínio externo. -
 https://github.com/divanov11/Django-2021/tree/master/frontend
 - Criar diretório 'frontend' na pasta do manage.py com os arquivos dentro:
 
@@ -40,7 +41,7 @@ https://github.com/divanov11/Django-2021/tree/master/frontend
 
 </html>
 
-########## main.js:
+- main.js:
 let projectsUrl = 'http://127.0.0.1:8000/api/projects/'
 
 let getProjects = () => {
@@ -102,7 +103,8 @@ let buildProjects = (projects) => {
 
 getProjects()
 #Agora no insperct element->console vai mostrar mais detalhada a informação dos objetos
-############# Modificar:
+
+- Modificar:
 
 let buildProjects = (projects) => {
     let projectsWrapper = document.getElementById('projects--wrapper')

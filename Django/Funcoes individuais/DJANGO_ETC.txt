@@ -496,4 +496,3 @@ https://github.com/veryacademy/yt-django-4-baseline-multiple-image-form/blob/mai
 - Testar no website criando uma nova conta com imagem. Checar no db tbm
 - A biblioteca Pillow oferece ainda mais formas de validar imagem, redimensionar, 
 permitir apenas PNG ou JPG, etc.
-

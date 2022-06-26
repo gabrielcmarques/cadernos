@@ -2,7 +2,7 @@ Templates e Resources:
 https://github.com/divanov11/Django-2021/tree/master/api
 
 
-###### O exemplo vai criar um endpoint para um usuário submeter uma POST Data #####
+##### O exemplo vai criar um endpoint para um usuário submeter uma POST Data #####
 - Api/views.py:
 from projects.models import Project
 

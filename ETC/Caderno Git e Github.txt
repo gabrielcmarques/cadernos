@@ -206,8 +206,7 @@ ou seja, as alterações em uma branch não afetam o código das outras branches
 já vai estar em highlight no app. Dá para optar por aceitar ambas alterações, deixando 
 uma em baixo da outra no código.
 
-+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=
-###### GitHub Flow: ######
+### GitHub Flow: ###
 - Cria uma branch baseadana master para a feature que será desenvolvida
 - Trabalhe normalmente nessa branch, faça comits
 - Abra uma pull request
@@ -225,7 +224,7 @@ https://devconnected.com/how-to-set-upstream-branch-on-git/
 - Configurar o remote origin para que ele aponte para o nosso fork
 - Configurar o remote upstream para que ele aponte para o repositório oficial
 - Cria uma branch para desenvolvimento / seguir GitHug Flow.
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+###########################################################################
 
 Caso dê um git add acidental:
 >>>git --rm cached [arquivo]

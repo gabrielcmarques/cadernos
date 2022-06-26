@@ -8,7 +8,7 @@ Construindo Login e Logout:
 - Webside -> Inspect Element -> Application, Sessions, Cookies: Onde ficam armazenados as sessões e tokens
 Também aparece em databases como postgres
 
--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+############################################################
 https://github.com/divanov11/Django-2021/tree/master/users
 Criar Users/templates/users/login_register:
 
@@ -62,7 +62,7 @@ https://docs.djangoproject.com/en/4.0/ref/contrib/messages/#displaying-messages
 </body>
 </html>
 
--=-=-=-=-=-=-=-=-=-=-= LOG IN / LOG OUT VIEW -=-=-=-=-=-=-=-=-=-=-=-=-=
+### LOG IN / LOG OUT VIEW ###
 https://github.com/divanov11/Django-2021/blob/master/users/views.py
 - Users/views.py:
 from django.contrib.auth import login, logout, authenticate

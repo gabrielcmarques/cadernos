@@ -1,33 +1,32 @@
 https://www.udemy.com/course/python-django-2021-complete-course/learn/lecture/27580814#overview
--=-=-=-=-=-=-=-=-=-=-=-=
 https://www.heroku.com/
 https://devcenter.heroku.com/articles/deploying-python
 https://devcenter.heroku.com/categories/working-with-django
 
 --- Dando Deploy num projeto com Heroku ---
 
-###### gunicorn ######
+### gunicorn ###
 >>>pip install gunicorn
 settings.py ->
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'project.herokuapp.com', project.com]
 
-#Código para checar se o site está Up + Debug False. Última linha do settings.py ->
+- Código para checar se o site está Up + Debug False. Última linha do settings.py ->
 if os.getcwd() == '/app'
 	DEBUG = False
 	
-#Vamos apontar o wsgi.py para o gunicorn criando 'Procfile' sem extensão na pasta root contendo:
+- Vamos apontar o wsgi.py para o gunicorn criando 'Procfile' sem extensão na pasta root contendo:
 web:gunicorn project.wsgi --log-file -
 
 >>>pip freeze > requirements.txt
 
-#Criar runtime.txt contendo:
+- Criar runtime.txt contendo:
 python-[versão.instalada.especificada] #EX: python-3.9.5
 
-#Criar .gitignore contendo:
+- Criar .gitignore contendo:
 env/
 etc 
 
-#Caso precise de whitenoise
+- Caso precise de whitenoise
 >>>pip install whitenoise
 settings.py -> 
 MIDDLEWARE =[
@@ -36,9 +35,9 @@ MIDDLEWARE =[
 [...]
 ]
 
-###### Configurar Environments: ######
+### Configurar Environments: ###
 
-## Pelo Windows (Apenas para Testes): ##
+- Pelo Windows (Apenas para Testes): 
 Windows search -> "Edit the system environment variables" -> Advanced -> Environment Variables.
 New...
 #Pegar todos os envs com informação que precise esconder. Exemplo:
@@ -46,7 +45,7 @@ Key: DB_PASS
 Value: senha123456789!@#$%¨
 #Isso vai ser puxado abaixo no settings.py
 
-## Pelo Heroku: ##
+- Pelo Heroku: 
 Login -> Dashboard -> Settings -> Config Vars:
 Key: DB_PASS
 Value: senha123456789!@#$%¨
@@ -66,19 +65,19 @@ DATABASES = {
     }
 }
 
-#Caso AWS:
+- Caso AWS:
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_BUCKET_NAME')
 
-###### Linkando com Github: ######
+### Linkando com Github: ###
 
 Dashboard -> Settings -> Configurar.
 - Vars
 - Add buildpack: Python
 - etc
 
-#Caso ainda não tiver um repositório github para víncular:
+- Caso ainda não tiver um repositório github para víncular:
 https://github.com/ 
 new repo, create -> instalar git desktop. Shell:
 
@@ -95,19 +94,19 @@ new repo, create -> instalar git desktop. Shell:
 >>>git push -u origin nome_branch
 #deploy final para o github.
 
-###### Configurando Heroku: ######
+### Configurando Heroku: ###
 https://www.heroku.com/
 - Login -> Dashboard -> New -> Create App, configurar, "Create App".
 - Dashboard -> Deploy -> Linkar com github que criamos acima, "connect" -> "Enable Automatic Deploys".
 #Vai começar a instalar tudo, pode demorar um tempo.
 
 https://stackoverflow.com/questions/36665889/collectstatic-error-while-deploying-django-app-to-heroku
-#Caso ERRO "collectstatic". Pode acontecer caso não configuramos whitenoise. Solução:
+- Caso ERRO "collectstatic". Pode acontecer caso não configuramos whitenoise. Solução:
 Heroku Dashboard -> Settings -> Config Vars: 
 Key: DISABLE_COLLECTSTATIC 
 Value: 1
 
-#Caso Application Error:
+- Caso Application Error:
 cmd shell
 >>>heroku login
 >>>heroku logs --tail -a nome_heroku_project

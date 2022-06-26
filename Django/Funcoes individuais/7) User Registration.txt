@@ -1,7 +1,7 @@
 Referências e Templates:
 https://github.com/divanov11/Django-2021/tree/master/users
 
-###### Configurando Registro de usuários: ######
+### Configurando Registro de usuários: ###
 
 - Criar Users/forms.py:
 

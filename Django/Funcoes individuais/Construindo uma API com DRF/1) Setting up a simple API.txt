@@ -3,7 +3,7 @@ https://github.com/divanov11/Django-2021/tree/master/api
 https://www.django-rest-framework.org/
 https://www.youtube.com/watch?v=cJveiktaOSQ
 
-###### Configurando Django Rest Framework para víncular e mostrar a 
+##### Configurando Django Rest Framework para víncular e mostrar a 
 informação dentro do database/models.py no website. #####
 
 

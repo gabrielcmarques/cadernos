@@ -66,7 +66,7 @@ Classe [form](models.Model):
 
 
 https://github.com/divanov11/Django-2021/tree/master/resources/DevSearch-Theme/uikit
--=-=-=-=-=-=-=-= UI KIT -=-=-=-=-=-=-=-=-=
+### UI KIT ###
 - Vários templates com útilidades, mensagens de erro, etc.
 - DevSearch-Theme/uikit/index.html (abrir no browser) -> Sessão "Alert messages"
 - Instalar static files na Root contendo images, js, styles e uikit.
