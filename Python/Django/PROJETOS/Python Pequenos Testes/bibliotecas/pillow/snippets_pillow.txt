@@ -1,0 +1,38 @@
+from PIL import Image, ImageChops, ImageFilter
+from matplotlib import pyplot as plt
+
+### Abrir imagem ###
+x = Image.open("imagem1.jpg")
+
+x.show()
+
+print("Tamanho: ", x.size, "Modo de Cor: ", x.mode )
+
+### Combinando 2 imagens com matplotlib ###
+x = Image.open("imagem1.jpg")
+y = Image.open("imagem2.jpg")
+
+plt.subplot(121), plt.imshow(x)
+plt.axis('off')
+plt.subplot(122), plt.imshow(y)
+plt.axis('off')
+
+merged = ImageChops.multiply(x, y)
+
+### Combinando duas imagens com cor de fundo branca e convertendo para cor preta ###
+x = Image.open("imagem1.jpg")
+y = Image.open("imagem2.jpg")
+
+merged = ImageChops.multiply(x, y)
+
+pixel = merged.load()
+for row in range(merged.size[0]):
+    for column in range(merged.size[1]):
+        if pixel[row, column] != (255,255,255):
+            pixel[row, column] = (0,0,0)
+
+merged.show()
+
+# 
+
+### ###

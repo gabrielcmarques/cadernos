@@ -1,0 +1,79 @@
+### Usaremos a API da alphavantage.co como exemplo: ###
+https://www.alphavantage.co/documentation/
+
+import requests 
+import os
+
+api_key = os.getenv('ALPHAVANTAGE_API_KEY')
+url = 'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={}&interval=5min&apikey={}'
+symbols = ['APPL', 'GOOG', 'TSLA', 'MSFT', 'APPL', 'GOOG', 'TSLA', 'MSFT']
+results = []
+
+for symbol in symbols:
+    print('Working on symbol {}'.format(symbol))
+    response = requests.get(url.format(symbol, api_key))
+    results.append(response.json())
+print('DONE!')
+
+# Essa forma acima é a convencional sem async, leva +/-3 segundos para ser executada.
+# Ver na doc sobre api keys e variaveis internas
+# replace the "demo" apikey below with your own key from https://www.alphavantage.co/support/#api-key
+
+### Utilizando Async ###
+
+import asyncio 
+import aiohttp
+import os
+
+[...]
+[...]
+[...]
+[...]
+
+async def get_symbols():
+    async with aiohttp.ClientSession() as session:
+        for symbol in symbols:
+            print('Working on symbol {}'.format(symbol))
+            response = await session.get(url.format(symbol, api_key)) #As vezes ssl=false vai ser necessario aqui
+            results.append(await response.json())
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(get_symbols())
+loop.close()
+
+# ou apenas asyncio.run(get_symbols()) vai executar essas 3 linhas acima em 1.
+
+print('A tarefa terminou de ser executada!')
+
+# Essa versão leva +/-2 segundos para ser executada.
+
+### Async Mais avançado com TASKS  ###
+import asyncio 
+import aiohttp
+import os
+
+[...]
+[...]
+[...]
+[...]
+
+def get_tasks(session):
+    tasks = []
+    for symbol in symbols:
+        tasks.append(session.get(url.format(symbol, api_key)))
+    return tasks
+
+async def get_symbols():
+    async with aiohttp.ClientSession() as session:
+        tasks = get_tasks(session)
+        responses = await asyncio.gather(*tasks)
+        for response in responses:
+            results.append(await response.json)
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(get_symbols())
+loop.close()
+
+# O código acima executa praticamente instantanemente 0.1 segundos comparado aos outros 2 acima.
+# A linha 69 vai empacotar dinamicamente cada tarefa. Seria a msma coisa que o codigo abaixo +/-:
+# responses = await asyncio.gather(session.get(APPL API Call), session.get(GOOG API Call), session.get(TSLA API Call), ........................ )

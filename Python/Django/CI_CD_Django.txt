@@ -1,0 +1,9 @@
+https://www.youtube.com/watch?v=fxAIta6qdys
+
+CI & CD: Continuous Integration Continuous Deployment
+
+https://github.com/ -> escolher rep -> "Actions" -> set up 
+workflow yourself -> start commmit. -> "Actions".
+
+https://docs.github.com/en/enterprise-server@2.22/actions/learn-github-actions/understanding-github-actions
+Configurar de acordo.

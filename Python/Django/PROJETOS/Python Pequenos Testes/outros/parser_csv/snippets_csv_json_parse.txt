@@ -1,0 +1,87 @@
+### Básico, vai abrir o txt e retornar a informação linha por linha ###
+import csv
+
+with open('names.csv', 'r') as csv_file:
+    csv_reader = csv.reader(csv_file)
+
+    for line in csv_reader:
+        print(line)
+
+# se adicionar essa linha acima do loop for, vai pular a primeira linha: next(csv_reader)
+# print(line[2]) para o index 2. etc
+
+### Abrindo o txt e criando um novo txt contendo os nomes separados poe '-'  ###
+with open('names.csv', 'r') as csv_file:
+    csv_reader = csv.reader(csv_file)
+
+    with open('new_names.csv', 'w', newline="") as new_file:
+        csv_writer = csv.writer(new_file, delimiter='-')
+
+        for line in csv_reader:
+            csv_writer.writerow(line)
+
+#'newline' serve para evitar espaços em branco entre linhas
+
+### Parsing de uma informação já processada por delimiter ###
+with open('new_names.csv', 'r') as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter='\t')
+
+    for line in csv_reader:
+        print(line)
+
+#Nesse caso é importenta apontar o delimiter que a informação possuí
+
+### Retornando em forma de dicionário com DictReader ###
+with open('names.csv', 'r') as csv_file:
+    csv_reader = csv.DictReader(csv_file)
+
+    for line in csv_reader:
+        print(line)
+
+# Dessa forma podemos acessar as variáveis por nome. Ex: print(line['email'])
+
+### Gravando dados com DictWriter ###
+
+with open('names.csv', 'r') as csv_file:
+    csv_reader = csv.DictReader(csv_file)
+
+    with open('new_names.csv', 'w') as new_file:
+        fieldnames = ['first_name', 'last_name', ['email']]
+
+        csv_writer = csv.DictWriter(new_file, fieldnames=fieldnames, delimiter='\t')
+
+        csv_writer.writeheader()
+
+        for line in csv_reader:
+            
+            csv_writer.writerow(line)
+
+# Usando o DictWriter faz ficar mais claro no código o que estamos fazendo.
+# Exemplo abaixo vai remover o field emails, retornando apenas Nome e Sobrenome.
+
+fieldnames = ['first_name', 'last_name']
+for line in csv_reader:
+    del line['email']        
+    csv_writer.writerow(line)
+
+###### Variantes do with open simples ######
+with open('names.csv', 'r') as f:
+    f_contents = f.read()
+    print(f_contents)
+
+
+# f_contents = f.readline()
+# f_contents = f.readlines()
+# f_contents = f.readlines(100)
+# print(f_contents, end='')
+
+### Condicional do acima: ###
+with open('names.csv', 'r') as f:
+
+    size_to_read = 10
+
+    f_contents = f.read(size_to_read)
+    
+    while len(f_contents) > 0:
+        print(f_contents, end='')
+        f_contents = f.read(size_to_read)

@@ -1,0 +1,119 @@
+https://docs.python.org/3/library/datetime.html
+### Criando um intervalo com todas as variaveis de Timedelta ###
+
+from datetime import date, datetime, timedelta, time
+
+delta = timedelta(
+    weeks=2
+	days=50,    
+	hours=8,
+    minutes=5,
+	seconds=27,
+	microseconds=10,
+	milliseconds=29000,	
+)
+
+print(delta)
+>>>64 days, 8:05:56.000010
+
+### Outras possibilidades ###
+tempo = timedelta.min | timedelta.max | timedelta.resolution | 
+print(tempo)
+
+### Operações com Timedelta ###
+x = timedelta(days = 10, seconds = 40)
+y = timedelta(days = 20, hour = 4, minutes = 20)
+
+print(y-x)
+>>>10 days, 7:19:20
+
+# Retornando o total em Horas, Minutos ou Segundos #
+print(x.total_seconds())
+
+### Trabalhando com Calendário ###
+from datetime import date 
+data = date(2022, 6, 8)
+print(data)
+>>>2022-06-08
+
+# Convertendo para um tipo datetime.date #
+[codigo acima + ...]
+x = date.fromisoformat(str(data))
+print(type(x))
+>>><class 'datetime.date'>
+
+# Acessando as variaveis de x acima #
+print(x.day)
+print(x.month)
+print(x.year)
+
+# Retornando a data atual #
+print(date.today())
+
+# Trocando informação dentro de uma data #
+data = date(2021, 10, 5)
+print(data.replace(year=2022, day=28))
+>>> 2022-28-5
+
+# Retornando dia da semana #
+x = data.weekday()
+>>>2
+# Segunda a Domingo, entre 0 a 6.
+
+### Alterando a ordem da data ### 
+x = data.strftime("%d:%m:%Y")
+>>>08:06:2022
+
+x = data.strftime("%d/%m/%y")
+>>>08/06/22
+
+### Outros codigos ###
+
+#data = datetime.today()
+#data = datetime.now()
+#date = datetime.fromisoformat('')
+#date = datetime.min | datetime.max
+#date.touple()
+
+print(data)
+
+# Retornando com Loop #
+for i in data.timetuple():
+    print(i)
+>>>Tudo em cada linha.
+
+### Exemplo operação Hoje + 10 dias 20 horas 10 minutos ###
+x = datetime.today() # 8 Jun 2022, 15:37:00 #
+y = timedelta(day = 10, hour = 20, minutes = 10)
+z = x+y
+print(z)
+>>>2022-06-19 11:47:18.215356
+
+print((z).weekday())
+>>>6
+
+# Customizando dias da semana com codigo acima #
+semanas = ['Seg','Ter','Qua','Qui','Sex','Sab','Dom']
+zz = z.weekday()
+print(semanas[zz])
+>>>Dom
+
+### TIME serve para intervalos de tempo###
+
+x = time(hour=2, minute=50, second=0, microsecond=0)
+print(x)
+>>>02:50:00
+
+print(x.min)
+print(x.max)
+print(x.hour)
+print(x.minute)
+print(x.second)
+
+time.min
+time.max
+time.resolution
+...
+
+# Linha 73, vantagem do .now comparado ao .today é que ele pode retornar tz #
+# como argumento, para fuso horario. O .today não pode receber argumentos   #

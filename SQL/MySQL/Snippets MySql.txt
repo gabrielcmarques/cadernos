@@ -1,0 +1,42 @@
+//////////// Inserindo informções na tabela
+insert into cursos values
+('1', 'HTML4', 'Curso de HTML5', '40', '37', '2014'),
+('2', 'Algoritmos', 'Lógica de Programação', '20', '15', '2014'),
+('3', 'Photoshop', 'Dicas de Photoshop CC', '10', '8', '2014'),
+('4', 'PGP', 'Curso PHP para Iniciantes', '40', '20', '2010'),
+('5', 'Jarva', 'Introdução à Linguagem Java', '10', '29', '2000'),
+('6', 'MySQL', 'Banco de dados MySQL', '30', '15', '2016'),
+('7', 'Word', 'Curso completo de Word', '40', '30', '2016'),
+('8', 'Sapateado', 'Danças Rítmicas', '40', '30', '2018'),
+('9', 'Cozinha Árabe', 'Aprenda a fazer Kibe', '40', '30', '2018'),
+('10', 'Youtuber', 'Gerar polêmica e ganhar inscritos', '5', '2', '2018');
+
+//////////// Criando tabelas com Chave Estrangeira
+create table gafanhoto_assiste_curso(
+id int not null auto_increment,
+`data` date,
+idgafanhoto int,
+idcurso int,
+primary key (id),
+foreign key(idgafanyhoto) references gafanhotos (id),
+foreign key(idcurso) references cursos(idcurso)
+)default charset = utf8;
+
+//////////// Uso avançado do Join:
+select g.nome, c.nome from gafanhotos g
+join gafanhoto_assiste_curso a
+on g.id = a.idgafanhoto
+join cursos c
+on c.idcurso = a.idcurso;
+
+//////////// Outros
+show
+describe
+select * from cursos;
+Tables->cursos-columns->
+idcurso
+nome
+descricao
+carga
+totaulas
+ano

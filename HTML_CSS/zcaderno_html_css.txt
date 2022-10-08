@@ -1,0 +1,150 @@
+CSS w3schools
+https://www.w3schools.com/Css/
+
+HTML w3schools
+https://www.w3schools.com/html/
+
+HTML Mozilla Reference 
+https://developer.mozilla.org/en-US/docs/Web/HTML/Element
+
+Best Practices
+https://www.youtube.com/watch?v=Qhaz36TZG5Y
+https://www.youtube.com/watch?v=e3jhKg1ozvw
+
+CSS Clippy para animações:
+https://bennettfeely.com/clippy/
+
+Validador de HTML, checagem de erros, closing tags, etc.
+https://validator.w3.org/nu/
+
+https://youtu.be/gXLjWRteuWI
+###### HTML / CSS ######
+==== Maneiras para deixar o site responsivo ====
+-----
+img {
+  width: 100%;
+}
+- Vai deixar todas as imagens (<img>) responsivas 
+com tamanho 100%. funciona com qualquer %.
+
+---------------
+margin: 0 auto; 
+- 0 top + bot + left + right. Auto vai centralizar tudo, 
+utilizar em um wrapper global.
+
+----------------------------------------
+- Flexbox é melhor para rows individuais
+.flex { 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+-----------------------------------
+- Grid é melhor para múltiplas rows
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 500px 1fr; // 1 Fraction unit (share space)
+  grid-template-rows: 100px 200px;
+  place-items: center;  
+}
+
+---------------------------------------------
+- Prefered vs Small Screens vs Large Screens:
+article {
+  width: 50%;
+}
+
+@media only screen and (max-width: 600px) {
+  article {
+    width: 200px;  
+  }
+}
+
+@media only screen and (max-width: 1200px) {
+  article {
+    width: 800px;  
+  }
+}
+
+- Porem conforme o codigo cresça, a opção acima vai dar dor de cabeça. Utilizaremos 
+o MIN MAX CLAMP. Esse código abaixo entra no lugar de todos os 3 anteriores.:
+
+article {
+  width: clamp(200px, 50%, 600px); // min 200px, max 600px, prefered value of 50%
+}
+
+
+================ Melhores práticas para CSS ================
+- "Hero section", é o nome da classe dada por convensão para 
+elementos que tem que ser mostrados primeiro, por cima de tudo. 
+O topo do website.
+
+<div class="hero-img"></div>    
+<div class="wrapper">
+
+</div>
+
+=========================================
+- Começar com Mobile -> Tablet -> Desktop
+- REM units são melhores para fontes.
+- EM units são melhores para Margin e Padding por conta do Zoom. O browser sempre aplica uma Margin e Padding padrão
+- Pixel Converter (em, rem, px, etc) https://pixelsconverter.com/
+
+=== Header para o Website ===
+.hero-img {
+  position: absolute; //Para ficar sempre por cima
+  top: 0; //Valor para o position absolute
+  left: 0;
+  background: url('../images/shoe.jpg');
+  background-size: cover; // Evita duplicar a imagem ao dar zoom
+  background-position-x: 20%; //Move um pouco a imagem
+  background-position-y: 20%;
+  width: 100%;
+  height: 100vh;
+  z-index: -1; //Coloca o objeto por trás ou por cima. Nesse caso vai ficar atrás de ícones
+}
+
+<!-- SCRIPT PARA OS BOTOES DE MENU EM HTML E JS -->
+<script>
+  const menu = document.querySelector('.menu')
+  const close = document.querySelector('.close')
+  const nav = document.querySelector('nav')
+
+  menu.addEventListener('click', () => {
+    nav.classList.add('open-nav')
+  })
+  // Quando clica no Menu, vai disparar o evento click, que quando clicado, 
+  // vai adicionar uma class CSS dinamica dentro de nav chamada 'open-nav'.
+  // podemos estilizar no arquivo css.
+
+  close.addEventListener('click', () => {
+    nav.classList.remove('open-nav')
+  })
+  // Quando clica no X, vai disparar o evento click, removendo a 
+  // classe acima, fechando o menu dinamico automaticamente.
+</script>
+
+======================== Async e Defer ========================
+- Async o arquivo é executado assim que baixado, asynchronously.
+- Defer o arquivo baixa asyncronicamente, mas executado apenas depois do 
+documento levar parse completamente
+- Defer scripts são garantidos a serem executados em ordem que aparece 
+na página 
+
+- Async executa na primeira oportunidade
+- Defer executa na ordem que definimos
+
+<head>
+ <title>Title of the documnet</title>
+ <script src="example.js" defer></script>
+ <noscript>Sorry, your browser doesn't support JavaScript!</noscript>
+ </head>
+<body>
+ <h1>Example</h1>
+ <p>The "defer" attribute  specifies that a script is executed when a page has finished the parsing. It is a boolean attribute.</p>
+</body>
+
+<body>
+  <script async src="myscript.js"></script>
+</body>

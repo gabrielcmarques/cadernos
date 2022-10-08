@@ -1,0 +1,663 @@
+https://scrimba.com/
+
+### Data Types: ###
+'undefined' Something that havent been defined
+'symbol' an immutable primitive value that is unique
+object that can be stored stuff
+null 
+boolean 
+string 
+number 
+
+### Declarando variáveis: ###
+var myName = "Gabriel"
+myName = 8
+let ourName = "freeCodeCamp"
+const pi = 3.14
+
+'var' permite usar no programa inteiro, pode ser mudada.
+'let' é usado apenas usado dentro do Escopo de uma função. 
+'const' é uma variável que não pode ser mudada.
+
+### Storing values with Assignment Operator ###
+
+var a;
+var b = 2;
+console.log(a)
+a = 7;
+b = a;
+console.log(a)
+
+- a está apenas sendo declarado.
+- b está sendo declarado e assinado um valor ao mesmo tempo. 
+- como a já foi delacrado, podemos assinar outros valores. 7 no caso.
+- podemos também adicionar conteúdos de a para b.
+- com o console.log podemos ver o que tinha dentro de a em cada assignment. 
+
+### Initializing Variables w/ Assignment Operator ###
+
+var a = 5;
+var b = 10;
+var c = "I am a";
+
+a = a + 1;
+b = b + 5;
+c = c + " String!";
+console.log(a, b, c)
+
+- Rode o codigo.
+
+### Incrementing ###
+
+var myVar = 87;
+myVar = myVar +1;
+myVar++;
+console.log(myVar);
+myVar--;
+console.log(myVar);
+
+- A 2 ultimas linhas acima fazem a mesma coisa.
+
+### Finding the remainder ###
+
+var remainder;
+remainder = 11 % 3;
+console.log(remainder);
+
+- Sobra 2.
+
+### Compound Assignment with Augmented Addition ###
+var a = 3;
+var b = 17;
+var c = 12;
+var d = 4;
+
+a = a + 12;
+b = 9 * b;
+c = c - 7;
+d = d / 2
+console.log(a, b, c)
+
+- As três linhas acima são a mesma coisa que:
+
+a += 12;
+b *= 9;
+c -= 7;
+d /= 2;
+console.log(a, b, c, d)
+
+### Declaring String Variables ###
+
+var firstName = "Gabriel";
+var lastName = "Marques";
+
+### Escaping literal quotes in strings ###
+- Utilizando quote marks dentro de stings, no final de cada quote strings:
+
+var myStr = "I am a "double quoted " string inside " double quotes"";
+console.log(myStr);
+
+- Podemos fazer escapar com back slashes:
+
+var myStr = "I am a \"double quoted\ " string inside \" double quotes"";
+console.log(myStr);
+
+### Quoting strings with single quotes ###
+- Dá para utilizar Single quotes dentro de Double quotes, vise versa:
+var myStr = "<a href=\"http://www.example.com\" target=\"_blank">Link</a>";
+
+- Com single quotes:
+var myStr = '<a href="http://www.example.com" target="_blank">Link</a>';
+
+- Com Back Ticks, Single Quotes e Double Quotes
+var myStr = `'<a href="http://www.example.com" target="_blank">Link</a>'`;
+
+### Escape Sequences in a Strings ###
+- Carriege return seria 
+
+\' single quote
+\" double quote 
+\\ back slash
+\n newline 
+\r carriage return 
+\t tab
+\b backspace
+\f form feed
+
+var myStr "FirstLine\n\t\\SecondLine\nThirdLine";
+console.log(myStr);
+
+### Concatenating Strings with Plus Operator ###
+- var ourStr = "I come first." + "I come second.";
+console.log(ourStr);
+
+### Concatenating Strings with Plus Equals Operator ###
+var ourStr = "I come first. ";
+console.log(ourStr);
+
+ourStr += "I come second.";
+console.log(ourStr)/;
+
+### Constructing Strings with Variables ###
+var ourName = "freeCodeCamp";
+var ourStr = "Hello, our name is " + ourName + ", how are you?";
+console.log(ourStr)
+
+### Appending Variables to Strings ###
+var anAdjective = "awesome!";
+var ourStr = "freeCodeCamp is "
+ourStr += anAdjective;
+console.log(ourStr);
+
+### Finding Length of string ###
+- Utilizando a função interna .length do js:
+
+var firstNameLength = 0;
+var firstName = "Ada";
+
+firstNameLength = firstName.length;
+console.log(firstNameLength);
+
+### Bracket notation to find first character in string ###
+var firstLetterOfFirstName = "";
+var firstName = "Ada";
+
+firstLetterOfFirstName = firstName[0];
+console.log(firstLetterOfFirstName);
+
+### String Immutability ###
+- Vamos tentar consertar a frase abaixo
+var myStr = "Jello World";
+myStr[0] = "H";
+console.log(myStr);
+
+- Não vai funcionar, pois strings são imutáveis. 
+- Para realizar essa operação precisamos mudar o conteúdo inteiro:
+var myStr = "Jello World";
+myStr = "Hello World";
+console.log(myStr);
+
+### Bracket Notation to find Nth character in string ###
+var firstName = "Ada";
+var secondLetterofFirstName = firstName[1];
+console.log(secondLetterofFirstName);
+
+var lastName = "LoveLace";
+var thirdLetterOfLastName = lastName[2];
+console.log(thirdLetterOfLastName);
+
+### Bracket Notation to find last character in string ###
+- O -1 pega o ultimo valor. -2 penultimo, etc.
+var firstName = "Ada";
+var lastLetterOfFirstName = firstName[firstName.length - 1];
+console.log(lastLetterOfFirstName);
+
+### Word Blanks ###
+
+function wordBlanks(myNoun, myAdjective, myVerb, myAdverb){
+	var result = "";
+	result += "The " + myAdjective + " " + myNoun + " " + myVerb + " to the store " + myAdverb "."
+	return result;
+}
+console.log(worldBlanks("dog", "big", "ran", "quickly"));
+console.log(worldBlanks("bike", "slow", "flew", "slowly"));
+
+40:40s
+https://youtu.be/PkZNo7MFNFg?t=2445
+
+...
+...
+...
+...
+...
+...
+...
+...
+...
+...
+...
+...
+...
+...
+...
+########################################################
+https://youtu.be/g7T23Xzys-A
+Começa nos 57min
+
+### Objetos e . Notations ###
+
+const person = {
+  name: 'John',
+  age: 25,
+}
+
+console.log(typeof person.name)
+>>>string 
+console.log(typeof person.age)
+>>>number 
+
+const date new Date();
+console.log(date);
+>>>data atual 
+
+### Strict Equality: ###
+# Com triplo "=", retorna True APENAS se os dois valores forem iguais
+
+// The Good Ones: === !===
+# Os Goods comparam os dois tipos e dois valores
+
+// The Evil Twins: == !==
+# Os Evils também, porém se for de Tipos diferentes, ele tenta Alterar o tipo.
+
+# Strict Equal
+console.log(a === b);
+# Strict Inequality
+console.log(a !== b);
+
+console.log(5 == 5);
+>>>True
+console.log(5 == "5");
+>>>True
+
+console.log(5 === 5);
+>>>True
+console.log(5 === "5");
+>>>False
+
+console.log('' == '0'); //false
+console.log('0' == ''); //true
+console.log(0 == '0'); //true
+console.log(false == 'false'); /false
+console.log(false == '0'); //true
+
+# Experimente fazer tudo acima com os Goods.
+# 'Tabela verdade' do strict equality nos 1:20
+https://youtu.be/g7T23Xzys-A?t=4833
+
+### Logical Operators ###
+//AND && => ALL OPERANDS ARE TRUE
+console.log(true && false)
+
+//OR || => AT LEAST ONE IS TRUE
+console.log(true || false) 
+
+NOT ! => FLIPS BOOLEAN
+console.log(!true);
+>>>False
+console.log(!false);
+>>>True
+
+### Loops ###
+- Printando de 1 a 10:
+
+//The "while" loop 
+
+let i = 0;
+
+while(i < 10) {
+  console.log(i);
+  i++;
+}
+
+//The "for" loop 
+- (Inicialização ; Condição ; Expressão-Final)
+for(let i = 0; i < 10; i++) {
+  console.log(i);
+}
+
+### Functions ### 
+- Função simples para retornar o quadrado de um número:
+function square(number) {
+  return number * number;
+}
+
+- A Function Call (invoking/executing a function):
+const result = square(5);
+console.log(result);
+
+- A function declaration:
+function(params) {
+  // statements
+  // have access to "this" keyword
+}
+
+- A function expression:
+const name = function(params) {
+  // statements
+}
+
+- Arrow function expression.:
+const name = (params) => {
+  // statements
+}
+
+- 
+function sayHi(name) {
+  console.log(`Hi, ${name}!`);
+}
+sayHi('Joe');
+
+### Return statements ###
+- Todas as funções retornam undefined por padrão, caso não exista o argumento:
+
+function add(a, b) {
+  return "retornando" // O a+b nunca vai retornar. O primeiro return sempre para a function
+  return a + b;
+}
+
+const sum = add(2, 2);
+console.log(sum);
+
+### Arrow Functions ###
+- Não possurem o "this" keyword.
+
+const square = (number) => {
+  return number * number;
+}
+
+const result = square(5);
+console.log(result);
+
+- Caso temos apenas UM statement, podemos fazer numa linha apenas:
+
+const square = (number) => number * number;
+
+const result = square(5);
+console.log(result);
+
+####### Advanced JS ######
+https://youtu.be/R9I85RhI7Cg
+
+- Closures 
+- 'this' keyword 
+- Prototype
+- Prototypal inheritance 
+- Class 
+- Iterables and Iterators 
+- Generators
+
+### Function Currying ###
+- É um processo em que transformamos a função com multiplos argumentos 
+em uma sequencia de funções agrupadas, que pega uma de cada vez.
+- function f(a, b, c) é transformada em f(a)(b)(c)
+
+function sum(a, b, c) {
+  return a + b + c
+}
+console.log(sum(2, 3, 5))
+>>>10 
+
+// sum(2,3,5) ... sum(2)(3)(5)
+function curry(fn) {
+  return function(a) {
+    return function(b) {
+      return function(c) { 
+        return fn(a, b, c)
+      }
+    }
+  }
+}
+const curriedSum = curry(sum)
+console.log(curriedSum(2)(3)(5))
+>>>10
+
+- Isso acima seria o equivalente a:
+const add2 = curriedSum(2)
+const add3 = add2(3)
+const add5 = add3(5)
+console.log(add5)
+>>>10
+
+### 'this' keyword ###
+- Usado em funções, refere ao objeto que pertence. Permite que as funções 
+sejam reusaveis por permitir que você decida o valor do objeto. É 
+determinado de como a função é chamada.
+
+- Regular:
+function sayMyName(name) {
+  console.log(`My name is ${name}`)
+}
+
+sayMyName('Walter White')
+>>>My name is Walter White
+
+- Implicit binding:
+const person = {
+  name: 'Vishwas',
+  sayMyName: function () {
+    console.log(`My name is ${this.name}`)
+  },
+}
+
+person.sayMyName()
+>>>My name is Vishwas
+
+- Explicit binding:
+const person = {
+  name: 'Vishwas',
+  sayMyName: function () {
+    console.log(`My name is ${this.name}`)
+  },
+}
+
+function sayMyName() {
+  console.log(`My name is ${this.name}`)
+}
+sayMyName.call(person) // .call permite especificar Explicitamente a função evocada
+>>>My name is Vishwas
+
+- New binding:
+function Person(name) {
+  // this = {} // <- Isso é feito automaticamente por evocação
+  this.name = name 
+}
+
+const p1 = new Person('Vishwas')
+const p2 = new Person('Batman')
+// basicamente um método construtor.
+console.log(p1.name, p2.name)
+>>>Vishwas Batman
+
+- Default binding:
+function sayMyName() {
+  console.log(`My name is ${this.name}`)
+}
+
+sayMyName()
+>>>My name is undefined
+
+// Porem se adicionarmos uma variável no global scope:
+const name = 'Superman'
+//ou globalThis.name = 'Superman'
+function sayMyName() {
+  console.log(`My name is ${this.name}`)
+}
+
+sayMyName()
+>>>My name is Superman
+
+- Order of precedence :
+New binding > Explicit Binding > Implicit > Default Binding
+
+### Prototype ###
+- Todas as funções possuem uma propriedade que aponta para o objeto. 
+Podemos determinar todas as propriedades compartilhadas:
+
+function Person(fName, lName) {
+  this.firstName = fName 
+  this.lastName = lName
+}
+
+const person1 = new Person('Bruce', 'Wayne')
+const person2 = new Person('Clark', 'Kent')
+
+person1.getFullName = function() {
+  return this.firstName + ' ' + this.lastName
+}
+
+console.log(person1.getFullName())
+>>>Bruce Wayne
+console.log(person2.getFullName())
+>>>ERROR
+
+- Solucionamos isso acima com Prototype: 
+
+function Person(fName, lName) {
+  this.firstName = fName 
+  this.lastName = lName
+}
+
+const person1 = new Person('Bruce', 'Wayne')
+const person2 = new Person('Clark', 'Kent')
+
+Person.prototype.getFullName = function() {
+  return this.firstName + ' ' + this.lastName
+}
+
+console.log(person1.getFullName())
+>>>Bruce Wayne
+console.log(person2.getFullName())
+>>>Clark Kent
+
+### Inheritance ###
+https://youtu.be/R9I85RhI7Cg // 36:00 Brainfuck.
+
+- Suporta o conceito de prototypes, evitar duplicar o codigo multiplas vezes 
+quando queremos adicionar metodos e propriedades ao objeto:
+
+function Person(fName, lName) {
+  this.firstName = fName 
+  this.lastName = lName
+}
+
+Person.prototype.getFullName = function() {
+  return this.firstName + ' ' + this.lastName
+}
+
+function SuperHero(fName, lName) {
+  Person.call(this, fName, lName)
+  this.isSuperHero = true
+}
+
+SuperHero.prototype.fightCrime = function() {
+  console.log('Fighting crime')
+}
+SuperHero.prototype = Object.create(Person.prototype)
+//Quando ele tenta acessar batman.getFullName, js checa o tipo de 
+//prototype de SuperHero, sem achar. Mas, se o prototype object tem 
+//uma fila para Person.prototype por causa do Object.create(Person.prototype)
+//checa se Person.prototype tem um getFullName method, ele tem, e vai executar.
+//Isso eh o Prototypal Inheritance
+
+const batman = new SuperHero('Bruce', 'Wayne')
+console.log(batman.getFullName())
+>>>Bruce Wayne 
+
+// batman fez inheritance de .getFullName() from Person(), que acessa 
+// this.firstName e this.lastName, que são inherited pelo SuperHero()
+
+- Agora para Cleanup nas ultimas linhas acima: 
+
+const batman = new SuperHero('Bruce', 'Wayne')
+SuperHero.prototype.constructor = SuperHero
+console.log(batman.getFullName())
+>>>Bruce Wayne 
+
+// JS vai achar que é criado a partir de Person(), essa linha acima evita isso.
+
+### Class ###
+- Similar ao conceito de Prototypal Inheritance, mas tudo dentro de 
+uma classe, que é basicamente um conjunto organizado de funções:
+
+class Person {
+  constructor(fName, lName) {
+      this.firstName = fName 
+      this.lastName = lName
+  }
+  sayMyName() {
+    return this.firstName + ' ' + this.lastName
+  }
+}
+
+const classP1 = new Person('Bruce', 'Wayne')
+console.log(classP1.sayMyName())
+
+class SuperHero extends Person {
+  constructor(fName, lName) {
+    super(fName, lName)
+    this.isSuperHero = true
+  }
+  fightCrime() {
+    console.log('Fighting Crime')
+  }
+}
+// Isso vai extender e chamar a Person() class constructor
+
+const classP1 = new Person('Bruce', 'Wayne')
+console.log(batman.sayMyName())
+>>>Bruce Wayne
+
+### Iterables and Iterators ###
+- Permite acessar uma coleção de informação 1 por vez, permitindo-nos 
+forcar o que fazer com essa informação.
+
+const obj = {
+  [Symbol.iterator]: function() {
+    let step = 0
+    const iterator = {
+      next: function() {
+        step++
+        if(step === 1) {
+          return { value: 'Hello', done: false}
+        } else if (step === 2) {
+          return { value: 'World', done: false}
+        }
+        return {value: undefined, done: true}
+      },
+    }
+    return iterator
+  },
+}
+// value: gives the current element, done: is a boolean value which 
+// indicates wether there are more elements to be interated opon
+
+for(const word of obj) {
+  console.log(word)
+}
+>>>Hello
+>>>World
+//Com isso criamos um iterable. JS faz isso 
+//internamente para Strings, Arrays, Maps e Sets.
+
+### Generators ###
+- São classes especiais que simplificam iterators. Aqui vamos focar 
+apenas na parte de Iterators, tem muito assunto para isso:
+- Vamos reescrever o codigo Iterator acima de com Generators:
+
+function normalFunction() {
+  console.log('Hello')
+  console.log('World')
+}
+normalFunction()
+>>>Hello
+>>>World
+
+function* generatorFunction() {
+  yield 'Hello'
+  yield 'World'
+}
+
+const generatorObject = generatorFunction()
+for(const word of generatorObject){
+  console.log(word)
+}
+>>>Hello
+>>>World
+
+//generator function* consegue pausar a execução com yield.
+//o generatorObject passa a ser o Iterator, que pode ser
+//usado em for loops.
+//Nao tem necessidade de Symbol, next, step, etc.
+
+### Proximo passo: Async Javascript ###
+https://www.youtube.com/watch?v=exBgWAIeIeg

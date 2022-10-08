@@ -1,0 +1,43 @@
+### Comandos Metaclass: ###
+
+class Pessoa(models.Model):
+    nome = models.CharField()
+	idade = models.IntegerField()
+
+    class Meta:
+		db_table = "Pessoa" 
+		unique_together = ['nome', 'idade'] 
+		abstract = True
+		permissions = [('alterar_tudo', 'alterar_tudo')]
+		default_permissions = ('add', 'change', 'delete', 'view' ...)
+		indexes = [models.Index()]
+		constraints = [models.CheckConstraints() [Tem varios..]]
+		ordering = ['nome'] 
+		verbose_name = "Pessoa" 
+		verbose_name_plural = "Pessoas" 
+
+# 8) Vai Renomear no DB
+# 9) Define valores que não podem ser repetir quando juntos. EX: Se já existe valor 'Gabriel' '28', não pode ser criado outro.
+# 10) Abstract informa que a Classe não vai ser uma model de fato, mas herdada por outras models. EX: uma Classe 'Pessoa_Juridica' herdar info de uma classe 'Pessoa_Física'
+# 11) Cria uma permissão em url/admin/auth/users/change. Pesquisar melhor detalhado.
+# 12) Define permissões pelo models.py
+# 13) indexes 
+# 14) constraints 
+
+/////////////////////
+# INDICES E INDEXES #
+/////////////////////
+
+# São importantes para otimizar o database, >>caso seja muito grande<<:
+# Models.py:
+
+class Pessoa(models.Model):
+    nome = models.CharField()
+	idade = models.IntegerField()
+	endereco = models.CharField()
+
+    class Meta:		
+		indexes = [
+			models.Index(fields =  ['nome']),
+			]
+		constraints = [models.CheckConstraints()]

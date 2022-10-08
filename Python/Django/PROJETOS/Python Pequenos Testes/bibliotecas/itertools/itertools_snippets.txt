@@ -1,0 +1,129 @@
+# https://docs.python.org/3/library/itertools.html #
+
+import itertools
+
+letters = ['a', 'b', 'c', 'd']
+numbers = [1, 2, 3]
+names = ['Gabriel', 'Daniel']
+
+### Retornando key;value. Similar ao Enumerate, #
+#  mas ele dá assign dentro de uma lista###
+
+# counter = itertools.count(start=5, step=-2)
+# data = [100, 200, 300, 400]
+# daily_data = list(zip(itertools.count(), data))
+# print(daily_data)
+
+### Caso tenha mais range do que informação ###
+# daily_data = list(itertools.zip_longest(range(10), data))
+# print(daily_data)
+
+### Cycle com potencia ###
+# counter = itertools.repeat(2, times=3)
+# squares = map(pow, range(10), itertools.repeat(2))
+# print(list(squares))
+
+### Starmap é similar ao acima, mas ao inves de iterables, 
+# faz cycle em tuplas ###
+
+# counter = itertools.repeat(2, times=3)
+# squares = itertools.starmap(pow, [(0, 2), (1, 2), (2, 2)])
+# print(list(squares))
+
+### Combinations comum ###
+# result = itertools.combinations(letters, 2)
+# for item in result:
+#     print(item)
+
+### Permutations é similar ao acima, mas conta valores já repetidos ###
+# result = itertools.combinations(letters, 2)
+# for item in result:
+#     print(item)
+
+### Product retorna todas as possíveis combinações de uma lista ###
+# result = itertools.product(numbers, repeat=4)
+# for item in result:
+#     print(item)
+
+### Product de duas listas ###
+a = [1, 2]
+b = [3, 4]
+prod = product(a,b)
+print(list(prod))
+>>>[(1, 3), (1, 4), (2, 3), (2, 4)]
+
+### Combinations_with_replacement é similar ao acima, mas aceita valores repetidos ###
+# result = itertools.combinations_with_replacement(numbers, 4)
+# for item in result:
+#     print(item)
+
+### Chain combina listas (letters + numbers + names) ###
+# result = itertools.chain(letters, numbers, names)
+# for item in result:
+#     print(item)
+
+### Slice de um iterador útil para iteradores muito largos.
+#  (Range, começo, fim, step) ###
+
+# result = itertools.islice(range(10), 1, 5, 2)
+# for item in result:
+#     print(item)
+
+### Slice print de 3 primeiras linhas de um txt #### 
+# with open('itertools\itertools_snippets.txt') as f:
+#     header = itertools.islice(f, 3)
+#     for line in header:
+#         print(line)
+
+### Compress é similar ao filter() com mais regras###
+# letters = ['a', 'b', 'c', 'd']
+# selectors = [True, True, False, True]
+# result = itertools.compress(letters, selectors)
+# for item in result:
+#     print(item)
+
+### Accumulate soma todas as variáveis ###
+# result = itertools.accumulate(numbers)
+# for item in result:
+#     print(item)
+
+### Combinando Accumulate com Operator Multiplicador ###
+# import operator
+
+# result = itertools.accumulate(numbers, operator.mul)
+
+# for item in result:
+#     print(item)
+
+### Groupby pega certos valores dentro de dicts e printa
+# em key e value. Ver o arquivo txt para mais snippets ###
+
+# def get_state(person):
+#     return person['state']
+
+# people = [
+#     {
+#         'name': 'John Doe',
+#         'city': 'Gotham',
+#         'state': 'NY'
+#     },
+#     {
+#         'name': 'Jane Doe',
+#         'city': 'Kings Landing',
+#         'state': 'NY'
+#     }
+# ]
+
+# person_group = itertools.groupby(people, get_state)
+
+# for key, group in person_group:
+#     print(key)
+#     for person in group:
+#         print(person)
+#     print()
+
+### Outra forma mais simples do exemplo acima, substituir ###
+# for key, group in person_group:
+#     print(key, len(list(group)))
+
+#Bem útil para por exemplo ver quantos estudantes tiraram notas 10, 9, 8, etc.

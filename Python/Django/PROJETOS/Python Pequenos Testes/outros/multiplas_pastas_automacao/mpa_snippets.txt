@@ -1,0 +1,82 @@
+### O Objetivo desse exercicio é percorrer pelas pastas dentro de "Vendas", 
+abrir todos os arquivos de texto e juntar as informações. ###
+
+# Utilizando Jupyter Notebooks: # 
+
+import os
+from pathlib import Path
+import pandas as pd
+
+###########################################################
+
+caminho = Path.cwd()
+print(caminho)
+>>>'D:\Gabriel\Desktop\Jupyter'
+print(caminho.iterdir())
+>>>'<generator object Path.iterdir at 0x0000000123456789ABCDE>'
+
+for pasta in caminho.iterdir():
+    if pasta.is_dir():
+        os.chdir(pasta)
+        caminho = Path.cwd()
+        print(caminho)
+>>>'D:\Gabriel\Desktop\Jupyter\.ipynb_checkpoints
+    D:\Gabriel\Desktop\Jupyter\2020
+    D:\Gabriel\Desktop\Jupyter\2021' 
+
+# Linha 16, Loop nos diretorios internos
+# 18, Caso detecte um diretorio, mude (change) para ele 
+# 19, e registre print
+
+###########################################################
+# Mais a fundo: #
+caminho = Path.cwd()
+for pasta in caminho.iterdir():
+    [...]
+    for pasta in caminho.iterdir():
+        if pasta.is_dir():
+            os.chdir(pasta)
+            caminho = Path.cwd()
+            print(caminho)
+
+>>>'D:\Gabriel\Desktop\Jupyter\2021\01.Janeiro\01
+D:\Gabriel\Desktop\Jupyter\2021\02.Fevereiro\02
+D:\Gabriel\Desktop\Jupyter\2021\03.Março\02
+D:\Gabriel\Desktop\Jupyter\2021\04.Abril\30
+D:\Gabriel\Desktop\Jupyter\2021\05.Maio\01'
+[...]
+
+###########################################################
+# Ultima camada : #
+
+caminho = Path.cwd()
+for pasta in caminho.iterdir():
+   [...]
+    for pasta in caminho.iterdir():
+        [...]
+        for pasta in caminho.iterdir():
+            if pasta.is_dir():
+                os.chdir(pasta)
+                caminho = Path.cwd()
+                print(caminho)
+
+>>> Mesma coisa do acima, so que com arquivos.
+###########################################################
+# Acessando os arquivos : #
+
+caminho = Path.cwd()
+
+vendas = pd.DataFrame(columns=['Loja', 'Vendedor', 'Valor da Venda'])
+
+for pasta in caminho.iterdir():
+   [...]
+    for pasta in caminho.iterdir():
+        [...]
+        for pasta in caminho.iterdir():
+            [...]
+                for arquivo in caminho.iterdir():
+                    venda = pd.read_excel(arquivo)
+                    vendas = vendas.append(venda, ignore_index=True)
+
+# Linha 69 vai criar um arquivo .csv com essas colunas
+# Linha 79 ignora o ID da Linha/Coluna salvo, salvando em sequencia sem questionar

@@ -1,0 +1,71 @@
+/////////////////////////////////////////////////////////////
+// https://tabula-py.readthedocs.io/en/latest/tabula.html  //
+// O tabula-py é utilizado para ler as TABELAS de um PDF   //
+// convertendo em dataframes  Utilizando Jupyter Notebooks //
+/////////////////////////////////////////////////////////////
+
+pip install tabula-py
+atualizar java
+iniciar o jupyter notebook 
+
+import tabula
+
+lista_tabelas = tabula.read_pdf("ResultadoVale.pdf", pages="all")
+print(len(lista_tabelas))
+>>>11
+
+#############################################################
+# Linha 13: podemos colocar  direto um link como argumento: #
+# link = "www.link.com/arquivoPdf"                          #
+# lista_tabelas = tabula.read_pdf(link, pages="all")        #
+#############################################################
+
+for tabela in lista_tabelas:
+    display(tabela)
+>>>Retorna o dataframe de tabelas do pdf de exemplo
+
+lista_tabelas2 = tabula.read_pdf("ResultadoVale.pdf", pages="10")
+print(len(lista_tabelas2))
+>>>1
+
+tabela = lista_tabelas2[0]
+display(tabela)
+
+///////////////////////////////////////////////////////////////////
+# Editar o codigo acima com Cabeçalho. EXECUTE 1 POR 1 AOS POUCOS #
+
+tabela = lista_tabelas2[0]
+tabela.columns = tabela.iloc[0]
+tabela[[0, 1]] = tabela["Variação percentual"].str.split(" ", expand=True)
+tabela = tabela[1:9]
+tabela = tabela.set_index("R$ milhões")
+tabela.columns = tabela.iloc[0]
+tabela=tabela[1:]
+tabela = tabela.drop("1T21/4T20 1T21/1T20", axis=1)
+display(tabela)
+
+#########################################################################
+# Linha 38: Pega a primeira linha da tabela e transforma em Cabeçalho   #
+# 39: Cria uma nova coluna no argumento oferecido, separando por espaço #
+# 40: Desconsidera a linha 0 e limita até a linha 8                     #
+# 41: Apontando um índice, o índice é onde a tabela começa              #
+# 42 e 43: -1 linha                                                     #
+# 44: Removendo a tabela por eixo. Axis 0=Linha, 1=Coluna               #
+#########################################################################
+
+///////////////////////////////////////
+# Parametros extras caso não funcione #
+
+lista_tabelas2 = tabula.read_pdf("ResultadoVale.pdf", pages="10", lattice=True)
+
+lista_tabelas2 = tabula.read_pdf("ResultadoVale.pdf", pages="10", guess=False)
+
+
+#####################################################
+# O Lattice e Guess tentam retornar mais parametros #
+# que foram ignorados por padrão                    #
+######################################################
+
+"Stream looks for whitespace between columns, while Lattice looks for boundary 
+lines between columns. guess, se não me engano, adivinha a área onde está a 
+tabela na página, que é o oposto de você difinir a área usando a opção area."

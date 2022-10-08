@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My new LP</title>
+    <link rel="stylesheet" href="css/main.css">
+  </head>
+  <body>
+    <div class="hero-img"></div>    
+    <div class="wrapper">
+      <header>
+        <a href="https://www.google.com" target="_blank" class="logo">Shoe<span>Brand</span></a>
+          <nav>
+            <svg xmlns="http://www.w3.org/2000/svg" class="close" viewBox="0 0 24 24"><path d="M21 5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5zm-4.793 9.793-1.414 1.414L12 13.414l-2.793 2.793-1.414-1.414L10.586 12 7.793 9.207l1.414-1.414L12 10.586l2.793-2.793 1.414 1.414L13.414 12l2.793 2.793z"/>
+              <path xmlns="http://www.w3.org/2000/svg" d="M21 5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5zm-4.793 9.793-1.414 1.414L12 13.414l-2.793 2.793-1.414-1.414L10.586 12 7.793 9.207l1.414-1.414L12 10.586l2.793-2.793 1.414 1.414L13.414 12l2.793 2.793z"/>
+            </svg>
+
+            <ul>
+              <li><a href="#">Home</a></li>
+              <li><a href="#">Sneakers</a></li>
+              <li><a href="#">Players</a></li>
+            </ul>
+
+          </nav>
+
+          <svg class="menu" class="svg-icon" viewBox="0 0 20 20">
+            <path d="M10,1.445c-4.726,0-8.555,3.829-8.555,8.555c0,4.725,3.829,8.555,8.555,8.555c4.725,0,8.555-3.83,8.555-8.555C18.555,5.274,14.725,1.445,10,1.445 M10,17.654c-4.221,0-7.654-3.434-7.654-7.654c0-4.221,3.433-7.654,7.654-7.654c4.222,0,7.654,3.433,7.654,7.654C17.654,14.221,14.222,17.654,10,17.654 M14.39,10c0,0.248-0.203,0.45-0.45,0.45H6.06c-0.248,0-0.45-0.203-0.45-0.45s0.203-0.45,0.45-0.45h7.879C14.187,9.55,14.39,9.752,14.39,10 M14.39,12.702c0,0.247-0.203,0.449-0.45,0.449H6.06c-0.248,0-0.45-0.202-0.45-0.449c0-0.248,0.203-0.451,0.45-0.451h7.879C14.187,12.251,14.39,12.454,14.39,12.702 M14.39,7.298c0,0.248-0.203,0.45-0.45,0.45H6.06c-0.248,0-0.45-0.203-0.45-0.45s0.203-0.45,0.45-0.45h7.879C14.187,6.848,14.39,7.051,14.39,7.298"></path>
+          </svg>
+      </header>
+
+      <section class="hero">
+        <h1>Regain your confidence on the court.</h1>
+
+        <p class="subhead">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iste totam autem beatae ab praesentium necessitatibus incidunt ducimus consequuntur expedita deserunt.</p>
+        
+        <svg class="down-arrow" clip-rule="evenodd" fill-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="m9.001 13.022h-3.251c-.412 0-.75.335-.75.752 0 .188.071.375.206.518 1.685 1.775 4.692 4.945 6.069 6.396.189.2.452.312.725.312.274 0 .536-.112.725-.312 1.377-1.451 4.385-4.621 6.068-6.396.136-.143.207-.33.207-.518 0-.417-.337-.752-.75-.752h-3.251v-9.02c0-.531-.47-1.002-1-1.002h-3.998c-.53 0-1 .471-1 1.002zm4.498-8.522v10.022h3.008l-4.507 4.751-4.507-4.751h3.008v-10.022z" fill-rule="nonzero"/>
+        </svg>
+      </section>
+
+      <section class="more-info">
+        <div class="feature">
+          <div class="content">
+            <p class="title">Lightweight</p>
+            <p class="desc">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem iure?</p>
+          </div>
+          <img src="images/shoe2.jpg" alt="Another shoe">
+        </div>
+
+        <div class="feature left">
+          <div class="content">
+            <p class="title">Lightweight</p>
+            <p class="desc">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem iure?</p>
+          </div>
+          <img src="images/shoe3.jpg" alt="Another shoe">
+        </div>
+
+        <div class="feature">
+          <div class="content">
+            <p class="title">Lightweight</p>
+            <p class="desc">Lorem ipsum dolor sit amet consectetur adipisicing elit?</p>
+          </div>
+          <img src="images/shoe4.jpg" alt="Another shoe">
+        </div>
+      </section>
+
+    </div>
+
+    <!-- SCRIPT PARA OS BOTOES DO MENU -->
+    <script>
+      const menu = document.querySelector('.menu')
+      const close = document.querySelector('.close')
+      const nav = document.querySelector('nav')
+
+      menu.addEventListener('click', () => {
+        nav.classList.add('open-nav')
+      })
+      // Quando clica no Menu, vai disparar o evento click, que quando clicado, 
+      // vai adicionar uma class CSS dinamica dentro de nav chamada 'open-nav'.
+      // podemos estilizar no arquivo css.
+
+      close.addEventListener('click', () => {
+        nav.classList.remove('open-nav')
+      })
+      // Quando clica no X, vai disparar o evento click, removendo a 
+      // classe acima, fechando o menu dinamico automaticamente.
+    </script>
+  </body>
+</html>

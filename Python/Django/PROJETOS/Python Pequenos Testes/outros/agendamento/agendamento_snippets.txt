@@ -1,0 +1,70 @@
+### Agendamento comum de 2 em 2 segundos  ###
+
+import sched
+import time 
+
+scheduler = sched.scheduler(time.time, time.sleep)
+
+def soma(n1, n2):
+    print(f'Soma: {n1+n2} Tempo: {time.ctime()}')
+    scheduler.enter(2, 1, soma)
+
+soma()
+scheduler.run()
+
+### Forma recursiva ###
+
+def soma(n1, n2):
+    print(f'Soma: {n1+n2} Tempo: {time.ctime()}')
+    scheduler.enter(5, 1, soma, (2, 2))
+
+def sche():
+    scheduler.enter(5, 1, soma, (2, 2))
+
+sche()
+scheduler.run()
+
+### Vamos adicionar uma função de subtração ###
+
+import sched
+import time 
+
+scheduler = sched.scheduler(time.time, time.sleep)
+
+def soma(n1, n2):
+    print(f'Soma: {n1+n2} Tempo: {time.ctime()}')
+    scheduler.enter(2, 1, soma, (2, 2))
+    
+def sub(n1, n2):
+    print(f'Sub: {n1-n2} Tempo: {time.ctime()}')
+    scheduler.enter(2, 1, sub, (2, 2))
+
+def sche():
+    scheduler.enter(5, 1, soma, (2, 2))
+    scheduler.enter(5, 1, sub, (2, 2))
+
+sche()
+scheduler.run()
+
+### DEFININDO UMA DATA EXATA PARA O AGENDAMENTO ###
+
+import sched
+import time 
+from datetime import datetime, timedelta
+
+scheduler = sched.scheduler(time.time, time.sleep)
+
+def soma(n1, n2):
+    print(f'Soma: {n1+n2} Tempo: {time.ctime()}')
+    scheduler.enterabs((datetime.now() + timedelta(hours=24)).timestamp(), 1, soma, (2, 2))
+
+def sche():
+    scheduler.enterabs(datetime(year=2022, month=6, day=7, hour=20, minute=30).timestamp(), 1, soma, (2, 3))
+
+sche()
+scheduler.run()
+
+# Linha 59: Agora + 24 horas
+# Linha 61: no final 1=pririodate, usando a função soma, separado por virgula seus argumentos.
+# Tomar bastante cuidado para não usar Data;Hora que já passou.
+# O Scheduler pede a informação em formato Float de .timestamp.

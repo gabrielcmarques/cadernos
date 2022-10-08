@@ -1,0 +1,115 @@
+import requests
+
+### Request siples ###
+r = requests.get('https://xkcd.com/754/')
+print(r)
+
+### DEBUG: ###
+# print(r.status_code): 200 significa "Sucesso", 300 "Redirects" 400 "Client Errors", 500 "Server Errors" 
+# print(r.ok) é uma versão mais simples do acima. Retorna apenas True/False
+# print(r.headers) vai retornar os headers da response (Servers, Last Modified, Cache, ETC)
+# print(help(r)) e/ou print(dir(r)) também tem boas informações 
+# Os conteúdos dentro de help são objetos que podem ser chamados. EX: print(r.text)
+
+### HTTP Bin https://httpbin.org/ ###
+# É um excelente website para HTTP Request & Response
+
+# EX: https://httpbin.org/get?page=2&count=25 nós podemos representar esses parametros em um dicionário:
+payload = {'page': 2, 'count': 25}
+r = requests.get('https://httpbin.org/get', params=payload)
+#Elementos
+print(r.text) 
+#URL Final
+print(r.url)
+
+# POST:
+payload = {'username': 'gabriel', 'password': 'testing'}
+r = requests.post('https://httpbin.org/post', data=payload)
+print(r.text)
+
+
+### TESTE DE AUTENTICAÇÃO COM REQUESTS E HTTP BIN ###
+# Testar com valores que não se encaixam tbm
+r = requests.get('https://httpbin.org/basic-auth/gabriel/senha123', auth=('gabriel', 'senha123'))
+print(r.text)
+print(r)
+
+
+### Download de imagem direto do website ###
+r = requests.get('https://imgs.xkcd.com/comics/dependencies.png')
+with open('comic.png', 'wb') as f:
+    f.write(r.content)
+
+# wb = write bytes. Vai salvar no diretorio do codigo
+
+### REQUESTS COM JSON ###
+r_json = r.json
+print(r_json)
+print(r_json['form']) 
+[etc...]
+
+##############################################
+### REQUESTS COM APIS EM JUPITER NOTEBOOKS ###
+https://docs.awesomeapi.com.br/api-de-moedas
+
+# GET = Pega informação
+# POST = Manda Informação
+# PATCH = Edita informação 
+# DELETE = Deleta informação
+
+import requests
+requisicao = requests.get("https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL")
+print(requisicao)
+>>>Response [200]
+print(requisicao.json)
+>>>`Vai printar um Dicionario com as infos`
+
+# print((help)requisicao) para ver todas as variaveis que podem ser chamadas!
+
+### Database GET ###
+requisicao = requests.get("[URL Database]")
+print(requisicao.json)
+ou print(requisicao.json())
+# Codigo pode variar dependendo do database. Ler documentacao sobre Get requests do DB.
+
+### Database POST ###
+
+informacoes = '{
+    "nome": "Gabriel"
+}'
+
+requisicao = requests.post("[URL do DB]", data=informacao)
+print(requisicao.json)
+ou print(requisicao.json())
+# O DB vai criar um ID aleatorio, ver na doc como customizar IDs de metodos POST.
+
+### Database PATCH ###
+atualizacao = '{
+    "nome": "Daniel",
+    "sobrenome": "Marques"
+}'
+
+requisicao = requests.patch("[URL ESPECIFICA da informacao no DB]", data=atualizacao)
+print(requisicao.json)
+ou print(requisicao.json())
+
+### Database DELETE ###
+
+requisicao = requests.delete("[URL ESPECIFICA da informacao no DB]")
+
+### Outro Ex usando AwesomeAPI: ###
+
+link = 'https://cep.awesomeapi.com.br/json/05424020'
+
+requisicao = requests.get(link)
+print(requisicao.json())
+
+>>>{'cep': '05424020', 
+    'address_type': 'Rua ...',
+    'address_name': 'Carlos ...',  
+    'address': 'R Reis ...',
+    'state': 'SP', 'district': 'Pinheiros',
+    'lat': '-23.57021', 'lng': '-46.69685',
+    'city': 'São Paulo',
+    'city_ibge': '3550308',
+    'ddd': '11'}

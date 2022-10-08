@@ -1,0 +1,36 @@
+def equals_debuggint():
+    str_value = "Gabriel Marques"
+    num_value = 123
+    print(f'the value is {str_value}')
+    print(f'{str_value = }')
+    print(f'{num_value % 2 = }')
+    print(f'{str_value!a}')
+    print(f'{str_value!r}')
+
+# Linha 5 é bom para debugs
+# Linha 6 expressões arbitrarias
+# Linha 7 '!a' vai mostrar valores em ascii, se tiver  
+# Linha 8 '!r' é equivalente a print(f'{repr(str_value)}'), mas melhor para debugging
+
+### Exemplo mais prático ###
+
+class MyClass:
+    def __format__(self, format_spec) -> str:
+        print(f'MyClass __format__ called with {format_spec = !r}')
+        return "MyClass()"
+
+
+def formatting():
+    num_value = 123.456
+    now = datetime.datetime.utcnow()
+    print(f'{now=:%Y-%m-%d}')
+    print(f'{num_value:.2f}')
+    print(f'{MyClass(): blah blah %%MYFORMAT%%}')
+
+    nested_format = ".2f"
+    print(f'{num_value:{nested_format}}')
+
+
+# Linha 26 vai retornar now=2022-06-01
+# Linha 27 123.46
+# Linha 28 modifica a forma como MyClass é retornada

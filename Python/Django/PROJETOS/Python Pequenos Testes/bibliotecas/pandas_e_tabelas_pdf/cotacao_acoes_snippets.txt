@@ -1,0 +1,63 @@
+https://pandas-datareader.readthedocs.io/en/latest/
+https://pandas.pydata.org/docs/
+https://matplotlib.org/stable/index.html
+
+////////////////////////////////////////////////////////
+// Nesse exemplo vamos pegar cotação de ações         //
+// com pandas_datareader utilizando Jupyter Notebooks //                   
+////////////////////////////////////////////////////////
+
+>>>pip install pandas_datareader
+Jupyter notebook:
+
+
+from pandas_datareader import data as web
+import pandas as pd 
+import matplotlib.pyplot as plt 
+
+cotacao_bovespa = web.DataReader('^BVSP', source='yahoo', start="01-01-2020", end="01-01-2021")
+display(cotacao_bovespa)
+>>>Dataframe contendo a cotação
+
+################################################################
+# 14: Pegando as cotações do Yahoo do inicio de 2020 ate 2021. #
+# Formato Mês/Dia/Ano, pode ser `/` ou `-`. Exemplo de como    #
+#  pegar esse Ticker: "finance.yahoo.com, o '^BVSP' e search   #
+# Todos os ticers do Brasil são .SA. EX: 'MGLU3.SA'            #
+################################################################
+
+///////////////////////////////////////////////////////////
+# Nesse dataframe vamos utilizar o 'Adj Close' como base: #
+
+cotacao_bovespa["Adj Close"].plot()
+plt.show()
+>>>Gráfico
+
+# Exemplo de como deixar o gráfico maior:
+cotacao_bovespa["Adj Close"].plot(figsize=(15, 10))
+
+##########################################
+# 28 cria o gratico com valores passados #
+# 29 vai mostrar em um Gráfico           #
+# ! Tomar cuidado com datas e feriados ! #
+##########################################
+
+///////////////////////////////////////////////
+# Agora vamos trabalhar com um arquivo excel: #
+
+tabela_empresas = pd.read_excel("Empresas.xlsx")
+display(tabela_empresas)
+>>>Dataframe com ticker de empresas 
+
+for empresa in tabela_empresas['Empresas']:
+    print(empresa)
+    cotacao = web.DataReader(f'{empresa}.SA', data_source='yahoo', start="01-01-2020", end="01-01-2021")
+    display(cotacao)
+    cotacao["Adj Close"].plot(figsize=(15, 10))
+    plt.show()
+
+>>>DF + Gráficos de todas os Tickers listados no arquivo .xlsx
+# 53 é apenas para rotular. 
+
+
+

@@ -1,0 +1,51 @@
+#/////////////////////////////////////////////#
+# Explicando o comando ASSERT: É usado apenas #
+# no desenvolvimento, geralmente para testes. #
+#/////////////////////////////////////////////#
+
+assert 1 < 2
+>>> True 
+# 6: "Afirme/garanta que 1 é menor do que 2. Se não, retorne erro."
+
+assert 1 > 2
+>>> False and/or Error 
+
+### Exemplo com Requests: ###
+import requests
+
+requisicao = requests.get("https://economia.awesomeapi.com.br/last/USD-BRL")
+requisicao_dic = requisicao.json()
+
+cotacao = requisicao_dic["USDBRL"]["bid"]
+print(cotacao)
+>>>5.1193
+
+preco_produto = 100
+
+faturamento = preco_produto * cotacao 
+print(faturamento)
+
+>>>5.12045.12045.12045.12045.12045.12045.12045.12045.12045.12045.12045.
+12045.12045.12045.12045.12045.12045.12045 [...]
+
+/////////////////////////////////
+# Codigo acima com assert test: #
+
+assert type(cotacao) == float
+faturamento = preco_produto * cotacao 
+print(faturamento)
+>>> ERROR type not float.
+
+/////////////////////////////////////////////////////////////////////////////
+# Agora que identificamos o erro graças ao assert, basta consertar a fonte: # 
+
+cotacao = requisicao_dic["USDBRL"]["bid"]
+cotacao = float(cotacao) # <-------------
+print(cotacao)
+
+preco_produto = 100
+
+faturamento = preco_produto * cotacao 
+print(faturamento)
+>>>5.1164
+>>>511.64

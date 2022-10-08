@@ -1,0 +1,987 @@
+- PostgreSQL Docs:
+https://www.postgresql.org/docs/
+
+- Mockaroo para gerar informação dummy
+https://mockaroo.com/
+
+- Cheat Sheet: 
+https://www.postgresqltutorial.com/postgresql-cheat-sheet/
+
+- Cheat Sheet 2:
+https://blog.forestadmin.com/postgresql-cheat-sheet/
+
+https://www.youtube.com/watch?v=qw--VYLpxG4&list=WL&index=11&t=7568s
+
+### INICIANDO PELO SHELL ###
+- Abra o SQL Shell: Para conectar a um server, [enter vazio] para local, mais um 
+enter vazio para Database caso Local, mesmo para Port, Username, Password escolher um.
+
+Agr abrir o PGAdmin com essas credenciais acima.
+
+### COMANDOS PRINCIPAIS ###
+>>>psql
+# Entra no modo psql shell
+
+>>>help
+# Ajuda 
+
+>>> \?
+# Mais ajuda 
+
+>>> \l
+# Lista os databases em um formato linha coluna
+
+>>>CREATE DATABASE test;
+# Database simples criado
+
+### Conectando a um database ###
+>>>psql help 
+# Podemos ver as informacoes e credenciais, vamos usar abaixo uma delas
+
+>>>psql -h localhost -p 5432 -U amigoscode test
+# Vai conectar com o test database que criamos 
+>>> \l
+
+>>> \c test 
+# vai conectar a um database
+
+>>> \c amigoscode 
+# vai conectar a outro database
+
+- Vamos voltar para o test.
+
+>>>DROP DATABASE test;
+# !!! MUITO CUIDADO COM ESSE COMANDO. VAI DELETAR TODAS AS INFORMACOES. REALIZAR BACKUPS !!!
+
+https://www.postgresql.org/docs/current/datatype.html
+### CRIANDO TABLES ###
+
+>>>\c test 
+>>>CREATE TABLE person(
+id INT,
+first_name VARCHAR(50),
+last_name VARCHAR(50),
+gender VARCHAR(7),
+date_of_birth DATE
+);
+>>>\d 
+# Criamos uma table 'person', \d (describe) vai retornar um df com as tables.
+>>>\d person 
+# Describe especifico
+
+https://www.postgresql.org/docs/current/datatype.html
+### CRIANDO TABLES COM CONSTRAINTS ###
+
+DROP TABLE person;
+# Vamos criar uma com constraints
+
+>>>CREATE TABLE person(
+id BIGSERIAL NOT NULL PRIMARY KEY,
+first_name VARCHAR(50) NOT NULL,
+last_name VARCHAR(50) NOT NULL,
+gender VARCHAR(7) NOT NULL,
+date_of_birth DATE NOT NULL,
+email VARCHAR(150)
+);
+
+# NOT NULL significa que não pode ser nulo;vazio.
+# BIG SERIAL é um 'auto increment number' forma melhor de utilizar no id. Ver na doc.
+# Ctrl + L limpa o terminal
+
+### COMO INSERIR REGISTROS NAS TABLES ###
+
+>>>INSERT INTO person(
+first_name,
+last_name,
+gender,
+date_of_birth
+)
+VALUES('Anne', 'Smith', 'FEMALE', DATE `1988-01-09`);
+
+>>>ID FIRST_NAME LAST_NAME GENDER DATE_OF_BIRTH 
+>>>1  Anne       Smith     FEMALE 1988-01-09
+
+### INSERINDO UM SEGUNDO REGISTRO NA TABLE ###
+
+>>>INSERT INTO person(
+first_name,
+last_name,
+gender,
+date_of_birth,
+email
+)
+VALUES('Jake', 'Jones', 'MALE', DATE '1993-01-10', 'jake@gmail.com');
+
+>>>ID FIRST_NAME LAST_NAME GENDER DATE_OF_BIRTH EMAIL
+>>>1  Anne       Smith     FEMALE 1988-01-09
+>>>2  Jake       Jones     MALE   1990-01-10    jake@gmail.com
+
+>>> \d 
+# Lista de relations. (Describe)
+>>> \dt 
+# Apenas tables. Describe (tables)
+
+### GERANDO INFORMAÇÃO PARA TESTES COM MOCKAROO ###
+- https://mockaroo.com/
+- Vamos gerar com first_name (First Name), last_name (Last Name), email (Email Address blank 30%), 
+gender (Gender), date_of_birth (Date). Rows 1000. Format SQL. Table name: person -> DOWNLOAD!
+- Abrir o VSCODE-> File, Open... -> 'person.sql'.
+- Editar todos os fields para serem 'NOT NULL' exceto email e salvar o arquivo. EX:
+
+create table person(
+first_name VARCHAR(50) NOT NULL,
+last_name VARCHAR(50) NOT NULL,,
+[...]
+)
+
+- Agora vamos executar esse arquivo pelo terminal. Em OUTRO terminal:
+>>>cd [path onde está localizado o arquivo .sql]
+>>>la 
+# +/- igual o >>>ls do vscode 
+>>>pwd 
+# Retorna o path. Copie Ctrl+C esse path 
+
+- Retornando para o shell do psql:
+>>> \i [Ctrl+V]/person.sql
+# Vai retornar um erro: "Country_of_Birth" of relations does not exists. Vamos resolver:
+
+>>> \d person
+# Temos apenas date_of_birth, vamos dropar. (CUIDADO EM CASOS REAIS)
+
+>>> DROP TABLE person;
+>>> \d 
+>>> \i [Ctrl+V]/person.sql
+>>> SELECT * FROM person;
+# Retorna informação inserida.
+
+- Esquecemos do ID nessa table, e agora?? Volte pro VSCode, editeo create table:
+
+create table person(
+id BIGSERIAL NOT NULL PRIMARY KEY,
+first_name VARCHAR(50) NOT NULL,
+last_name VARCHAR(50) NOT NULL,,
+[...]
+)
+# Salvar 
+
+>>> DROP TABLE person;
+>>> \d 
+>>> \i [Ctrl+V]/person.sql
+>>> SELECT * FROM person;
+# INFORMACOES
+
+### MULTIPLOS FROM SELECT ### 
+
+>>> SELECT first_name, second_name FROM person;
+
+### ORDER BY ### 
+
+- Selecionando por pessoa e ordenando por Country of Birth
+>>> SELECT * FROM person ORDER BY country_of_birth;
+
+- Ascending e Descending:
+>>> SELECT * FROM person ORDER BY country_of_birth ASC;
+>>> SELECT * FROM person ORDER BY country_of_birth DESC;
+
+- Multiplas condições
+>>> SELECT * FROM person ORDER BY first_name, id DESC;
+
+### DISTINCT ### 
+
+- Esses 2 vão retornar vários duplicados
+>>>SELECT country_of_birth FROM person;
+>>>SELECT country_of_birth FROM person ORDER BY country_of_birth;
+
+- Vamos mostrar cada um com 1 valor de Country of birth, distinguindo:
+>>>SELECT DISTINCT country_of_birth FROM person ORDER BY country_of_birth;
+>>>SELECT DISTINCT country_of_birth FROM person ORDER BY country_of_birth DESC; #ETC
+
+### Where Clause and AND ###
+
+- Condicionais Where e AND:
+>>>SELECT * FROM person;
+>>>SELECT * FROM person WHERE gender = 'Female';
+>>>SELECT * FROM person WHERE gender = 'Male';
+>>>SELECT * FROM person WHERE gender = 'Male' AND country_of_birth = 'Brazil';
+
+- Multiplos valores para Clause Where e And
+>>>SELECT * FROM person WHERE gender = 'Male' AND (country_of_birth = 'Brazil' OR country_of_birth = 'China');
+
+- Multiplos valores para Clause Where e And
+>>>SELECT * FROM person WHERE gender = 'Male' AND (country_of_birth = 'Brazil' OR country_of_birth = 'China');
+
+- Lembrando que o comando so executa depois do ';':
+>>>SELECT * FROM person WHERE gender = 'Male' AND (country_of_birth = 'Brazil' OR country_of_birth = 'China')
+AND last_name = 'Silva';
+
+### Comparison Operators ###
+
+- True e False
+>>>SELECT 1=1;
+>>>SELECT 1=2;
+
+### LIMIT e FETCH ###
+
+- Apenas os 10 primeiros valores:
+>>>SELECT * FROM person;
+>>>SELECT * FROM person LIMIT 10;
+
+- Ignorando 5 valores e retornando 5 valores depois dos ignorados
+>>>SELECT * FROM person OFFSET 5 LIMIT 5;
+
+- com FETCH
+>>>SELECT * FROM person OFFSET 5 FETCH FIRST 5 ROW ONLY;
+>>>SELECT * FROM person OFFSET 5 FETCH FIRST ROW ONLY;
+
+### clause IN ###
+>>>SELECT * FROM person;
+
+- Retornando dados de usuarios com Brazil e France ou China.
+>>>SELECT * FROM person WHERE country_of_birth = 'Brazil'
+>>>OR country_of_birth = 'France' OR country_of_birth = 'China';
+
+- Método mais ágil com clause IN:
+>>>SELECT * FROM person
+>>>WHERE country_of_birth IN ('China', 'Brazil', 'France')
+>>>ORDER BY country_of_birth;
+
+### clause BETWEEN ###
+- Utilizado para range. 
+
+- Pegue dados de pessoas que nasceram entre 2000 e 2015:
+>>>SELECT * FROM person;
+>>>SELECT * FROM person
+>>>WHERE date_of_birth
+>>>BETWEEN DATE '2000-01-01' AND '2015-01-01';
+
+### clause LIKE e ILIKE ###
+- Utilizado para comparações e match patterns. % = 'Qualquer coisa', ex: %.com seria qualquer coisa .com
+
+- Pegue os dados de tdos os emails que terminam com .com (no DF provavelmente vai ter de .uk, .org, etc)
+>>>SELECT * FROM person;
+>>>SELECT * FROM person
+>>>WHERE email LIKE '%.com';
+
+- Apenas gmail especificamente
+>>>WHERE email LIKE '%.gmail.com';
+
+- Outra forma:
+>>>SELECT * FROM person WHERE email LIKE '%google.';
+
+- Filtrando por quantidade de characters com '_'. 'Pegue emails de nomes com 8 characters':
+>>>SELECT * FROM person WHERE email LIKE '________@%';
+
+- 'Pegue emails de nomes com 7 characters que começa com G':
+>>>SELECT * FROM person WHERE email LIKE 'G_______@%';
+
+- 'Pegue emails com o país começando por 'P':
+>>>SELECT * FROM person WHERE country_of_birth LIKE 'P%';
+
+### ILIKE ###
+- iLIKE é similar ao LIKE, apenas ignora CASE Sensitive
+
+- 'Pegue emails com o país começando por 'P':
+>>>SELECT * FROM person WHERE country_of_birth LIKE 'p%';
+
+### GROUP BY ###
+- Permite agrupar a informação baseado na COLUNA especificada:
+
+- Quantas pessoas temos por cada país que temos:
+>>>SELECT DISTINCT country_of_birth from person;
+
+- Agora vamos filtrar pela coluna Country_of_Birth:
+>>>SELECT country_of_birth FROM person GROUP BY country_of_birth;
+
+- Se retornar tudo agrupado certo, vamos adicionar uma segunda coluna para representar os valores totais,
+- Vamos utilizar o COUNT(*) para realizar essa operação:
+>>>SELECT country_of_birth, COUNT(*) 
+>>>FROM person 
+>>>GROUP BY country_of_birth;
+
+- Ordernando:
+>>>SELECT country_of_birth, COUNT(*) 
+>>>FROM person 
+>>>GROUP BY country_of_birth 
+>>>ORDER BY country_of_birth;
+
+https://www.postgresql.org/docs/current/functions-aggregate.html
+### GROUP BY HAVING ###
+- Permite realizar um filtro extra antes da agregação. 
+
+- Vamos procurar os países com mais de 5 pessoas e depis realizar a agregação Depois do Group By:
+>>>SELECT country_of_birth, COUNT(*) 
+>>>FROM person 
+>>>GROUP BY country_of_birth 
+>>>HAVING COUNT(*) >= 5
+>>>ORDER BY country_of_birth;
+
+### ADDING NEW TABLE AND DATA USING MOCKAROO ###
+- Vamos adicionar ainda mais informação e migrar para o database atual:
+- https://mockaroo.com/
+
+#####################################
+# Field name 	Type 		Options	#		
+# id 			row number 	0#		#
+# make 			car make	0		#
+# model 		car model	0		#////////////////////////////////
+# price 		money		between 10000 and 100000 in none blank 0#
+# rows 1000 format sql table name: car (Check) include create table #
+#####################################################################
+
+- Salvar, abrir no vscode:
+create table car(
+	id BIGSERIAL NOT NULL PRIMARY KEY,
+	make VARCHAR(100) NOT NULL,
+	model VARCHAR(100) NOT NULL,
+	price NUMERIC(19, 2) NOT NULL
+);
+[1000 ROWS...]
+
+- Terminal ~psql ativado, Utilize pwd para pegar o path do arquivo e execute:
+>>>pwd
+>>>la 
+>>>\i [caminho]/car.sql
+>>>SELECT * FROM car;
+
+### CALCULANDO MIN, MAX E AVG ###
+
+- Retornando o carro com maior valor e menor valor:
+>>>SELECT * FROM car;
+>>>SELECT MAX(price) FROM car;
+>>>SELECT MIN(price) FROM car;
+
+- Avarage e valor Avg cheio:
+>>>SELECT AVG(price) FROM car;
+>>>SELECT ROUND(AVG(price)) FROM car;
+
+- 'Filtre por montadora e modelo retornando o menor preço de cada. Tbm o Max em seguida' 
+>>>SELECT make, model, MIN(price) 
+>>>FROM car 
+>>>GROUP BY make, model;
+
+>>>SELECT make, model, MAX(price) 
+>>>FROM car 
+>>>GROUP BY make, model;
+
+- Apenas montadora e preço maximo
+>>>SELECT make, MAX(price) 
+>>>FROM car 
+>>>GROUP BY make;
+
+- Retornando montadora e preço AVG
+>>>SELECT make, AVG(price) 
+>>>FROM car 
+>>>GROUP BY make;
+
+- Round:
+>>>SELECT make, ROUND(AVG(price)) 
+>>>FROM car 
+>>>GROUP BY make;
+
+### SUM ###
+- Agora vamos realizar Somas:
+
+- 'Some o preço total de todos os carros que temos no DB...'
+>>>SELECT SUM(price) FROM car;
+
+- 'E junto retorne a montadora em uma tabela agrupada'
+>>>SELECT SUM(price) FROM car
+>>>GROUP BY make;
+
+### BASICS OF ARITHMETICS OPERATORS ###
+- Vamos realizar operações para retornar estatísticas com operadores aritmeticos:
+
+- 'Vamos criar promoções para nossos produtos, crie queries para retornar os valores -10% do valor'
+>>>SELECT * FROM car;
+
+- Apenas para ter certeza que é a mesma coisa do acima
+>>>SELECT id, make, model, price FROM car;
+
+- Agora vamos retornar os valores com desconto de 10% (Preço * 0.10). Vai criar uma nova coluna nesse Round.
+>>>SELECT id, make, model, price * .10 FROM car;
+
+- Arrendondando 2 casas decimais:
+>>>SELECT id, make, model, price ROUND(price * .10, 2) FROM car;
+
+- Agora vamos realizar a operação para retornar o valor - 10%
+>>>SELECT id, make, model, price 
+>>>ROUND(price * .10, 2), 
+>>>ROUND(price - (price * .10), 2) 
+>>>FROM car;
+
+- Vamos renomear essas colunas novas que criamos:
+- Procurar usar nomes consistentes:
+>>>SELECT id, make, model, price AS original_price_value,
+>>>ROUND(price * .10, 2) AS ten_percent_value, 
+>>>ROUND(price - (price * .10), 2) AS discount_after_ten_percent
+>>>FROM car;
+
+### COALESCE ###
+- Lidando com NULLS. Permite ter um Default value caso o retornado seja branco.
+
+
+>>>SELECT COALESCE(1);
+
+- Primeiro valor
+>>>SELECT COALESCE(null, 1) AS number;
+
+- Primeiro e segundo em diante
+>>>SELECT COALESCE(null, null 1) AS number;
+
+- Primeiro e segundo em diante + 10
+>>>SELECT COALESCE(null, null 1, 10) AS number;
+
+- 'Retorne valores que tem email nulo e substitua por `Email not provided` '
+>>>SELECT * FROM person;
+>>>SELECT email FROM person;
+>>>SELECT COALESCE(email) FROM person;
+
+>>>SELECT COALESCE(email, 'Email not provided') FROM person;
+
+### TIMESTAMP and DATES ###
+https://www.postgresql.org/docs/9.1/datatype-datetime.html
+- Vamos trabalhar com Horas e datas:
+
+- Vamos checar se o DB tem um date type:
+>>>\d person
+
+- Retornando a data e hora atual:
+>>>SELECT NOW();
+
+- Apenas DATE e apenas TIME
+>>>SELECT NOW()::DATE;
+>>>SELECT NOW()::TIME;
+
+### OPERAÇÕES MATEMÁTICAS COM DATAS ###
+
+- Agora - 1 ano, +2 meses, +3 semanas, -15 dias:
+>>>SELECT NOW() - INTERVAL '1 YEAR';
+>>>SELECT NOW() + INTERVAL '2 MONTHS';
+>>>SELECT NOW() + INTERVAL '3 WEEKS';
+>>>SELECT NOW() - INTERVAL '15 DAY';
+
+- Retornando em formato apenas DATE:
+>>>SELECT NOW()::DATE + INTERVAL '2 MONTHS';
+>>>SELECT (NOW() + INTERVAL '2 MONTHS')::DATE;
+
+### AGE FUNCTION ###
+
+- Permite retornar uma coluna extra com informações sobre Idade detalhada
+>>>SELECT first_name, last_name, gender, country_of_birth, date_of_birth FROM person;
+
+- Agora com uma coluna adicional para Age com o timestamp atual e data de nascimento
+- Vai retornar já em formato Datetime detalhado, podendo realizar operações customizadas em APIs
+>>>SELECT first_name, last_name, gender, country_of_birth, date_of_birth AGE(NOW(), date_of_birth) AS age FROM person;
+
+### DELETING PRIMARY KEYS ###
+- Chaves primárias servem para diferenciar rows, especialmente as repetidas.
+
+- Na nossa tabela já temos o ID como pk
+- nextvaql('person_id_seq'::regclass) significa que é Auto Incrementado. NUNCA MODIFICAR ISSO.
+>>>\d
+
+- Vamos ver um exemplo:
+>>> SELECT * FROM person LIMIT 1;
+
+- Se tentarmos inserir um dado com ID customizado, vai falhar
+>>>insert into person (id, first_name, last_name, gender, email, date_of_birth, country_of_birth) 
+>>>values (1, 'Gabriel', 'Marques', 'Male', 'gabmarques0@email.com.br', '1993-10-11', 'Brazil')
+>>> "FATAL ERROR"
+
+- Exemplo deletando PK auto incremental (MUITO CUIDADO... isso vai ser apenas para nosso exemplo). 
+>>>ALTER TABLE person DROP CONSTRAINT person_pkey;
+
+- Agora não temos mais a função auto incremental que utilizamos (BIGSERIAL)
+>>>\d 
+
+- Com isso, podemos inserir id e realizar essa operação delicada:
+>>>values (1, 'Gabriel', 'Marques', 'Male', 'gabmarques0@email.com.br', '1993-10-11', 'Brazil');
+>>> "Success"
+
+>>>\d 
+>>>SELECT * FROM person WHERE id = 1;
+
+### ADDING PRIMARY KEYS ###
+- Adicionando Pks
+
+>>>\d
+>>>SELECT * FROM person WHERE id = 1;
+
+- Tentando diretamenta provavelmente vai dar um Error Could not creat unique index.
+>>>ALTER TABLE person ADD PRIMARY KEY (id);
+>>>ERROR 
+
+- Vamos deletar o erro para simular a adição (APENAS NO NOSSO EXEMPLO...)
+>>>DELETE FROM person WHERE id = 1;
+>>>SELECT * FROM person WHERE id = 1;
+
+- Adicionando. Sempre garanta que a PK seja ÚNICA em cada row:
+>>>ALTER TABLE person ADD PRIMARY KEY (id);
+>>>\d person 
+
+### UNIQUE CONSTRAINTS ###
+- Nos permite ter valores únicos para uma coluna. 
+
+- Vamos filtrar os emails e agrupar todos que estão NULOS
+>>>SELECT email, count(*) FROM person GROUP BY email;
+
+- Agora os duplicados 
+>>>SELECT email, count(*) FROM person GROUP BY email HAVING COUNT(*) > 1;
+
+- Pegue uma linha de codigo do arquivo .sql e copie no shell psql para duplicarmos ela. EX:
+>>>name, last_name, gender, email, date_of_birth, country_of_birth values ('Fernando', 'Cristo', 'Male', 'fercrist@email.com.br', '1965-01-02', 'Colombia')
+
+- Novamente o comando, vamos ver o que mudou. Tem que ter 2 duplicados nesse teste:
+>>>SELECT email, count(*) FROM person GROUP BY email HAVING COUNT(*) > 1;
+
+- Procure pelo email que duplicamos:
+>>>SELECT * FROM person WHERE email = 'fercrist@email.com.br';
+
+- Com isso criamos um problema, 2 pessoas com o mesmo email em nosso DB. 
+- Isso vai criar problemas com emails automaticos e etc. É aqui que o Unique Constraint vai brilhar:
+
+- Quando executarmos o comando vai dar um erro de Email duplicado
+>>>ALTER TABLE person ADD CONSTRAINT unique_email_address UNIQUE (email);
+
+- Temos 2 opcoes: Deletar um dos usuarios completamente ou alterar o email para algo, ou NULL mesmo:
+- Opção 1:
+>>>DELETE FROM person WHERE id = [ID DA PESSSOA DUPLICADO];
+>>>ALTER TABLE person ADD CONSTRAINT unique_email_address UNIQUE (email);
+>>>success.
+>>>\d person
+
+- Agora toda vez que tentar adicionar uma informação já existente, não vai duplicar mais.
+- Daí para refazer isso, dropamos a constraint igual fizemos linhas acima, realizamos a operacao e recriamos a constraint.
+>>>name, last_name, gender, email, date_of_birth, country_of_birth values ('Fernando', 'Cristo', 'Male', 'fercrist@email.com.br', '1965-01-02', 'Colombia')
+>>>error.
+>>>ALTER TABLE person DROP CONSTRAINT unique_email_address;
+>>>\d person 
+>>>ALTER TABLE person ADD UNIQUE (email);
+>>>\d person
+
+### CHECK CONSTRAINTS ###
+- Permite adicionar constraints baseadas em BOOLEAN
+
+- Vamos trabalhar com a tabela MALE e FEMALE, no nosso exemplo, precisamos apenas desses 2.
+>>>	SELECT * FROM person;
+
+- Vá para o VSCODE, pegue a primeira linha e altera o Gender para 'HELLO' e execute no psql. o Email tbm. EX:
+>>>name, last_name, gender, email, date_of_birth, country_of_birth values ('Fernando', 'Cristo', 'HELLO', 'HELLO@email.com.br', '1965-01-02', 'Colombia')
+
+- Agora criamos um problema, criamos um 'HELLO' na parte de genders. 
+>>>SELECT DISTINCT gender FROM person;
+
+- É aqui que o CHECK é usado, vamos limitar para apenas Male ou Female nesse exemplo:
+- E claro, podemos adicionar mais genders num exemplo real.
+>>>ALTER TABLE person ADD CONSTRAINT gender_constraint CHECK (gender = 'Famale' OR gender = 'Male');
+
+- Vai gerar um erro por conta do gender 'HELLO' que criamos. Vamos deletar
+>>>ERROR, "gender_constraint" is violatead by some row.
+>>>DELETE FROM person WHERE gender = 'HELLO';
+>>>ALTER TABLE person ADD CONSTRAINT gender_constraint CHECK (gender = 'Famale' OR gender = 'Male');
+>>>success.
+>>>\d person
+
+- Se tentarmos adicionar novamente a pessoa com gender HELLO, vai falhar. 
+- Se quisermos adicionar mais genders, basta deletar a constraint igual nas linhas acima, adicionar e recriar a constraint nova.
+
+### DELETE RECORDS ###
+- Vamos deletar registros. Muito cuidado com exemplos reais. 
+
+- !!! >>> DELETANDO TUDO. NUNCA FAÇA ISSO SEM BACKUPS <<< !!!
+>>>DELETE FROM person;
+
+- Lembrete de como executar um arquivo .sql no terminal:
+- NOTA QUE O ID VAI MUDAR CASO DELETARMOS TUDO E RECRIAMOS DE NOVO.
+>>>cd [path]
+>>>pwd (copiar)
+>>>psql: (colar)/arquivo.sql
+
+- Vamos deletar por ID:
+>>>SELECT * FROM person;
+>>>DELETE FROM person WHERE id = 5;
+>>>SELECT * FROM person;
+
+- Vamos deletar por gender Female e país seja England:
+>>>DELETE FROM person WHERE gender = 'Female' AND country_of_birth = 'England';
+>>>SELECT * FROM person WHERE gender = 'Female' AND country_of_birth = 'England';
+>>>0
+>>>SELECT * FROM person WHERE gender = 'Male' AND country_of_birth = 'England';
+
+### UPDATE RECORDS ###
+- Atualizando registros. 
+
+
+>>>SELECT * FROM person;
+- Digamos que nós queremos Atualizar a informação da pessoa de ID 10;
+- A função SET permite passar um Array de colunas com os novos valores;
+- Muito cuidado pois sem esse WHERE ele atualizaria TODOS os emails:
+>>>UPDATE person SET email = 'gabrielchristo@email.co.br' WHERE id = 10;
+
+>>>SELECT * FROM person WHERE id = 10;
+
+- Atualizando por nome. Importante utiliazar Nome + Sobrenome, talvez até email:
+- Novamente super importante o WHERE, se não atualiza todo o DB com essa info!!!
+>>>UPDATE person SET first_name = 'Gabriel', last_name = 'Christo', email = 'gabriel@gmail.uk' WHERE id = 10;
+
+### ON CONFLICT DO NOTHING ###
+- Usado para passar por cima de constraints com regras duplicadas
+
+- Vamos pegar a pessoa com ID 20 nesse exemplo:
+>>>SELECT * FROM person;
+>>>SELECT * FROM person WHERE id = 20;
+(Vamos chamar de Tiago nesse exemplo)
+
+- Vamos tentar duplicar o Tiago com as mesmas informações:
+>>>INSERT INTO person (id, first_name, last_name, gender, email, date_of_birth, country_of_birth)
+>>>VALUES (20, 'Tiago', 'Silvia', 'Male', 'tiago@email.com', DATE '1992-05-28', 'Brazil');
+>>>error: Key (id)=(20) already exists.
+
+- O 'ON CONFLIT DO NOTHING' vai permitir fazer operações com duplicados em situações específicas. 
+- No exemplo vamos passar por cima da regra por ID. pode ser oq quiser:
+>>>INSERT INTO person (id, first_name, last_name, gender, email, date_of_birth, country_of_birth)
+>>>VALUES (20, 'Tiago', 'Silvia', 'Male', 'tiago@email.com', DATE '1992-05-28', 'Brazil')
+>>>ON CONFLICT (id) DO NOTHING;
+>>>success.
+>>>SELECT * FROM person WHERE id = 20;
+
+### UPSERT ###
+- Para casos específicos onde por ex o usuario cadastra um email mas muda de ideia
+- Com isso o usuário vai poder alterar o email registrado
+>>>SELECT * FROM person WHERE id = 30;
+>>>VALUES (20, 'Tiago', 'Silvia', 'Male', 'tiago@email.com', DATE '1992-05-28', 'Brazil')
+>>>ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email;
+
+- Exemplo com nome:
+>>>SELECT * FROM person WHERE id = 30;
+>>>VALUES (20, 'TiagoAlterado', 'SilviaAlterado', 'Male', 'tiago_alterado@email.com', DATE '1992-05-28', 'Brazil')
+>>>ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email,
+>>>last_name = EXCLUDED.last_name, first_name = EXCLUDED.first_name; 
+>>>SELECT * FROM person WHERE id = 30;
+
+### FOREIGN KEYS, JOINS & RELATIONSHIPS ###
+
+- Digamos que temos 2 tables com person e car e queremos retornar uma query combinando
+as informações de Car e Person para uma table Single_Person:
+https://app.diagrams.net/#G1phOScs9k3XUSKNSevtkhKuAu9DMe8sfU
+
+Diagrama 1 combinado com Diagrama 2, o problema com essa combinação no Diagrama 3 é que nem todos 
+os usuários podem ter carros e está como not null. PostgreSQL é um database relacional, temos que 
+solucionar utilizando Referências invés de fundir tudo em uma nova tabela! Diagrama 4 e 5.
+
+- A seguinte linha do Diagrama 4 cria uma RELAÇÃO entre a tabela person e car por ID PK
+- Utilizando uma FOREIGN KEY, a chave estrangeira que serve para REFERENCIAR outra tabela.
+- "[nomeTable]_id + Type REFERENCES nomeTable(id) UNIQUE([nomeTable]_id)"
+- Unique garante que no nosso caso teremos apenas 1 carro por pessoa no DB
+
+car_id BIGINT REFERENCES car(id) UNIQUE (car_id)
+
+### ADDING RELETIONSHIPS BETWEEN TABLES ###
+- Agora que visualizamos acima como fazer, vamos executar! No shell ~psql:
+
+- Vamos deletar tudo que temos no database atual para esse exercicio:
+>>>\d
+ou
+>>>\dt 
+>>>DROP TABLE person;
+>>>DROP TABLE car;
+>>>DROP TABLE etc;
+
+- Tipo de info.sql que vamos trabalhar. O mais importante é a nova última linha da table person;
+- BIGINT é similar ao BIGSERIAL. Essa linha vai ser a referência por chave estrangeira entre person e car;
+- Não vamos utilizar NOT NULL no car_id pq nem todos tem carros. Bom sempre checar essas condições;
+- Também vamos criar uma regra especial em constraint dizendo que car_id tem que ser único:
+
+creata table car(
+	id BIGSERIAL NOT NULL PRIMARY KEY,
+	make VARCHAR(100) NOT NULL,
+	model VARCHAR(100) NOT NULL,
+	price NUMERIC (19, 2) NOT NULL
+);
+
+create table person(
+	id BIGSERIAL NOT NULL PRIMARY KEY,
+	first_name VARCHAR(50) NOT NULL,
+	last_name  VARCHAR(50) NOT NULL,
+	gender VARCHAR(7) NOT NULL,
+	email VARCHAR(100),
+	date_of_birth DATE NOT NULL,
+	country_of_birth VARCHAR(50) NOT NULL,
+	car_id BIGINT REFERENCES car (id),
+	UNIQUE (car_id)
+);
+
+insert into person (first_name, last_name, gender, email, date_of_birth, country_of_birth) values ('Fernanda', 'Beardon', 'Female', 'fernandab@is.gd', '1953-10-28', 'Colombia');
+insert into person (first_name, last_name, gender, email, date_of_birth, country_of_birth) values ('Omar', 'Colmore', 'Male', 'null', '1921-04-03', 'Sweden');
+insert into person (first_name, last_name, gender, email, date_of_birth, country_of_birth) values ('Adriana', 'Matuscheck', 'Female', 'amatuscheck2@feedburner.com', '1985-06-15');
+
+insert into car (make, model, price) values ('Land Rover', 'Sterling', '87665.38');
+insert into car (make, model, price) values ('GMC', 'Acadia', '17662.69');
+
+- Executando arquivo .sql no shell ~psql:
+>>>\i [path]/arquivo.sql
+
+### UPDATING FOREIGN KEYS COLUMNS ###
+- Atualizando Chaves Estrangeiras
+
+- Se consultar, car_id vai estar vazio. 
+>>>SELECT * from person;
+>>>SELECT * from car;
+>>>\d 
+>>>\dt 
+
+- Vamos Registrar o carro id 2 para a pessoa id 1. Muito cuidado com duplicados;
+- Porem essa forma só permite relação 1 a 1. 1 Carro pode ter apenas 1 pessoa específica:
+>>>UPDATE person SET car_id = 2 WHERE id = 1;
+>>>SELECT * from person;
+
+https://dataschool.com/assets/images/how-to-teach-people-sql/sqlJoins/sqlJoins_7.png
+https://i.stack.imgur.com/qGCWC.png
+### INNER JOINS ###
+- Uma forma efetica de combinar tables. Vamos combinar uma tabela A com B;
+- INNER JOIN junta uma tabela A com um B criando um C entre eles. Ambas com Foreign Key;
+- EX: Vamos juntar Car e Person por INNER JOIN;
+- Depois do ON, geralmente apontamos a chave primária:
+
+>>>SELECT * from person;
+>>>SELECT * from car;
+>>>'Pressione `Q`'
+>>>\x
+>>>SELECT * from person JOIN car ON person.car_id = car.id;
+- ('Tudo da table person com row car_id vai se juntar a table car com row id');
+- Agora tudo que entre ID até CAR_ID é de person, o resto abaixo é referência INNER JOIN
+- Como Adriana não tem um car_id, ela não foi inclusa.
+
+- Agora um INNER JOIN personalizado apenas com Nome, Fabricante, Modelo e Preço:
+>>>SELECT person.first_name, car.make, car.model, car.price
+>>>FROM person 
+>>>JOIN car ON person.car_id = car.id 
+
+- Para remover o display aumentado um \x novamente: 
+>>>\x
+
+### LEFT JOINS ###
+- Permite combinar 2 tables A+B, porém incluindo apenas as Rows da table A e algumas 
+informação correspondentes da B, gerando uma C que possui maioria de informações A:
+
+- Nesse exemplo vamos 
+
+- A)
+>>>SELECT * from person;
+- B)
+>>>SELECT * from car;
+
+- Como podemos observaer, Adriana não tem um car_id. Vamos uncluir ela com LEFT JOIN:
+- Por consequencia vai estar NULL
+>>>SELECT * FROM person
+>>>LEFT JOIN car ON car.id = person.car_id;
+
+- Agora permitindo essa operação (car.* = procure por tds os valores dessa row):
+>>>SELECT * FROM person
+>>>LEFT JOIN car ON car_id = person.car_id
+>>>WHERE car.* IS NULL;
+
+- Experimente:
+>>>SELECT * FROM person
+>>>JOIN car ON person.car_id = car.id;
+
+>>>SELECT * FROM person
+>>>LEFT JOIN car ON car.id = person.car_id;
+
+### DELETING RECORS WITH FOREIGN KEYS ###
+- Como deletar registros com chaves estrangeiras constraints:
+- Tomar muito cuidado com métodos tipo CASCADE.
+
+- Vamos inserir os valores no ~psql para exemplo:
+>>>insert into car(id, make, model, price) values (13, 'Mazda', 'RX-8', '51272.48');
+>>>insert into person(id, first_name, last_name, gender, email, date_of_birth, country_of_birth) values (9000, 'John', 'Smith', 'Male', 'null', '1921-04-03', 'Finland');
+>>>SELECT * FROM person WHERE id = 9000;
+
+>>>SELECT * FROM person WHERE id = 9000;
+>>>SELECT * FROM car WHERE id = 13;
+
+- Nessa tabela, John não tem um carro. Vamos registrar um para ele:
+>>>UPDATE person 
+>>>SET car_id = 13 
+>>>WHERE id = 9000;
+
+>>>SELECT * FROM person WHERE id = 9000;
+>>>SELECT * FROM car WHERE id = 13;
+
+- Agora se tentarmos deletar o carro do DB não vai dar certo, pois a foreign key vai estar vínculada a John.
+>>>DELETE FROM car WHERE id = 13;
+>>>error.
+
+- Sempre antes de deletar qualquer valor no DB, remover primeiro as CONSTRAINTS!!
+- Pra solucionar temos 2 opções: 1) Deletamos John, pois a row dele não tem Constraint;
+- Ou alteramos o car_id para NULL. Vamos com a opção 1:
+
+>>>DELETE FROM person WHERE id = 9000;
+>>>SELECT * FROM person WHERE id = 9000;
+>>>DELETE FROM car WHERE id = 13;
+>>>success.
+>>>SELECT * FROM car WHERE id = 13;
+
+### EXPORTING QUERY RESULTS TO CSV ###
+- Vamos gerar um arquivo .csv:
+
+- Left join para incluir todos com e sem carros:
+>>>SELECT * FROM person
+>>>LEFT JOIN car ON car.id = person.car_id;
+
+- Vamos ver uns comandos. Usaremos Input/Output copy
+>>>\? 
+- Primeiro selecionamos, especificamos o método e as tables/rows, para qual caminho + /nome.csv,
+com delimiter vírgula como separador dos valores salvos:
+
+>>>\copy (
+>>>SELECT * FROM person 
+>>>LEFT JOIN car 
+>>>ON car.id = person.car_id) 
+>>>TO '[path]/nome.csv' 
+>>>DELIMITER ',' CSV HEADER;
+
+### SERIAL & SEQUENCES ###
+- Serve para operações com BIGSERIAL/BIGINT IDs
+
+- Quando consultamos no shell psql, ele mostra bigint, diferente do arquivo que geramos que
+diz que é um tipo "BIGSERIAL". Na coluna Default da linha id ele diz "nextval....", que 
+significa que é do tipo auto incremental.  
+>>>\d person 
+>>>\d car 
+
+- Nós podemos selecionar esses valores para realizar operações específicas:
+>>>SELECT * FROM person_id_seq;
+>>>SELECT * FROM car_id_seq;
+
+- Executando a linha diretamente com SELECT, alterando o last_value:
+>>>SELECT nextval('person_id_seq':regclass); # Execute 4x
+>>>SELECT * FROM person_id_seq;
+
+- Caso mais um usuário registrar apos a operação acima, o proximo ID dessa pessoa vai pular 4 valores.
+>>>insert into person(John... etc etc)
+>>>SELECT * FROM person;
+
+###################
+# ID	NOME	  #
+# 3		Adriana   #
+# 2		Omar 	  #
+# 1		Fernanda  # 
+# 7 	John	  #
+###################
+
+- Também podemos dar RESTART nos valores:
+>>>SELECT nextval('person_id_seq':regclass); # Execute 4x
+>>>SELECT * FROM person_id_seq;
+>>>8
+>>>\d
+
+- Digamos que a tabela \d esteja com valor maior 9, precisamos resetar para que o proximo seja 10:
+>>>ALTER SEQUENCE person_id_seq RESTART WITH 9;
+>>>SELECT * FROM person_id_seq;
+>>>9
+
+https://www.postgresql.org/docs/current/external-extensions.html
+### EXTENSIONS ###
+- No site acima existem extensões que beneficiam diferentes 
+tipos de funcionalidades personalizadas
+
+- Podemos consultar no terminal psql. EX:
+>>>SELECT * FROM pg_available_extensions;
+
+- Instalando de forma segura:
+>>>CRETE EXTENSION IF NOT EXISTS "[nome_extensão]";
+
+https://en.wikipedia.org/wiki/Universally_unique_identifier
+### UNDERSTANDING UUID DATA TYPE ###
+- UUID são tipos de IDs que permitem um identificador único Globalmente, 
+com colísão praticamente impossível graças a uma matemática complexa. 
+
+- Vamos utilizar no postgres, primeiro consultar, ver o nome certo e instalar:
+>>>SELECT * FROM pg_available_extensions;
+"uuid-ossp"
+
+>>>CRETE EXTENSION IF NOT EXISTS "uuid-ossp";
+- Checar se está instalado na table
+>>>SELECT * FROM pg_available_extensions;
+
+- Gerando uma UUID. Vamos consultar quais funções temos disponíveis:
+>>>\id #vamos utilizar \df#
+>>>\df
+
+- Nesse exemplo vamos utiliar a v4, que é a random (ver na doc):
+>>>SELECT uuid_generate_v4(): # <-  Faça umas 3x #
+>>>[id random gerado].
+
+https://www.postgresql.org/docs/current/datatype.html
+### UUID AS PRIMARY KEYS ###
+- Vamos alterar os IDS da nossa table atual para UUID de acordo com o 
+datatype do link acima, abra o arquivo .sql e edite;
+- Lembrando que por conta de Foreign Key Constraints para Car, ele deve existir primeiro:
+
+creata table car(
+	car_uid UUID NOT NULL PRIMARY KEY,
+	...
+	...
+);
+
+
+create table person(
+	person_uid UUID NOT NULL PRIMARY KEY,
+	...
+	...
+	...
+	car_uid UUID REFERENCES car(car_uid),
+	UNIQUE(car_uid),
+	...
+);
+
+
+
+- Na parte de insert vamos nomear explicitamente, e em values 
+executar diretamente a função que usamos acima para gerar:
+
+insert into person (person_uid, ..., ...) values (uuid_generate_v4(), ..., ...);
+insert into person (person_uid, ..., ...) values (uuid_generate_v4(), ..., ...);
+insert into person (person_uid, ..., ...) values (uuid_generate_v4(), ..., ...);
+
+insert into car (car_uid, ..., ...) values (uuid_generate_v4(), ..., ...);
+insert into car (car_uid, ..., ...) values (uuid_generate_v4(), ..., ...);
+
+- Depois de salvar, vamos deletar a atual para incluir essa nova modificada no psql:
+>>>DROP TABLE person;
+>>>DROP TABLE car;
+>>>\i [path]/modificado.sql
+>>>\x # para mais detalhes. execute novamente para desligar #
+>>>SELECT * FROM person;
+>>>\d person;
+>>>SELECT * FROM car;
+>>>\d car;
+
+- Agora vamos testar o registro de carros a pessoas:
+>>>SELECT * FROM person;
+- Copie a UID inteira de alguma pessoa na row person_uid *CTRL+C*
+
+>>>SELECT * FROM car;
+- Copie a UID inteira da primeira row de car_uid *CTRL+C*
+
+>>>UPDATE person SET car_uid = '[CTRL+V_car]' WHERE person_uid = '[CTRL+V_person]';
+
+- Vamos registrar mais um:
+>>>UPDATE person SET car_uid = '[CTRL+V_x]' WHERE person_uid = '[CTRL+V_y]';
+
+>>>\x
+>>>SELECT * FROM person
+>>>JOIN car ON person.car_uid = car.car_uid;
+
+- Como a Primary Key e Foreign Key tem o mesmo nome, 
+podemos usar a keyword para ser mais dinâmico: 
+>>>JOIN car USING(car_uid);
+
+- Experimente:
+>>>LEFT JOIN car USING(car_uid);
+
+>>>LEFT JOIN car USING(car_uid)
+>>>WHERE car.* IS NULL;
+
+VER SOBRE ADVANCED POSTGRESQL:

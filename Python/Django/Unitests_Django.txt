@@ -1,0 +1,337 @@
+- Documentação:
+https://docs.python.org/3/library/unittest.html
+https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/
+
+- Templates e Referências
+https://github.com/codingforentrepreneurs/Django-Bootcamp-1
+
+- Vídeo Referência Django:
+https://www.youtube.com/watch?v=5E_xLmQXOZg
+
+- Vídeo Referência Python:
+https://www.youtube.com/watch?v=kboMzqsvBjg
+
+- Cheat Cheet:
+https://www.valentinog.com/blog/testing-django/
+
+"TEST DRIVEN DEVELOPMENT": Consiste em construir os testes ao mesmo tempo que as 
+funções e classes do projeto. Criar primeiro o tests.py e em seguida o models.py, etc.
+
+Arrange (fixture), Act(codigo), Assert(teste de comparação).
+
+self.assertEqual   (user_count, 1) # Comparação ==
+self.assertNotEqual(user_count, 0) # Comparação !=
+self.assertTrue    (user_exists  ) # Comparação True/False
+self.assertFalse
+
+Procurar separar testes mais específicos por classes. Em específico
+os que tenham x numeros de usuários para x números de testes.
+
+############ Testes unitários ############
+### Exemplo de testes para checar se a criação de usuários está funcionando ###
+- App/tests.py:
+from django.test import TestCase
+from django.conf import settings #test_login_url
+
+class UserTestCast(TestCase):
+
+	# Testando a criação de usuário no database sqlite3 descartável
+	def setUp(self) # Python Builtin do TestCase
+		user_a = User(username='cfe', email='cfe@invalid.com')#Mesma coisa que User.objects.create()	
+		user_a_pw = 'some_123_password' 
+		self.user_a_pw = user_a_pw      
+		user_a.is_staff = True
+		user_a.is_superuser = True 
+		user_a.set_password('user_a_pw')
+		user_a.save()
+		#print(user_a.id)
+		self.user_a = user_a
+		
+		
+	# Testando se o usuário pode ser criado
+	def test_user_exists(self):
+		user_count = User.objects.all().count()
+		#print(user_count)
+		self.assertEqual(user_count, 1) # ==
+		#Builtin do TestCase. Quase como assert user_count == 1, mas direto no teste.
+		self.assertNotEqual(user_count, 0) # !=
+	
+	
+	# Testando se a senha foi criada corretamente
+	def test_user_password(self):
+		# user_a = User.objects.get(username = "cfe")
+		self.assertTrue(self.user_a.check_password(self.user_a_pw)) 
+								 # .check_password("some_123_password")) 	
+	
+	
+	# Testando URL de Login
+	def test_login_url(self):
+		# login_url = "/login/"
+		# self.assertEqual(settings.LOGIN_URL, login_url)
+		login_url = settings.LOGIN_URL
+		response = self.client.post(url, {}, follow=True)
+		data = {"username": "nome", "password": self.user_a_pw}#"password": "some_123_password"}
+		response = self.client.post(login_url, data, follow=True)
+	    # print(dir(response)) # Todos os métodos disponíveis
+		# print(response.request)
+		status_code = response.status_code
+		redirect_path = response.request.get("PATH_INFO") # print(dir(response))
+		self.assertEqual(redirect_path, settings.LOGIN_REDIRECT_URL) # follow=True e Settings.py
+		self.assertEqual(status_code, 200) # 200 respostas de teste
+		
+		
+>>>(venv): python manage.py test 
+#ou mais específico
+>>>(venv): python manage.py test nomeApp
+
+# Quando executar, vai gerar um database sqlite3 descartável, testar, retornar o resultado e deletar.
+# Experimentar com resultados que esperar sair FAILED e OK.
+
+### Exemplo de testes para checar o tipo de usuário que está acessando certa página. 
+Nesse exemplo um usuário com permissão especial e um usuário regular  ###
+- Products/tests.py:
+from .models import Product 
+
+User = get_user_model()
+
+class ProductTestCase(TestCase):
+	
+	# Criando usuário. Definir abaixo o que precisar (staff ou superuser True ou False)
+	def setUp(self) # Python Builtin do TestCase
+		user_a = User(username='cfe', email='cfe@invalid.com')#Mesma coisa que User.objects.create()
+		#User.objects.create 
+		#User.objects.create_user()		
+		user_a_pw = 'some_123_password' 
+		self.user_a_pw = user_a_pw      
+		user_a.is_staff = True
+		user_a.is_superuser = False 
+		user_a.set_password('user_a_pw')
+		user_a.save()
+		self.user_a = user_a
+		user_b = User.objects.create_user('user_2', 'cfe3@invalid.com', 'some_123_password')
+		self.user_b = user_b
+		
+	# Contagem de usuários
+	def test_user_count(self):
+		user_count = User.objects.all().count()
+		self.assertEqual(user_count, 3) #Vai depender de quantos forem criados nesse teste. Exemplo vai ser 3. 
+
+
+	# Testando se o usuário é inválido para a request ques está acessando
+	def test_invalid_request(self):
+		self.client.login(username = self.user_b.username, password = 'some_123_password')
+		# Vai realizar login diretamente pelo teste
+		# print(self.client.post)
+		response = self.client.post("/products/create/", {"title": "This is a valid test"})
+		self.assertNotEqual(response.status_code, 200) # ou 201
+		
+	
+	# Testando se usuário é válido para a request ques está acessando. user_a é Staff User. user_b não é
+	def test_invalid_request(self):
+		self.client.login(username = self.user_b.username, password = 'some_123_password')
+		# Vai realizar login diretamente pelo teste
+		# print(self.client.post)
+		response = self.client.post("/products/create/", {"title": "This is a valid test"})
+		self.assertEqual(response.status_code, 200) # ou 201
+				#   ^
+
+>>>(venv): python manage.py test 
+#ou mais específico
+>>>(venv): python manage.py test nomeApp
+
+# Outra maneira de falhar um teste, no final do código:
+
+try:
+	[codigo]
+except Exceptio as e:
+	self.fail(e)
+
+### Exemplo que verifica a força das senhas: 
+https://docs.djangoproject.com/en/3.2/_modules/django/contrib/auth/password_validation/
+
+from django.contrib.auth.password_validation
+
+class TryDjangoConfigTest(TestCase):
+	
+	def test_password(self):
+		senha = os.environ.get('SECRET_KEY')
+		try:
+			is_strong = validate_password(senha, 'abc123')
+
+		except Exception as e:
+			msg = f'Senha muito fraca {e.messages}'
+			self.fail(e)
+
+https://docs.python.org/3/library/unittest.html
+https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/
+
+###### PyTest Framework: ######
+- Video Referência:
+https://www.youtube.com/watch?v=LYX6nlECcro&list=PLOLrQ9Pn6caw3ilqDR8_qezp76QuEOlHY&index=1
+- Documentação:
+https://pytest-django.readthedocs.io/
+
+- O nome das funções tem que começar com test_ e em seguida o nome normal sempre
+
+>>>(env)
+>>>django-admin startapp appnome
+>>>pip install pytest-django
+# Apontar ambos no settings.py em installed_apps
+
+Criar 'pytest.ini' na root do projeto contendo:
+
+[pytest]
+DJANGO_SETTINGS_MODULE = appnome.settings
+python_files = test_*.py
+# Essa última linha diz que todos os arquivos começando com test_ serão considerados. EX: test_ex1.py
+
+- Appnome/tests/test_ex1.py:
+import pytest
+
+def test_example():
+	assert 1 == 1
+
+def test_example1():
+	print("test1")
+	assert 1 == 2
+
+>>>pytest
+>>>pytest nomeapp # Mais específico
+>>>pytest nomeapp/test_ex1.py # ++
+>>>pytest nomeapp/test_ex1.py::test_example1 # +++
+>>>pytest -rP # Vai incluir os prints no output
+
+###### Outro exemplo ######
+https://www.youtube.com/watch?v=eG4oiOE95aM
+
+import pytest 
+from restaurante import Restaurante
+
+
+def test_pedidos_na_fila_valor_inicial_padrao_igual_a_zero():
+	restaurante = Restaurante("Pizzaria X")
+	assert restaurante.pedidos_na_fila == 0
+
+
+def test_pedidos_na_fila_valor_inicial_maior_que_zero():
+	restaurante = Restaurante("Pizzaria X", 1)
+	assert restaurante.pedidos_na_fila == 1
+
+
+def test_pedidos_na_fila_valor_inicial_menor_que_zero():
+	with pytest.raises(ValueError)
+	Restaurante("Pizzaria X", -1)
+
+
+def test_adiciona_um_pedido_na_fila():
+	restaurante = Restaurante("Pizzaria X", 1)
+	restaurante.adiciona_pedido()
+	assert restaurante.pedidos_na_fila == 2
+
+
+def test_remove_um_pedido_na_fila():
+	restaurante = Restaurante("Pizzaria X", 1)
+	restaurante.remove_pedido()
+	assert restaurante.pedidos_na_fila == 0
+	
+
+def test_remove_um_pedido_na_fila_vazia():
+	restaurante = Restaurante("Pizzaria X")
+	restaurante.remove_pedido()
+	assert restaurante.pedidos_na_fila == 0
+
+### Fixtures do codigo acima: ###
+
+@pytest.fixture
+def restaurante_fila_vazia():
+	return Restaurante("Pizzaria X")
+
+@pytest.fixture
+def restaurante_com_um_pedido():
+	return Restaurante("Pizzaria X", 1)
+	
+def test_pedidos_na_fila_valor_inicial_padrao_igual_a_zero(restaurante_fila_vazia):
+	assert restaurante.pedidos_na_fila == 0
+
+
+def test_pedidos_na_fila_valor_inicial_maior_que_zero(restaurante_com_um_pedido):
+	assert restaurante.pedidos_na_fila == 1
+
+
+def test_pedidos_na_fila_valor_inicial_menor_que_zero():
+	with pytest.raises(ValueError)
+	Restaurante("Pizzaria X", -1)
+
+
+def test_adiciona_um_pedido_na_fila(restaurante_com_um_pedido):
+	restaurante.adiciona_pedido()
+	assert restaurante.pedidos_na_fila == 2
+
+
+def test_remove_um_pedido_na_fila(restaurante_com_um_pedido):
+	restaurante.remove_pedido()
+	assert restaurante.pedidos_na_fila == 0
+	
+
+def test_remove_um_pedido_na_fila_vazia(restaurante_fila_vazia):
+	restaurante.remove_pedido()
+	assert restaurante.pedidos_na_fila == 0
+
+
+### PARAMETRIZE: Testando uma função várias vezes. ###
+							
+@pytest.mark.parametrize("inicial, final", [(0,0),(1,0),(2,1)])
+def test_remoção_de_pedidos(inicial, final)
+	restaurante = Restaurante("Pizzaria X", inicial)
+	restaurante.remove_pedido()
+	assert restaurante.pedidos_na_fila == final
+	
+# Chama o decorador Parametrize, passa os argumentos inicial e final, define um par de tuplas dentro 
+de uma lista com o valor inicial e final da primeira tupla. Depois a segunda e terceira tupla.
+
+- Ver mais na doc:
+https://pytest-django.readthedocs.io/
+
+### Exemplo simples pytest criando usuário no db ###
+
+import pytest 
+from django.contrib.auth.models import User 
+
+# @pytest.fixture(scope="session") para rodar a fixture em múltiplos testes
+@pytest.fixture()
+def user_1(db):
+	user = User.objects.create_user("test-user")
+	# print(create_user)
+	return user
+
+
+def test_set_check_password(user_1):
+	print('check-user1')
+	assert user_1.username == 'test-user'
+
+def test_set_check_password(user_1):
+	print('check-user2')
+	assert user_1.username == 'test-user'
+
+
+### Exemplo pytest yield  ###
+import pytest 
+
+@pytest.fixture()
+def yield_fixture():
+	print('Start Test Phase')
+	yield 6
+	print('End Test Phase')
+
+
+def test_example(yield_fixture):
+	assert yield_fixture == 6
+
+
+### Exemplo pytest create user ###
+
+https://stackoverflow.com/questions/61595777/pytest-django-users-created-with-create-user-are-always-authenticated
+
+
+
+https://youtu.be/qrvqNdCDKjM?list=PLOLrQ9Pn6caw3ilqDR8_qezp76QuEOlHY

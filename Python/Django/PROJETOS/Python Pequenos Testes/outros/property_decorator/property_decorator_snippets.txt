@@ -1,0 +1,96 @@
+### Solucionando problemas com @Property Getters e Setters ###
+
+class Employee:
+    def __init__(self, first, last):
+        self.first = first
+        self.last = last
+        self.email = first + '.' + last + '@email.com'
+
+    def fullname(self):
+        return '{} {}'.format(self.first, self.last)
+
+emp_1 = Employee('John', 'Smith')
+
+print(emp_1.first)
+print(emp_1.email)
+print(emp_1.fullname())
+
+>>>John, John.Smith@email.com, John Smith
+
+# O problema com esse código é que caso o Employee mude o primeiro nome, vai ficar assim:
+emp_1.first = 'Jim'
+>>> Jim, John.Smith@email.com, Jim Smith
+
+# Uma solução seria criar outra função email dentro da classe, mas isso
+# obrigaria tds que usam nosso codigo a instanciar como classe:
+
+class Employee:
+    ´[...]    
+    def email(self):
+        return '{}.{}@email.com'.format(self.first, self.last)
+    ´[...]
+
+emp_1 = Employee('John', 'Smith')
+emp_1.first = 'Jim'
+
+print(emp_1.first)
+print(emp_1.email()) #
+print(emp_1.fullname())
+
+# Para resolver isso usamos @Property para acessar como atributo
+
+class Employee:
+    [...]    
+    @property
+    def email(self):
+        return '{}.{}@email.com'.format(self.first, self.last)
+    
+    @property 
+    def fullname(self):
+        return '{} {}'.format(self.first, self.last)
+
+print(emp_1.first)
+print(emp_1.email) #
+print(emp_1.fullname) #
+
+
+# emp_1.fullname = 'Gabriel Marques'
+# >>> AttributeError
+# Agora o problema é caso o Employee queira alterar o nome por inteiro. Não vai funcionar.
+# Para resolver, vamos adicionar um setter em fullname:
+
+class Employee:
+    [...]    
+    
+    [...] 
+    
+    @property 
+    def fullname(self):
+        return '{} {}'.format(self.first, self.last)
+    
+    @fullname.setter
+    def fullname(self, name):
+        first, last = fullname.split(' ')
+        self.first = first 
+        self.last = last 
+
+emp_1.fullname = 'Gabriel Marques'
+print(emp_1.fullname)
+>>> Gabriel Marques
+
+# Agora pro caso de querermos adicionar um metodo Deleter:
+
+class Employee:
+    [...]        
+    [...]     
+    [...]     
+    [...] 
+
+    @fullname.deleter
+    def fullname(self):
+        self.first = None 
+        self.last = None
+        print('Nome Deletado!')
+
+del emp_1.fullname
+>>> Nome Deletado!

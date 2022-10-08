@@ -1,0 +1,31 @@
+https://docs.python.org/3/library/dataclasses.html
+
+from dataclasses import dataclass, field, KW_ONLY
+
+### Criando dataclass simples ###
+@dataclass
+class Perfil:
+    nome: str
+    idade: int
+    genero: str = "user-specified"
+    trabalho: list[str] = field(default_factory=list)
+
+
+perfil = Perfil("Gabriel", 28, "H", ["Estudante"])
+print(f"{perfil}")
+>>>Perfil(nome='Gabriel', idade=28, genero='H', trabalho=['Estudante'])
+
+### Isso acima é equivalente ao código abaixo. Faz o mesmo resultado: ###
+class Perfil:
+    def __init__(self, nome:str, idade:int, genero:str = "user-specified", trabalho: list[str] | None = None):]
+        self.nome = nome
+        self.idade = idade 
+        self.genero = genero 
+        self.trabalho = trabalho or []
+
+        def __repr__(self) -> str:
+            return f"{self.__class__.__name__}(
+                nome={self.nome!r}, idade={self.idade!r}, genero={self.genero!r}, trabalho={self.trabalho!r}
+                )"
+
+# Linha 11 evita que multiplas listas deêm append na primeira
