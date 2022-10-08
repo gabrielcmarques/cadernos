@@ -1,0 +1,41 @@
+- Documentações referência para consultas:
+- [adicione aqui os links para documentação oficial
+- de linguagens, frameworks, cheat sheets, videos, etc.]
+
+
+=============================
+=== PADRÕES MAIS UTILIZADOS: ===
+- Adicione aqui os comandos mais utilizados, padrões de 
+código mais utilizados, etc.
+>>>3 setas representam comando terminal
+
+=== Render em view engine: ===
+
+
+=================
+### ASSUNTO 1 ###
+- root/arquivo.html.css.js.etc:
+[codigo]
+
+// comentario breve
+
+=================
+### ASSUNTO 1 ###
+- root/arquivo.html.css.js.etc:
+[codigo]
+
+// comentario breve
+
+=================
+### ASSUNTO 2 ###
+- root/arquivo.html.css.js.etc:
+[codigo]
+
+// comentario breve
+
+=================
+### ASSUNTO 3 ###
+- root/arquivo.html.css.js.etc:
+[codigo]
+
+// comentario breve
