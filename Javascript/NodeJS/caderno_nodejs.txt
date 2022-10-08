@@ -1,0 +1,266 @@
+- Documentações referência para consultas:
+- Javascript:https://developer.mozilla.org/en-US/docs/Web/javascript
+- Nodejs: https://nodejs.org/en/docs/
+- Express: http://expressjs.com/en/4x/api.html
+- Vídeo Referência: https://youtu.be/SccSCuHhOw0
+
+
+=============================
+=== PADRÕES MAIS UTILIZADOS: ===
+- Abrindo o server de testes:
+>>>npm run devStart
+
+=== Render em view engine: ===
+<%= %>
+<%- %>
+<% %>
+
+...
+=============================
+
+>>>npm init -y
+>>>npm i express
+>>>npm i --save-dev nodemon
+----------------------------------
+- package.json:
+"scripts": {
+  "devStart": "nodemon server.js"
+},
+
+- Criar server.js com um console.log('Hello')
+>>>npm run devStart
+res.render('index')
+- root/server.js:
+
+const express = require('express') 
+const app = express()
+
+app.get('/', (req, res) => {
+  console.log('Here')
+  res.render('index')
+})
+
+app.listen(3000)
+----------------------------------
+- root/views.index.ejs:
+[Boilerplate básico, dentro de <body>:]
+<body>
+  <p>Hello</p>
+</body>
+
+---------------------------------------------------------
+- !! Só vai funcionar se configurarmos uma 'View Engine': 
+>>>npm i ejs
+
+- server.js:
+const express = require('express')
+const app = express() 
+
+app.set('view engine', 'ejs')
+
+-------------------------------------------------
+### RENDERIZANDO CONTEXTO DO SERVER PARA VIEW: ###
+- root/server.js:
+
+app.get('/', (req, res) => {
+  res.render('index', {text: 'Hello, World!'})
+})
+
+- root/views/index.ejs:
+<p> <%= {text} %> </p>
+
+-------------------------------------------
+### ENCAPSULANDO ROUTERS ###
+- Dentro do root/server.js podemos alterar ... :
+
+app.get('/users', (req, res) => { 
+  res.send('User List')
+})
+app.get('/users/new', (req, res) => { 
+  res.send('User New Form')
+})
+
+- ... Para um novo root/routes/users.js, recortar tudo acima, colar e alterar:
+
+const express = require('express')
+const router = express.Router() 
+
+router.get('/', (req, res) => { 
+  res.send('User List')
+})
+
+router.get('/new', (req, res) => { // Rota para cadastro de users. localhost/users/new
+  res.send('User New Form')
+})
+
+module.exports = router
+
+// Router Funciona igual app em server.js, mas para mini rotas encapsuladas
+// Nota especial que o 'users/' foi deletado, o padrão é setado pelo nome do arquivo
+
+- Retorne para o root/server.js, importe o novo mini router, pode ser no final:
+
+...
+const userRouter = require('./routes/users')
+app.use('/users', userRouter)
+app.listen(3000)
+
+// Teste todas as rotas após isso.
+
+
+-------------------------------------------
+### ADVANCED ROUTER ###
+- root/routes/users.js:
+
+...
+...
+router.post('/', (req, res) => {
+  res.send('Create User')
+})
+
+router.get('/:id', (req, res) => {
+  req.params.id 
+  res.send(`Get User With Id ${req.params.id}`)
+}) 
+
+router.put('/:id', (req, res) => {
+  req.params.id 
+  res.send(`Update User With Id ${req.params.id}`) 
+}) 
+
+router.delete('/:id', (req, res) => {
+  req.params.id 
+  res.send(`Delete User With Id ${req.params.id}`) 
+}) 
+
+// !! Cuidado, a ordem do codigo importa! Vai procurar pelo ID de cima para baixo !!
+- Como as rotas são super parecidas, podemos simplificar elas com router.route() em formato Chain:
+
+router.route("/:id").get((req, res) => {
+  res.send(`Get User With Id ${req.params.id}`) 
+}).put((req, res) => {
+  res.send(`Update User With Id ${req.params.id}`) 
+}).delete((req, res) => {
+  res.send(`Delete User With Id ${req.params.id}`) 
+})
+
+- Podemos quebrar linha para ser lido mais facilmente:
+router
+  .route("/:id")
+  .get((req, res) => {
+    res.send(`Get User With Id ${req.params.id}`) 
+  })
+  .put((req, res) => {
+    res.send(`Update User With Id ${req.params.id}`) 
+  })
+  .delete((req, res) => {
+    res.send(`Delete User With Id ${req.params.id}`) 
+  })
+
+// Isso vai funcionar exatamente da mesma forma que nas linhas 117~134 acima.
+
+
+
+### router.param ###
+- param permite procurar e reutilizar nomes, ids, etc em todo o resto do codigo.
+- root/routes/users.js
+
+...
+...
+const users = [{ name: "Gabriel"}, { name: "Gabriel2"}]
+router.param("id", (req, res, next, id) => {
+  req.user = users[id] 
+  // console.log(user)
+  next() 
+})
+
+-------------------------------------------
+### MIDDLEWARE ### https://youtu.be/lY6icfhap2o
+- Resumo sem o video acima, vamos criar um middleware para realizar Logging de algo:
+- root/server.js:
+
+...
+app.use(logger)
+...
+...
+function logger(req, res, next){
+  console.log(req.originalUrl)
+  next()
+}
+
+// !! Novamente cuidado com a ordem do codigo. Deixar isso bem acima das routes. !!
+
+app.get('/', logger, (req, res) => {
+  [...]
+}
+---------------------------------
+### Renderizando Static Files ###
+- root/server.js:
+...
+app.use(express.static("public"))
+
+- Criar root/public/[nome].html com boilerplate pronto, dentro de <body></body>:
+<p>Ola mundo static</p>
+
+------------------------------
+### PARSING FORM JSON DATA ###
+- root/routes/users.js, modificar:
+
+router.get('/new', (req, res) => { 
+  res.render("users/new", { firstName: "Test"}} 
+})
+
+- Criar root/views/users/new.ejs com boilerplate HTML, dentro de <body></body>:
+<form action="/users" method="POST">
+  <label>First name
+    <input type="text" name="firstName" value="<%= locals.firstName %> /">
+  </label>
+  <button type="submit">Submit</button>
+</form>
+
+// Esse action vai disparar a /users como POST, ou seja, o router.post("/") dentro de users.js.
+// E vai imprimir o valor que for submetido
+
+- Para acessar o body desse form submetido acima:
+req.body.firstName
+
+!! CASO ERROR "Cannot read property "firstName" of undefined", configuramos a middleware !!
+
+- root/server.js:
+...
+app.use(express.urlencoded({ extended: true}))
+...
+// Apenas isso vai resolver, provavelmente.
+
+------------------------------------------
+### VALIDANDO FORM E ADICIONANDO NO DB ###
+- root/routes/users.js:
+
+router.post('/', (req, res) => {
+  const isValid = true 
+  if (isValid) {
+    users.push({ firstName: req.body.firstName }) 
+    res.redirect(`/users/${users.length - 1}`) 
+  } else {
+    console.log("Error")
+    res.render('users/new', { firstName: req.body.firstName })
+  }
+})
+// Nesse caso o teste de form vai ser em localhost/users/new
+
+- Mesma coisa acima, com JSON. root/server.js:
+...
+app.use(express.json())
+...
+// O resto eh exatamente igual ao urlencoded que fizemos acima.
+
+----------------------------
+### PARSING QUERY PARAMS ###
+Exemplo: localhost/users/?name=Gabriel
+
+- root/routes/users.js, para extrair a ?name acima:
+router.get('/', (req, res) => { 
+  ...
+  req.query.name
+  ...
+})
