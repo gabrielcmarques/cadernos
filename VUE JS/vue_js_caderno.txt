@@ -1,0 +1,231 @@
+- Video reference: https://youtu.be/bzlFvd0b65c
+- Github Reference: https://github.com/Code-Pop/Intro-to-Vue-3
+- CodePen: https://codepen.io/VueMastery/projects/public?cursor=ZD0xJm89MCZwPTEmdj01MTcwODI%3D
+- Doc https://vuejs.org/guide/introduction.html
+
+#############
+- Introdução:
+>>>git clone https://github.com/gabrielcmarques/Intro-to-Vue-3.git
+
+- root/intro/index.html:
+<!-- Import Styles -->
+<link rel="stylesheet" href="./assets/styles.css" />
+<!-- Import Vue.js -->
+<script src="https://unpkg.com/vue@3.0.0-beta.12/dist/vue.global.js"></script>
+
+- root/intro/main.js:
+const app = Vue.createApp({ //Criamos um app simples
+  data: function() { //Função simples para retornar algo
+    return {
+      product: 'Socks'
+    }
+  }
+})
+
+- root/intro/index.html:
+
+  <body>
+    <div id="app">
+      <h1>{{ product }}</h1> 
+    </div>
+
+    <!-- Import App -->
+    <script src="./main.js"></script>
+
+    <!-- Mount App -->
+    <script>
+      const mountedApp = app.mount('#app') 
+    </script>
+  </body>
+
+### Pattern: ###
+// const app em main.js -> script const mountedApp em index.html -> div id="app" <h1>{{ product }}</h1> /div
+
+### Exemplo Alterando Dinamicamente ###
+mountedApp.product = 'Shoes'
+mountedApp.product = 'Sandals'
+
+### Outros exemplos ###
+<h1>{{ product }}</h1>
+<p>{{ firstName + ' ' + lastName }}</p>
+<span>{{ clicked ? true : false }}</span>
+<div>{{ message.method() }}</div>
+
+############################
+- Attribute Binding: Imagens 
+
+>>>cd Intro-to-Vue-3
+>>>git checkout L3-start
+
+- root/intro/main.js:
+const app = Vue.createApp({
+    data() {
+        return {
+            product: 'Socks',
+            image: './assets/images/socks_green.jpg'
+        }
+    }
+})
+
+- root/intro/index.html:
+<div class="product-image">
+  <img v-bind:src="image">
+</div>
+
+### Pattern ###
+- main.js const app: image: '...' -> index.html img v-bind:src="image"
+// Ele vai estimar {{ image }} e vbind da mesma forma. Para ainda mais simplicidade, 
+// podemos utilizar apenas <img :src="image"> que ele vai estimar também.
+
+### Outros exemplos ###
+- Podemos também usar isso em descrições, urls, valores dinâmicos, desabilitando botões...
+<img :src="image">
+<img :alt="description">
+<a :href="url">
+<div :class="isActive">
+<span :style="isActive">
+<span :disabled="isDisabled">
+
+########################
+- Conditional Rendering:
+
+>>>git checkout L4-start
+
+- root/intro/main.js:
+const app = Vue.createApp({
+    data() {
+        return {
+            product: 'Socks',
+            image: './assets/images/socks_blue.jpg',
+            inStock: true
+        }
+    }
+})
+
+- root/intro/index.html:
+  <h1>{{ product }}</h1>
+  <p v-if="inStock">In Stock</p>
+  <p v-else>Out of Stock</p>
+
+// Queremos que apenas um dos paragrafos acima apareçam de acordo com
+// a condição de estoque.Caso sim, primeiro paragrafo. Senão, segundo.
+// Mude para false o valor e veja no browser. Caso tenha apenas um elemento, 
+// não é obrigatório utilizar um v-else.
+
+### Mais exemplos ###
+// Condicional simples
+  <p v-if="inStock">In Stock</p>
+  <p v-else>Out of Stock</p>
+  
+// Mais interessante caso tenhamos algo na tela ficando ON e OFF frequentemente.
+// no DOM ele adiciona style="display:none; " para a tag p abaixo.
+  <p v-show="inStock">In Stock</p> 
+
+### Chain Conditional Logic: ###
+
+- root/intro/main.js:
+return {
+  product: 'Socks',
+  image: './assets/images/socks_blue.jpg',
+  inventory: 100
+}
+
+- root/intro/index.html:
+<div class="product-info">
+  <p v-if="inventory > 10">In Stock</p>
+  <p v-else-if="inventory <= 10 && inventory > 0>">Almost sold out</p>
+  <p v-else>Out of Stock</p>
+</div>
+// Experimente mudar valores. 100, 8, 0...
+
+#################
+- List Renreding:
+
+>>>git checkout L5-start 
+- Agora temos uma lista com details em main.js, vamos renderizar:
+"details: ['50% cotton', '30% wool', '20% polyester']"
+
+- root/intro/index.html:
+  <h1>{{ product }}</h1>
+  <p v-if="inStock">In Stock</p>
+  <p v-else>Out of Stock</p>
+  <ul>
+    <li v-for="detail in details"> {{ detail }}</li>
+  </ul>
+// Pra cada valor dentro de details, imprima: {{ detail }}
+
+### Mais exemplos: ###
+- Array em main.js:
+details: ['50% cotton', '30% wool', '20% polyester'],
+variants: [
+  { id: 2234, color: 'green' },
+  { id: 2235, color: 'blue' },
+]
+
+- index.html:
+<ul>
+  <li>
+</ul>
+<div v-for="variant in variants">{{ variant.color }}</div>
+// Vai imprimir ambos green e blue. Muito cuidado com informações sensíveis.
+
+### Setting the Key Attribute ###
+
+<div v-for="variant in variants" :key="variant.id">{{ variant.color }}</div>
+// Vai dar uma key única para cada elemento DOM. 
+
+#################
+- Event Handling:
+>>>git checkout L6-start 
+
+- Nesse exemplo temos um botao 'Add to Cart' e acima 
+outro 'Cart'. Vamos trabalhar neles com Click Events: 
+
+- index.html:
+<div class="cart">Cart({{ cart }})</div>
+...
+...
+<button class="button" v-on:click="cart += 1">Add to Cart</button>
+
+- Agora vai adicionar em tempo real o cart. Podemos também utilizar funções:
+
+- index.html:
+<button class="button" v-on:click="addToCart">Add to Cart</button>
+
+- main.js:
+const app = Vue.createApp({
+    data() {
+        return {
+            cart:0,
+            ...
+            ]
+        }
+    },
+    methods: {
+      addToCart() {
+        this.cart += 1 //Se refere ao cart:0 acima e aplica dentro de v-on:click="addToCart"
+      }
+    }
+})
+
+// v-on:click="..." pode ser simplificado para apenas @click="..." como atalho.
+
+### Implementando mudança de cor de Imagem com event listener: ###
+- index.html:
+<div v-for="variant in variants" :key="variant.id" @mouseover="updateImage(variant.image">{{ variant.color }}</div>
+
+- main.js:
+...
+...
+    methods: {
+      addToCart() {
+        this.cart += 1
+      },
+      updateImage(variantImage) {
+        this.image = variantImage 
+      }
+    }
+})
+
+25:44 ...
+https://youtu.be/bzlFvd0b65c?t=1544

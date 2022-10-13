@@ -1,0 +1,14 @@
+12 Web Development Project Ideas 💡👨‍💻👩‍💻
+
+1.Calculator 🧮
+2.Tic Tac Toe ❌
+3.Todo List ✅
+4.Music Player 🎵
+5.Countdown Timer ⌛
+6.Notes App 🗒️
+7.Image Slider 🖼️
+8.Quiz App ❓
+9.Testimonial Board 🗣️
+10.Password Generator 🔑
+11.Portfolio 💼
+12.Landing page 💻
