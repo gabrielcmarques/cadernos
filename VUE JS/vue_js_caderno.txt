@@ -227,5 +227,246 @@ const app = Vue.createApp({
     }
 })
 
-25:44 ...
-https://youtu.be/bzlFvd0b65c?t=1544
+# Comparar os checkouts x-start com x-end #
+
+32:20 >>
+
+### Computed Properties ###
+>>>git checkout L7-start
+
+- Temos uma nova informacao no main.js "brand", vamos aplicar uma 
+propriedade 'computed' para juntar a informacao 'brand' com 'property':
+
+- main.js:
+const app = Vue.createApp({
+    data() {
+        return {
+            ...
+            ]
+        }
+    },
+    methods: {        
+        ...
+        }
+    },
+    computed: {
+        title() {
+            return this.brand + ' ' + this.product
+        }
+    }
+})
+
+- index.html:
+<div id="product-info">
+    <h1>{{ title }}</h1>
+</div>
+
+// Vai retornar automaticamente sem brand + product sem precisar fazer 
+// algo tipo title.product + ' ' + title.brand nesse h1 acima.
+// É recomendado fazer dessa forma por conta de performance!
+
+### Condicional de estoque ### 
+>>>git checkout L8-start
+- Nesse exemplo temos 2 cores com mousehover, caso mouse hover, muda as cores do produto. 
+Queremos também mudar se está ou não em estoque quando muda de cor, dinamicamente: 
+
+# Sequencia: #
+1) index.html: @mouseover="updateImage(variant.image)" 
+2) main.js: image: './assets/images/socks_blue.jpg',
+3) variants: [
+    { id: 2234, color: 'green', image: './assets/images/socks_green.jpg', quantity: 50 },
+    { id: 2235, color: 'blue', image: './assets/images/socks_blue.jpg', quantity: 0 },
+]
+
+- index.html:
+<div 
+    ...
+    class="color-circle" 
+    v-for="(variant, index) in variants" 
+    :key="variant.id" 
+    @mouseover="updateVariant(index)" 
+    ...
+</div>
+
+main.js:
+const app = Vue.createApp({
+    data() {
+        return {
+            ...
+            selectedVariant: 0,
+            ...
+            variants: [
+              { id: 2234, color: 'green', image: './assets/images/socks_green.jpg', quantity: 50 },
+              { id: 2235, color: 'blue', image: './assets/images/socks_blue.jpg', quantity: 0 },
+            ]
+        }
+    },
+    methods: {
+        addToCart() {
+            this.cart += 1
+        },
+        updateVariant(index) {
+            this.selectedVariant = index 
+        }
+    },
+    computed: {
+    title() {
+        return this.brand + ' ' + this.product
+    },
+    image() {
+        return this.variants[this.selectedVariant].image //this.variants = os 2 elementos acima nesse caso
+    },
+    inStock() {
+        return this.variants[this.selectedVariant].quantity
+    },
+}
+...
+
+### Components and Props ###
+- Encapsulando componentes em uma pasta separada:
+>>>git checkout L9-start 
+ate 
+>>>git checkout L9-end 
+
+- Criar pasta root/components/ProductDisplay.js, copiar componente especifico do html e do js, encapsular nesse arquivo novo.
+
+### Communicating Events ###
+- O desafio vai ser utilizar o botão em html se comunicar com main.js:
+>>>git checkout L10-start
+
+- em components/ProductDisplay.js:
+...
+  methods: {
+      addToCart() {
+          this.$emit('add-to-cart', this.variants[this.selectedVariant].id)
+      },
+...
+
+- em index.html:
+...
+    <product-display 
+    :premium="premium" 
+    @add-to-cart="updateCart"
+    @remove-from-cart="removeById"> <!-- solution -->
+    </product-display>
+...
+
+// Esse botao html product-display @add-to-cart vai ser ouvido por addToCart() no ProductDisplay.js,
+// que vai disparar uma função updateCart(), que vive em main.js.
+
+### Forms with Vue ###
+- Formularios em VueJS
+>>>git checkout L11-start
+
+- criar root/components os arquivos ReviewForm.js e ReviewList.js, como no checkout.
+Os 3 inputs especificos estão vínculados com a função data() abaixo:
+
+<form class="review-form" @submit.prevent="onSubmit"> <--- @.prevent previne que o browser atualize.
+    ...
+    <input id="name" v-model="name"> <--- data() name
+    ...
+    <textarea id="review" v-model="review"></textarea> <--- data() review
+    ...
+    <select id="rating" v-model.number="rating"> <--- data() rating
+        <option>5</option>
+        <option>4</option>
+        <option>3</option>
+        <option>2</option>
+        <option>1</option>
+    </select>
+</form>`,
+...
+data() {
+    return {
+      name: '',
+      review: '',
+      rating: null,
+      // solution
+      recommend: null
+      // solution
+    }
+  },
+  methods: {
+    onSubmit() {
+    ...
+    ...
+      let productReview = {
+        name: this.name,
+        review: this.review,
+        rating: this.rating,
+        recommend: this.recommend // solution
+        ...
+        ...
+
+- importar em index.html: 
+<!-- Import Components -->
+<script src="./components/ProductDisplay.js"></script>
+<script src="./components/ReviewForm.js"></script>
+
+
+- usar em ProductDisplay.js:
+...
+<review-form></review-form>
+...
+
+- Agora vamos ter o form simples. Se tudo estiver ok, vamos continuar adicionando os eventos:
+
+...
+<review-form @review-submited="addReview"></review-form>
+...
+
+data() {
+return {
+    ...
+    ...
+    ],
+    reviews: [] <---
+...
+  methods: {
+      addToCart() {
+         ...,
+      addReview(review) { <--
+        this.reviews.push(review) <--
+      }
+  },
+
+- Displaying reviews:
+- root/components/ReviewList.js:
+
+app.component('review-list', {
+  props: {
+    reviews: {
+      type: Array,
+      required: true
+    }
+  },
+  template:
+  /*html*/
+  `
+  <div class="review-container">
+  <h3>Reviews:</h3>
+    <ul>
+      <li v-for="(review, index) in reviews" :key="index">
+        {{ review.name }} gave this {{ review.rating }} stars
+        <br/>
+        "{{ review.review }}"
+        <br/>
+        <!-- solution -->
+        Recommended: {{ review.recommend }}
+        <!-- solution -->
+      </li>
+    </ul>
+  </div>
+`
+})
+
+- importar em index.html:
+<script src="./components/ReviewList.js"></script>
+
+- adicionar em ProductDisplay.js:
+...
+    <review-list v-if="reviews.length" :reviews="reviews"></review-list>
+    <review-form @review-submitted="addReview"></review-form>
+...
+
+https://youtu.be/bzlFvd0b65c?t=3267
