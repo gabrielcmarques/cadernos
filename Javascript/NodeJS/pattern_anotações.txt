@@ -1,12 +1,8 @@
-- Documentações referência para consultas:
-- [adicione aqui os links para documentação oficial
-- de linguagens, frameworks, cheat sheets, videos, etc.]
+
 
 =============================
 === PADRÕES MAIS UTILIZADOS: ===
-- Adicione aqui os comandos mais utilizados, padrões de 
-código mais utilizados, etc.
->>>3 setas representam comando terminal
+
 
 =================
 ### ASSUNTO 1 ###

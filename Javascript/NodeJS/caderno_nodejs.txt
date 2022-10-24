@@ -5,6 +5,7 @@
 - Vídeo Referência: https://youtu.be/SccSCuHhOw0
 
 
+
 =============================
 === PADRÕES MAIS UTILIZADOS: ===
 - Abrindo o server de testes:
@@ -17,11 +18,13 @@
 
 ...
 =============================
-
+- Dando trigger inicialization package JSON File.
 >>>npm init -y
+- Instalando express
 >>>npm i express
+- Istalando nodemon em modo dev
 >>>npm i --save-dev nodemon
-----------------------------------
+-------------------------------
 - package.json:
 "scripts": {
   "devStart": "nodemon server.js"
@@ -264,3 +267,6 @@ router.get('/', (req, res) => {
   req.query.name
   ...
 })
+
+###################
+### Web Scraper ###

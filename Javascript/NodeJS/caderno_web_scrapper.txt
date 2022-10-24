@@ -1,0 +1,47 @@
+- Documentações referência para consultas:
+- Javascript:https://developer.mozilla.org/en-US/docs/Web/javascript
+- Nodejs: https://nodejs.org/en/docs/
+- Express: http://expressjs.com/en/4x/api.html
+- Node Web Scraper: https://youtu.be/-3lqUHeZs_0 
+- Axios https://www.npmjs.com/package/axios
+- Cheerio https://www.npmjs.com/package/cheerio
+- Referencia Gihub https://github.com/kubowania/nodejs-webscraper
+
+=============================
+=== PADRÕES MAIS UTILIZADOS: ===
+- Abrindo o server de testes:
+>>>npm run devStart
+
+=============================
+- Dando trigger inicialization package JSON File.
+>>>npm init -y
+>>>npm i express
+>>>npm i --save-dev nodemon
+>>>npm i axios 
+>>>npm i cheerio
+-------------------------------
+- package-lock.json:
+"scripts": {
+    "start": "nodemon index.js"
+},
+-------------------------------
+- Criar root/index.js:
+const PORT = 8000
+const axios = require('axios')
+const cheerio = require('cheerio')
+const express = require('express')
+const app = express()
+
+app.listen(PORT, () => console.log(`server running on PORT ${PORT}`))
+
+>>>npm run start 
+// Checar no terminal se está ok. Se sim:
+
+app.get('/', function (req, res) {
+    res.json('This is my webscraper')
+})
+
+-------------------------------
+- atualizar root/index.js com axios:
+
+https://github.com/kubowania/nodejs-webscraper
